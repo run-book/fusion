@@ -58,19 +58,19 @@ async function recursivelyFindFileNames(context, root, trail, file, debug) {
     let newFile = path_1.default.join(root, file);
     const newPathForFile = path_1.default.dirname(newFile);
     if (!await fileOps.isFile(newFile))
-        return [{ trail, file, exists: false, errors: [] }];
+        return [{ trail, file, exists: false, errors: [], yaml: undefined }];
     const content = await fileOps.loadFileOrUrl(newFile);
     const derefed = (0, variables_1.derefence)(newFile, dic, content, { variableDefn: variables_1.dollarsBracesVarDefn, allowUndefined: true });
     const yamlContent = yaml.parser(derefed);
     if ((0, utils_1.hasErrors)(yamlContent))
-        return [{ trail, file, exists: true, errors: (0, utils_1.toArray)(yamlContent) }];
+        return [{ trail, file, exists: true, errors: (0, utils_1.toArray)(yamlContent), yaml: undefined }];
     const hierarchy = yamlContent?.hierarchy;
     let parameters = yamlContent?.parameters;
     const errors = [...validateHierarchy(hierarchy), ...validateParameters(dic, parameters)];
     if (errors.length > 0)
-        return [{ trail, file, exists: true, errors }];
+        return [{ trail, file, exists: true, errors, yaml: yamlContent }];
     const fromHierarchy = await (0, utils_1.flatMapK)(Object.values(toObject(hierarchy)), f => recursivelyFindFileNames(context, newPathForFile, [...trail, file], f, debug));
-    return [{ trail, file, exists: true, errors }, ...fromHierarchy];
+    return [{ trail, file, exists: true, errors, yaml: yamlContent }, ...fromHierarchy];
 }
 exports.recursivelyFindFileNames = recursivelyFindFileNames;
 // export async function recursivelyLoad ( context: LoadContext, root: string, trail: string[], file: string ): Promise<FileAndYaml[]> {

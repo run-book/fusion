@@ -1,7 +1,24 @@
-hierarchy:
-  "a": 1
+version: 1
 
-
+parameters:
+  product:
+    legal:
+      - instantLoan
+      - mortgage
+      - creditCard
+      - carLoan
+      - serviceLegal
+  geo:
+    legal:
+      - uk
+      - sw
+      - ca
+      - us
+  channel:
+    legal:
+      - customerPortal
+      - merchantPortal
+      - selfServicePortal
 
 services:
   experian_aml:

@@ -1,4 +1,4 @@
-import { flatMap, flatMapK, hasErrors, mapK, NameAnd, toArray } from "@laoban/utils";
+import { flatMap, flatMapK, hasErrors, NameAnd, toArray } from "@laoban/utils";
 import path from "path";
 import { FileOps } from "@laoban/fileops";
 import { derefence, dollarsBracesVarDefn } from "@laoban/variables";
@@ -43,11 +43,12 @@ type LoadContext = {
   dic: any
 }
 
-type FileDetails = {
+export type FileDetails = {
   trail: string[]
   file: string
   exists: boolean
   errors: string[]
+  yaml: any | undefined
 }
 export function validateHierarchy ( hierarchy: NameAnd<string> ): string[] {
   if ( hierarchy === undefined ) return []
@@ -79,18 +80,18 @@ export async function recursivelyFindFileNames ( context: LoadContext, root: str
   if ( trail.includes ( file ) ) throw new Error ( `Circular reference detected: ${trail.join ( ' -> ' )} -> ${file}` )
   let newFile = path.join ( root, file );
   const newPathForFile = path.dirname ( newFile )
-  if ( !await fileOps.isFile ( newFile ) ) return [ { trail, file, exists: false, errors: [] } ]
+  if ( !await fileOps.isFile ( newFile ) ) return [ { trail, file, exists: false, errors: [], yaml: undefined } ]
   const content = await fileOps.loadFileOrUrl ( newFile )
   const derefed = derefence ( newFile, dic, content, { variableDefn: dollarsBracesVarDefn, allowUndefined: true } )
   const yamlContent = yaml.parser ( derefed )
-  if ( hasErrors ( yamlContent ) ) return [ { trail, file, exists: true, errors: toArray ( yamlContent ) } ]
+  if ( hasErrors ( yamlContent ) ) return [ { trail, file, exists: true, errors: toArray ( yamlContent ), yaml: undefined } ]
   const hierarchy = yamlContent?.hierarchy
   let parameters = yamlContent?.parameters;
   const errors = [ ...validateHierarchy ( hierarchy ), ...validateParameters ( dic, parameters ) ]
-  if ( errors.length > 0 ) return [ { trail, file, exists: true, errors } ]
+  if ( errors.length > 0 ) return [ { trail, file, exists: true, errors, yaml: yamlContent } ]
   const fromHierarchy = await flatMapK ( Object.values ( toObject<string> ( hierarchy ) ),
     f => recursivelyFindFileNames ( context, newPathForFile, [ ...trail, file ], f, debug ) )
-  return [ { trail, file, exists: true, errors }, ...fromHierarchy ]
+  return [ { trail, file, exists: true, errors, yaml: yamlContent }, ...fromHierarchy ]
 }
 
 // export async function recursivelyLoad ( context: LoadContext, root: string, trail: string[], file: string ): Promise<FileAndYaml[]> {

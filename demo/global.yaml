@@ -14,8 +14,6 @@ parameters:
       - ca
   channel:
     legal:
-      - a
-        b
       - customerPortal
       - merchantPortal
       - selfServicePortal

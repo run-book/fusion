@@ -17,11 +17,12 @@ type LoadContext = {
     yaml: YamlCapability;
     dic: any;
 };
-type FileDetails = {
+export type FileDetails = {
     trail: string[];
     file: string;
     exists: boolean;
     errors: string[];
+    yaml: any | undefined;
 };
 export declare function validateHierarchy(hierarchy: NameAnd<string>): string[];
 export declare function validateParameters(dic: any, properties: NameAnd<Parameter>): string[];
