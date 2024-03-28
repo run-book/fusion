@@ -1,8 +1,8 @@
-import { CliContext, CommandDetails, ContextConfigAndCommander, HasCurrentDirectory, SubCommandDetails } from "@itsmworkbench/cli";
+import { CommandDetails, ContextConfigAndCommander, SubCommandDetails } from "@itsmworkbench/cli";
 import path from "path";
-import { flatMap, NameAnd } from "@laoban/utils";
+import { findPart, firstSegment, NameAnd } from "@laoban/utils";
 import { recursivelyFindFileNames } from "./transform";
-import { HasYaml, ThereAndBackContext } from "./context";
+import { ThereAndBackContext } from "./context";
 import { Merged, mergeObjectInto } from "./merge";
 import { convertToYaml, defaultCommentFunction } from "./convert.to.yaml";
 
@@ -70,6 +70,14 @@ export function listFilesCommand<Commander, Config, CleanConfig> ( tc: ContextCo
   }
 
 }
+async function mergeForCli<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig>, params: {}, parent: string, file: string, opts: NameAnd<string | boolean> ) {
+  const fileDetails = await recursivelyFindFileNames ( { fileOps: tc.context.fileOps, yaml: tc.context.yaml, dic: params }, parent, [], file, opts.debug === true )
+  const errors = fileDetails.filter ( f => f.errors.length > 0 )
+  const merged: Merged = fileDetails.reduce ( ( acc, fd ) => mergeObjectInto ( acc, fd ), { value: undefined, files: [] } )
+  const { version, parameters, hierarchy, ...rest } = merged.value as any
+  let sorted = { value: { version, parameters, hierarchy, ...rest }, files: merged.files };
+  return { fileDetails, errors, merged, sorted };
+}
 export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): CommandDetails<Commander> {
   return {
     cmd: 'merge',
@@ -82,19 +90,15 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
     },
     action: async ( _, opts ) => {
       const { params, file, parent } = fromOpts ( opts );
-      const fileDetails = await recursivelyFindFileNames ( { fileOps: tc.context.fileOps, yaml: tc.context.yaml, dic: params }, parent, [], file, opts.debug === true )
-      const errors = fileDetails.filter ( f => f.errors.length > 0 )
+      let { fileDetails, errors, merged, sorted } = await mergeForCli ( tc, params, parent, file, opts );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
         process.exit ( 1 )
       }
-      const merged: Merged = fileDetails.reduce ( ( acc, fd ) => mergeObjectInto ( acc, fd ), { value: undefined, files: [] } )
       if ( opts.full === true )
         console.log ( JSON.stringify ( merged.value, null, 2 ) )
       else {
-        const { version, parameters, hierarchy, ...rest } = merged.value as any
-        const sorted = { version, parameters, hierarchy, ...rest }
         console.log ( `# ${JSON.stringify ( params )}` )
         console.log ( "#" )
         console.log ( "# Files" )
@@ -103,7 +107,47 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
         console.log ( "# Files not found" )
         fileDetails.filter ( f => !f.exists ).forEach ( ( { yaml, ...rest } ) => console.log ( `# ${JSON.stringify ( rest )}` ) )
         console.log ( "#" )
-        console.log ( convertToYaml ( { value: sorted, files: merged.files }, defaultCommentFunction ) )
+        console.log ( convertToYaml ( sorted, defaultCommentFunction ) )
+      }
+    }
+  }
+}
+export function findPartInFull ( dic: Merged, ref: string ): any {
+  if ( ref === undefined ) return undefined
+  if ( ref === '' ) return dic
+  const parts = ref.split ( '.' )
+  try {
+    return parts.reduce ( ( acc, part ) => acc?.value?.[ firstSegment ( part, ':' ) ], dic )
+  } catch ( e ) {return undefined}
+}
+
+
+export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): CommandDetails<Commander> {
+  return {
+    cmd: 'property <property>',
+    description: 'Produces the composite merged file',
+    options: {
+      '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
+      '-p, --params <params>': { description: 'The parameters to use. Comma seperated attribute=value' },
+      '--debug': { description: 'Show debug information' },
+      '--full': { description: 'Show more data about the files' }
+    },
+    action: async ( _, opts, property ) => {
+      const { params, file, parent } = fromOpts ( opts );
+      let { fileDetails, errors, merged, sorted } = await mergeForCli ( tc, params, parent, file, opts );
+      if ( errors.length > 0 ) {
+        console.log ( 'Errors:' )
+        fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
+        process.exit ( 1 )
+      }
+      if ( opts.full === true )
+        console.log ( JSON.stringify ( findPartInFull ( sorted, property ), null, 2 ) )
+      else {
+        const simplified = tc.context.yaml.parser ( convertToYaml ( sorted, defaultCommentFunction ) )
+        let result = findPart ( simplified, property );
+        if ( typeof result === 'object' ) console.log ( JSON.stringify ( result, null, 2 ) )
+        else
+          console.log ( result )
       }
     }
   }
@@ -117,7 +161,8 @@ export function configCommands<Commander, Config, CleanConfig> ( tc: ContextConf
     commands: [
       viewConfigCommand<Commander, Config, CleanConfig> ( tc ),
       listFilesCommand<Commander, Config, CleanConfig> ( tc ),
-      mergeFilesCommand<Commander, Config, CleanConfig> ( tc )
+      mergeFilesCommand<Commander, Config, CleanConfig> ( tc ),
+      addPropertyCommand<Commander, Config, CleanConfig> ( tc )
     ]
   }
 }

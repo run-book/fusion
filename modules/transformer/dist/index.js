@@ -21,7 +21,6 @@ exports.findVersion = findVersion;
 const context = (0, context_1.thereAndBackContext)('intellimaintain', findVersion(), (0, filesops_node_1.fileOpsNode)(), (0, jsyaml_1.jsYaml)());
 const cliTc = (0, commander12_1.commander12Tc)();
 const configFinder = (0, cli_1.fixedConfig)(context);
-const yaml = (0, jsyaml_1.jsYaml)();
 (0, cli_1.makeCli)(context, configFinder, cliTc).then(async (commander) => {
     if ((0, utils_1.hasErrors)(commander)) {
         (0, utils_1.reportErrors)(commander);
