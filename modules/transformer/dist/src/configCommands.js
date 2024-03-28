@@ -138,7 +138,8 @@ function addPropertyCommand(tc) {
             '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
             '-p, --params <params>': { description: 'The parameters to use. Comma seperated attribute=value' },
             '--debug': { description: 'Show debug information' },
-            '--full': { description: 'Show more data about the files' }
+            '--full': { description: 'Show more data about the files' },
+            '--keys': { description: 'If an object shows the keys' },
         },
         action: async (_, opts, property) => {
             const { params, file, parent } = fromOpts(opts);
@@ -152,11 +153,19 @@ function addPropertyCommand(tc) {
                 console.log(JSON.stringify(findPartInFull(sorted, property), null, 2));
             else {
                 const simplified = tc.context.yaml.parser((0, convert_to_yaml_1.convertToYaml)(sorted, convert_to_yaml_1.defaultCommentFunction));
-                let result = (0, utils_1.findPart)(simplified, property);
-                if (typeof result === 'object')
-                    console.log(JSON.stringify(result, null, 2));
-                else
-                    console.log(result);
+                let result = property == '.' ? simplified : (0, utils_1.findPart)(simplified, property);
+                if (opts.keys) {
+                    if (typeof result === 'object')
+                        Object.keys(result).sort().forEach(k => console.log(k));
+                    else
+                        console.log('Not an object');
+                }
+                else {
+                    if (typeof result === 'object')
+                        console.log(JSON.stringify(result, null, 2));
+                    else
+                        console.log(result);
+                }
             }
         }
     };
