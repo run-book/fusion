@@ -1,0 +1,24 @@
+{
+  "template":    "typescript",
+  "name":        "@focuson/transformer",
+  "description": "Turns some json into other json",
+  "packageJson": {
+    "dependencies":    {
+      "jsonata":                    "^v2.0.4",
+      "@itsmworkbench/cli":         "0.0.5",
+      "@itsmworkbench/commander12": "0.0.5",
+      "@itsmworkbench/jsyaml":      "0.0.5",
+      "@laoban/filesops-node":      "1.4.45",
+      "@laoban/variables":          "1.4.45",
+      "@laoban/utils":              "1.4.45"
+    },
+    "devDependencies": {}
+  },
+  "links":       [
+  ],
+  "guards":      {
+    "compile": true,
+    "publish": false,
+    "test":    false
+  }
+}

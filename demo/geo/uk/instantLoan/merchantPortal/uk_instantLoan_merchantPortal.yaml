@@ -1,0 +1,7 @@
+version: 1
+
+mortgage:
+  capabilities: #only the ones that are different.
+    creditCheck: "services.experian_creditCheck"
+
+# just uses defaults

@@ -1,0 +1,3 @@
+capabilities: #only the ones that are different.
+  aml:
+    service: "services.internal_carloan_PricingService"

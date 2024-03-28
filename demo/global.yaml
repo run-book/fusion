@@ -1,0 +1,41 @@
+version: 1
+
+parameters:
+  product:
+    legal:
+      - instantLoan
+      - mortgage
+      - creditCard
+      - carLoan
+  geo:
+    legal:
+      - uk
+      - sw
+      - ca
+  channel:
+    legal:
+      - a
+        b
+      - customerPortal
+      - merchantPortal
+      - selfServicePortal
+
+hierarchy:
+  "Channel Specific Configuration": "geo/${geo}/${product}/${channel}/${geo}_${product}_${channel}.yaml"
+  "This Product in This Country": "geo/${geo}/${product}/${geo}_${product}.yaml"
+  "Geo Specific Configuration": "geo/${geo}_overrides.yaml"
+  "Product Specific Configuration": "product/${product}.yaml"
+  "Service integration details - topics and schemas": "services/services.yaml"
+
+# the default way of implementing these capabilities. We can override them at any level. For example in the uk use experian for aml.
+capabilities:
+  aml:
+    service: "services.equifax_creditCheck"
+  creditCheck:
+    service: "services.experian_creditCheck"
+  signatureVerification:
+    service: "services.internal_signatureVerification"
+  pricing:
+    service: "services.internal_pricingService"
+  limitManagement:
+    service:"services.internal_limitManagement"

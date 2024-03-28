@@ -1,0 +1,2 @@
+* C:\git\workshops\thereandbackagain/modules/transformer [tsc --noEmit false --outDir dist]
+src/configCommands.ts(50,42): error TS2554: Expected 5 arguments, but got 4.
