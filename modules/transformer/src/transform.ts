@@ -3,6 +3,7 @@ import path from "path";
 import { FileOps } from "@laoban/fileops";
 import { derefence, dollarsBracesVarDefn } from "@laoban/variables";
 import { YamlCapability } from "@itsmworkbench/yaml";
+import { extractPlaceholders } from "./utils";
 
 export interface LegalParameter {
   legal: string[]
@@ -59,9 +60,10 @@ export function validateHierarchy ( hierarchy: NameAnd<string> ): string[] {
   } )
 }
 export function validateParameters ( dic: any, properties: NameAnd<Parameter> ): string[] {
-
   if ( properties === undefined ) return []
   if ( typeof properties !== 'object' ) return [ `Parameters must be an object` ]
+  const notInProperties = Object.keys ( dic ).filter ( k => properties[ k ] === undefined )
+  if ( notInProperties.length > 0 ) return [ `The parameters ${notInProperties.join ( ', ' )} are not allowed` ]
   return flatMap ( Object.entries ( properties ), ( [ k, v ] ) => {
     if ( dic[ k ] === undefined ) return [ `The parameter '${k}' is not defined` ]
     if ( isLegalParameter ( v ) ) {
@@ -82,6 +84,9 @@ export async function recursivelyFindFileNames ( context: LoadContext, root: str
   const newPathForFile = path.dirname ( newFile )
   if ( !await fileOps.isFile ( newFile ) ) return [ { trail, file, exists: false, errors: [], yaml: undefined } ]
   const content = await fileOps.loadFileOrUrl ( newFile )
+  const allParams = extractPlaceholders ( content )
+  const missingParams = allParams.filter ( p => dic[ p ] === undefined ).map ( s => '${' + s + '}' )
+  if ( missingParams.length > 0 ) return [ { trail, file, exists: true, errors: [ `Illegal parameter(s) ${missingParams.join ( ', ' )}` ], yaml: undefined } ]
   const derefed = derefence ( newFile, dic, content, { variableDefn: dollarsBracesVarDefn, allowUndefined: true } )
   const yamlContent = yaml.parser ( derefed )
   if ( hasErrors ( yamlContent ) ) return [ { trail, file, exists: true, errors: toArray ( yamlContent ), yaml: undefined } ]

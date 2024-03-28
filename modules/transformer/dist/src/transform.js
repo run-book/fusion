@@ -7,6 +7,7 @@ exports.recursivelyFindFileNames = exports.validateParameters = exports.validate
 const utils_1 = require("@laoban/utils");
 const path_1 = __importDefault(require("path"));
 const variables_1 = require("@laoban/variables");
+const utils_2 = require("./utils");
 function isLegalParameter(x) {
     return x.legal !== undefined;
 }
@@ -35,6 +36,9 @@ function validateParameters(dic, properties) {
         return [];
     if (typeof properties !== 'object')
         return [`Parameters must be an object`];
+    const notInProperties = Object.keys(dic).filter(k => properties[k] === undefined);
+    if (notInProperties.length > 0)
+        return [`The parameters ${notInProperties.join(', ')} are not allowed`];
     return (0, utils_1.flatMap)(Object.entries(properties), ([k, v]) => {
         if (dic[k] === undefined)
             return [`The parameter '${k}' is not defined`];
@@ -60,6 +64,10 @@ async function recursivelyFindFileNames(context, root, trail, file, debug) {
     if (!await fileOps.isFile(newFile))
         return [{ trail, file, exists: false, errors: [], yaml: undefined }];
     const content = await fileOps.loadFileOrUrl(newFile);
+    const allParams = (0, utils_2.extractPlaceholders)(content);
+    const missingParams = allParams.filter(p => dic[p] === undefined).map(s => '${' + s + '}');
+    if (missingParams.length > 0)
+        return [{ trail, file, exists: true, errors: [`Illegal parameter(s) ${missingParams.join(', ')}`], yaml: undefined }];
     const derefed = (0, variables_1.derefence)(newFile, dic, content, { variableDefn: variables_1.dollarsBracesVarDefn, allowUndefined: true });
     const yamlContent = yaml.parser(derefed);
     if ((0, utils_1.hasErrors)(yamlContent))
