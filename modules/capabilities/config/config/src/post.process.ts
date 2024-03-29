@@ -1,5 +1,7 @@
 import { findPartInMerged, isMerged, Merged } from "./merge";
 import { ErrorsAnd, hasErrors, mapErrors, mapErrorsK, NameAnd } from "@laoban/utils";
+import { findStringArray } from "./extract.from.merged";
+import { FileOps } from "@laoban/fileOps";
 
 
 //This is an implied contract at the moment that config is the actual json object that sorted represents.
@@ -24,15 +26,15 @@ export type PostProcessor = {
   //sorted Value is the current value of the key we return a new value.
   //promise so that we can async things like file system look ups
   //ErrorsAnd so that we can return errors
-  postProcess: ( sortedValue: Merged, config: any, params: NameAnd<string> ) => Promise<ErrorsAnd<Merged>>
+  postProcess: ( full: Merged, sortedValue: Merged, params: NameAnd<string> ) => Promise<ErrorsAnd<Merged>>
 }
 
-export async function postProcess ( processors: PostProcessor[], sorted: Merged, config: any, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> {
+export async function postProcess ( processors: PostProcessor[], sorted: Merged, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> {
   const acc = sorted
   for ( let p of processors ) {
     const value = acc.value[ p.key ]
     if ( isMerged ( value ) ) {
-      const result = await p.postProcess ( value, config, params )
+      const result = await p.postProcess ( sorted, value, params )
       if ( hasErrors ( result ) ) return result
     }
   }
@@ -71,15 +73,29 @@ export function addNameStringToMerged ( merged: Merged, name: string, value: str
   return merged
 }
 
-type SchemaNameFn = ( nameParams: NameParams, requestOrResponse: string ) => Promise<ErrorsAnd<string>>
-export async function addRequestOrResponseToService ( serviceName: string, service: Merged, requestOrResponse: string, file: string, nameFn: SchemaNameFn ): Promise<ErrorsAnd<Merged>> {
+export type SchemaNameFn = ( nameParams: NameParams, requestOrResponse: string, tastSchemas: string[] ) => Promise<ErrorsAnd<string>>
+export type TaskExistsFn = ( name: string ) => Promise<boolean>
+export const defaultSchemaNameFn = ( taskExists: TaskExistsFn ) => async ( nameParams: NameParams, requestOrResponse: string, taskSchemas: string[] ): Promise<ErrorsAnd<string>> => {
+  const realTaskNames = taskSchemas.map ( t =>
+    t.replace ( /<task>/g, nameParams.serviceName ).replace ( /<reqOrResp>/g, requestOrResponse ) )
+  console.log('topicName',  nameParams.topicName)
+  console.log('requestOrResponse', requestOrResponse)
+  console.log('taskSchemas', taskSchemas)
+  console.log('realTaskNames', realTaskNames)
+  for ( let taskName of realTaskNames ) {
+    if ( await taskExists ( taskName ) ) return taskName
+  }
+  return [ `No schema found for ${nameParams.serviceName}/${nameParams.topicName}/${requestOrResponse} in ${realTaskNames}` ]
+};
+
+export async function addRequestOrResponseToService ( serviceName: string, service: Merged, requestOrResponse: string, taskSchemaNames: string[], file: string, nameFn: SchemaNameFn ): Promise<ErrorsAnd<Merged>> {
   const request = findPartInMerged ( service, requestOrResponse )
   const requestTopic: Merged = findPartInMerged ( request, 'topic' )
   const topicName = requestTopic.value
   if ( !topicName ) return [ `addRequestToSchema(${serviceName})- No topic found in ${requestOrResponse}` ]
   if ( typeof topicName !== 'string' ) return [ `addRequestToSchema(${serviceName}) ${requestOrResponse}- Topic must be a string but is ${JSON.stringify ( topicName )}` ]
   const nameParams = { serviceName, topicName }
-  return mapErrors ( await nameFn ( nameParams, requestOrResponse ), async requestName =>
+  return mapErrors ( await nameFn ( nameParams, requestOrResponse, taskSchemaNames ), async requestName =>
     addNameStringToMerged ( request, 'schema', requestName, [ file ] ) )
 }
 
@@ -88,15 +104,18 @@ export function addRequestsAndResponsesToServices ( nameFn: SchemaNameFn ): Post
   return {
     key: 'services',
     postProcess:
-      async ( services: Merged, config: any, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> => {
+      async ( full: Merged, services: Merged, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> => {
         if ( typeof services.value !== 'object' ) return [ 'services is not an object' ]
-
+        const task_schemas = findPartInMerged ( full, 'task_schemas' )
+        if ( !task_schemas ) return [ 'No task_schemas found. These are used to control where we look for schemas' ]
+        const taskSchemaNames = findStringArray ( task_schemas )
+        if ( taskSchemaNames.length === 0 ) return [ `No task_schemas found. These are used to control where we look for schemas - had value but wasn't an array of string` ]
         const serviceNames = Object.keys ( services.value )
         for ( let serviceName of serviceNames ) {
           const service = findPartInMerged ( services, serviceName )
-          const requestResult = await addRequestOrResponseToService ( serviceName, service, 'request', 'addRequestsAndResponsesToServices', nameFn )
+          const requestResult = await addRequestOrResponseToService ( serviceName, service, 'request', taskSchemaNames, 'addRequestsAndResponsesToServices', nameFn )
           if ( hasErrors ( requestResult ) ) return requestResult
-          const responseResult = await addRequestOrResponseToService ( serviceName, service, 'response', 'addRequestsAndResponsesToServices', nameFn )
+          const responseResult = await addRequestOrResponseToService ( serviceName, service, 'response', taskSchemaNames, 'addRequestsAndResponsesToServices', nameFn )
           if ( hasErrors ( responseResult ) ) return responseResult
         }
       }

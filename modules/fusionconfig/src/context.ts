@@ -7,7 +7,7 @@ import { Commander12, commander12Tc } from "@itsmworkbench/commander12";
 import { NoConfig } from "../index";
 import { LoadFilesFn } from "@fusionconfig/config";
 import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
-import { addRequestsAndResponsesToServices, PostProcessor } from "@fusionconfig/config/dist/src/post.process";
+import { addRequestsAndResponsesToServices, PostProcessor, SchemaNameFn } from "@fusionconfig/config/dist/src/post.process";
 
 export type HasYaml = {
   yaml: YamlCapability
@@ -17,14 +17,18 @@ export interface ThereAndBackContext extends CliContext, HasYaml {
   postProcessors: PostProcessor[]
 }
 
-export const postProcessors: PostProcessor[] = [ addRequestsAndResponsesToServices ( async ( nameParams, requestOrResponse ) => `some ${nameParams.serviceName}/${nameParams.topicName} ` ) ]
+export function postProcessors ( schemaNameFn: SchemaNameFn ): PostProcessor[] {
+  return [
+    addRequestsAndResponsesToServices ( schemaNameFn )
+  ]
+}
 
-export function makeContext ( version: string ): ThereAndBackContext {
-  return thereAndBackContext ( 'intellimaintain', version, fileOpsNode (), jsYaml () )
+export function makeContext ( version: string, schemaNameFn: SchemaNameFn ): ThereAndBackContext {
+  return thereAndBackContext ( 'fusion', version, fileOpsNode (), jsYaml (), schemaNameFn )
 }
 export const cliTc: CliTc<Commander12, ThereAndBackContext, NoConfig, NoConfig> = commander12Tc<ThereAndBackContext, NoConfig, NoConfig> ()
 export const configFinder = fixedConfig<NoConfig> ( makeContext )
 
-export function thereAndBackContext ( name: string, version: string, fileOps: FileOps, yaml: YamlCapability ): ThereAndBackContext {
-  return { ...cliContext ( name, version, fileOps ), yaml, loadFiles: findConfigUsingFileops ( fileOps, yaml ), postProcessors }
+export function thereAndBackContext ( name: string, version: string, fileOps: FileOps, yaml: YamlCapability, schemaNameFn: SchemaNameFn ): ThereAndBackContext {
+  return { ...cliContext ( name, version, fileOps ), yaml, loadFiles: findConfigUsingFileops ( fileOps, yaml ), postProcessors: postProcessors ( schemaNameFn ) }
 }

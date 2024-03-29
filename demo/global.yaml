@@ -29,10 +29,10 @@ hierarchy:
 kafka_schemas: "service.<service>.<request_response>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
 
 task_schemas: # Unlike kafka we have a chain of responsibility. We start most specific. We use a different templating than the config story for task
-  "task product country channel": "task.<task>.<reqOrResp>.${geo}.${product}.${channel}"
-  "task product country": "task.<task>.<reqOrResp>.${geo}.${product}"
-  "task product": "task.<task>.<reqOrResp>.${product}"
-  "task": "task.<task>.<reqOrResp>."
+  - "task.<task>.<reqOrResp>.${geo}.${product}.${channel}"
+  - "task.<task>.<reqOrResp>"
+  - "task.<task>.<reqOrResp>.${geo}.${product}"
+  - "task.<task>.<reqOrResp>.${product}"
 
 
 # the default way of implementing these capabilities. We can override them at any level. For example in the uk use experian for aml.

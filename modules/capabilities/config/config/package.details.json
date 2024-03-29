@@ -4,7 +4,8 @@
   "description": "the interfaces for the configuration",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils": "1.4.49"
+      "@laoban/utils":   "1.4.49",
+      "@laoban/fileOps": "1.4.49"
     },
     "devDependencies": {
       "@itsmworkbench/jsyaml": "0.0.10"
