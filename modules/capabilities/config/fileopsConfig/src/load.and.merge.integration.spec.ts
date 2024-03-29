@@ -15,7 +15,19 @@ describe ( "merging global.yaml", () => {
   it ( "should have a mergeForCli", async () => {
     const { fileDetails, sorted, errors, yaml } = await loadAndMergeAndYamlParts ( loadFiles, params, await testDirPromise, 'global.yaml', false )
     expect ( errors ).toEqual ( [] )
-    expect ( yaml ).toEqual ( `version:
+    expect ( yaml ).toEqual ( `# {"channel":"merchantPortal","geo":"uk","product":"carLoan"}
+#
+# Files
+# {"trail":[],"file":"global.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"product/carLoan/carLoan.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"services/services.yaml","exists":true,"errors":[]}
+#
+# Files not found
+# {"trail":["global.yaml"],"file":"geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml","exists":false,"errors":[]}
+# {"trail":["global.yaml"],"file":"geo/uk/carLoan/uk_carLoan.yaml","exists":false,"errors":[]}
+# {"trail":["global.yaml"],"file":"geo/uk_overrides.yaml","exists":false,"errors":[]}
+#
+version:
   1 # Contributed by: global.yaml, services/services.yaml
 parameters:
   channel:
@@ -167,6 +179,7 @@ transformations:
       https://schemas.mycompany.com/internal/pricing/request/v3/carloanspricingRequest.avsc # Contributed by: product/carLoan/carLoan.yaml
     transformation:
       transformations/request_internal_carloan_PricingService/request_internal_carloan_PricingService.jsonata # Contributed by: product/carLoan/carLoan.yaml
+
 ` )
 
   } )

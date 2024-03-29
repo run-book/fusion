@@ -3,17 +3,17 @@ import { NameSpaceDetails, UrlStore } from "@itsmworkbench/urlstore";
 import { NameAnd } from "@laoban/utils";
 import { getUrls, listUrls, putUrls } from "@itsmworkbench/apiurlstore";
 import { chainOfResponsibility } from "@runbook/utils";
+import { getFusion } from "./api.for.fusion";
+import { LoadFilesFn } from "@fusionconfig/config";
 
 
 export const fusionHandlers = (
-  details: NameAnd<NameSpaceDetails>,
-  urlStore: UrlStore,
+  loadFile: LoadFilesFn,
+  parent: string,
+  debug: boolean | undefined,
   ...handlers: KoaPartialFunction[] ): ( from: ContextAndStats ) => Promise<void> =>
   chainOfResponsibility ( defaultShowsError, //called if no matches
-    listUrls ( urlStore.list ),
-    getUrls ( urlStore ),
-    putUrls ( urlStore.save, details ),
-    // handleFile,
+    getFusion ( loadFile, parent,debug ),
     ...handlers,
     notFoundIs404,
   )

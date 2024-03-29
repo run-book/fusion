@@ -3,21 +3,10 @@ import path from "path";
 import { findPart, firstSegment, NameAnd } from "@laoban/utils";
 
 import { ThereAndBackContext } from "./context";
-import { loadAndMergeAndYamlParts, loadAndMergeParts, Merged } from "@fusionconfig/config";
+import { loadAndMergeAndYamlParts, Merged } from "@fusionconfig/config";
+import { parseParams } from "@fusionconfig/utils";
 
 
-function parseParams ( params: string | boolean ) {
-  if ( typeof params === 'string' ) {
-    const pairs = params.split ( ',' )
-    return pairs.reduce ( ( acc, pair ) => {
-      const [ key, value ] = pair.split ( '=' )
-      acc[ key ] = value
-      return acc
-    }, {} )
-  }
-  return {}
-
-}
 function fromOpts ( opts: NameAnd<string | boolean> ) {
   const params = parseParams ( opts.params )
   const file = opts.file as string

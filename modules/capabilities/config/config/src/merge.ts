@@ -1,4 +1,4 @@
-import { NameAnd } from "@laoban/utils";
+import { NameAnd, toArray } from "@laoban/utils";
 
 export type MergeInput = {
   file: string
@@ -17,8 +17,8 @@ export const intoMerged = ( file: string ) => ( input: any ): Merged => {
   throw new Error ( `Don't know how to process ${t} - ${input}` )
 };
 export function mergeObjectInto ( acc: Merged, input: MergeInput ): Merged {
-  if ( typeof acc.value !== 'object' )
-    return mergeObjectInto ( { value: {}, files: acc.files }, input )
+  if ( typeof acc?.value !== 'object' )
+    return mergeObjectInto ( { value: {}, files: toArray(acc?.files) }, input )
   const accObj = acc.value as NameAnd<Merged>
   const newObj = input.yaml as NameAnd<any>
   if ( newObj === undefined ) return acc
@@ -37,13 +37,13 @@ export function mergeObjectInto ( acc: Merged, input: MergeInput ): Merged {
 
 }
 export function mergeArrayInto ( acc: Merged, input: MergeInput ) {
-  if ( Array.isArray ( acc.value ) )
+  if ( Array.isArray ( acc?.value ) )
     return {
       value: [ ...acc.value,
         ...input.yaml.map ( intoMerged ( input.file ) ) ],
       files: [ ...acc.files, input.file ]
     }
-  return mergeArrayInto ( { value: [], files: acc.files }, input )
+  return mergeArrayInto ( { value: [], files: toArray(acc?.files) }, input )
 }
 export function postProcessArray ( acc: Merged ): Merged {
   if ( !Array.isArray ( acc.value ) ) return acc

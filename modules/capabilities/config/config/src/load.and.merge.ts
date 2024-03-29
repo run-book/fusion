@@ -12,7 +12,7 @@ export type LoadedAndMergedAndYamlParts = {
   fileDetails: FileDetails[],
   errors: FileDetails[],
   sorted: Merged
-  yaml: string
+  yaml: string | undefined
 }
 
 export async function loadAndMergeParts ( loadFiles: LoadFilesFn, params: NameAnd<string>, parent: string, file: string, debug?: boolean ): Promise<LoadedAndMergedParts> {
@@ -27,9 +27,11 @@ export async function loadAndMergeParts ( loadFiles: LoadFilesFn, params: NameAn
 const makeComment = ( fileDetails: FileDetails[] ): string =>
   fileDetails.map ( ( { yaml, ...rest } ) => `# ${JSON.stringify ( rest )}` ).join ( '\n' );
 export async function loadAndMergeAndYamlParts ( loadFiles: LoadFilesFn, params: NameAnd<string>, parent: string, file: string, debug?: boolean ): Promise<LoadedAndMergedAndYamlParts> {
+  if ( debug ) console.log ( 'loadAndMergeAndYamlParts', { loadFiles, params, parent, file } )
   const parts = await loadAndMergeParts ( loadFiles, params, parent, file, debug )
   const { fileDetails, errors, sorted } = parts
-  const yaml = `# ${JSON.stringify ( params )}
+  if ( debug ) console.log ( 'parts - filedetails and errors', JSON.stringify ( { fileDetails, errors }, null, 2 ) )
+  const yaml = errors.length > 0 ? undefined : `# ${JSON.stringify ( params )}
 #
 # Files
 ${(makeComment ( fileDetails.filter ( f => f.exists ) ))}

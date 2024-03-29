@@ -4,9 +4,15 @@ import { nodeUrlstore } from "@itsmworkbench/nodeurlstore";
 import { shellGitsops } from "@itsmworkbench/shellgit";
 import { OrganisationUrlStoreConfigForGit } from "@itsmworkbench/urlstore";
 import { fusionHandlers } from "./api";
+import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
+import { HasYaml } from "fusionconfig/dist/src/context";
+import { LoadFilesFn } from "@fusionconfig/config";
 
 
-export function apiCommand<Commander, Context extends HasCurrentDirectory, Config> ( ): CommandFn<Commander, Context, Config> {
+export type  ApiCommandContext = HasCurrentDirectory & {
+  loadFiles: LoadFilesFn
+}
+export function apiCommand<Commander, Context extends ApiCommandContext, Config> (): CommandFn<Commander, Context, Config> {
   return ( context, config ) => ({
     cmd: 'api ',
     description: 'Runs the api that supports the Wizard Of Oz',
@@ -18,12 +24,12 @@ export function apiCommand<Commander, Context extends HasCurrentDirectory, Confi
     },
     action: async ( commander, opts ) => {
       const { port, debug, directory } = opts
-
-      const orgs: OrganisationUrlStoreConfigForGit = { baseDir: 'fusion', nameSpaceDetails: {} }
-      const gitOps = shellGitsops ( false )
-      const urlStore = nodeUrlstore ( gitOps, orgs )
-      startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debug === true,
-        fusionHandlers ( orgs.nameSpaceDetails, urlStore, ) )
+      let debugBoolean = debug === true;
+      console.log('directory', directory)
+      console.log('port', port)
+      console.log('debug', debug)
+      startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
+        fusionHandlers ( context.loadFiles, directory.toString () ,debugBoolean,) )
     }
   })
 

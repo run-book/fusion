@@ -35,7 +35,7 @@ export async function recursivelyFindFileNames ( context: LoadFilesContext, root
   const content = await fileOps.loadFileOrUrl ( newFile )
   const allParams = extractPlaceholders ( content )
   const missingParams = allParams.filter ( p => dic[ p ] === undefined ).map ( s => '${' + s + '}' )
-  if ( missingParams.length > 0 ) return [ { trail, file, exists: true, errors: [ `Illegal parameter(s) ${[ ...new Set ( missingParams ) ].sort ().join ( ', ' )}` ], yaml: undefined } ]
+  if ( missingParams.length > 0 ) return [ { trail, file, exists: true, errors: [ `Missing parameter(s) ${[ ...new Set ( missingParams ) ].sort ().join ( ', ' )}` ], yaml: undefined } ]
   const derefed = derefence ( newFile, dic, content, { variableDefn: dollarsBracesVarDefn, allowUndefined: true } )
   const yamlContent = yaml.parser ( derefed )
   if ( hasErrors ( yamlContent ) ) return [ { trail, file, exists: true, errors: toArray ( yamlContent ), yaml: undefined } ]

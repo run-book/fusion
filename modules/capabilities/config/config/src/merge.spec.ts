@@ -220,8 +220,8 @@ describe ( "mergeArrayInto", () => {
 
   describe ( "arrays of objects", () => {
     it ( "should an arrays of objects into undefined", () => {
-      const data = jsYaml ().parser ( `
-      transformations:
+      const data = jsYaml ().parser (
+        `transformations:
   - fromSchema: "http://schemas.mycompany.com/carLoanForAml.schema.json"
     toSchema: "https://schemas.mycompany.com/experian/creditScore/request/v2/creditScoreRequest.avsc"
     transformation: "transformations/request_carloan_experian_aml/request_carloan_experian_aml.jsonata"
@@ -229,7 +229,71 @@ describe ( "mergeArrayInto", () => {
   - fromSchema: "http://schemas.mycompany.com/carLoanForAml.schema.json"
     toSchema: "https://schemas.mycompany.com/internal/pricing/request/v3/carloanspricingRequest.avsc"
     transformation: "transformations/request_internal_carloan_PricingService/request_internal_carloan_PricingService.jsonata"` )
-      expect ( merge ( undefined, { file: 'file1', yaml: data } ) ).toEqual ( {} )
+      console.log(jsYaml().parser(data))
+      expect ( merge ( undefined, { file: 'file1', yaml: data } ) ).toEqual ( {
+        "files": [
+          "file1"
+        ],
+        "value": {
+          "transformations": {
+            "files": [
+              "file1"
+            ],
+            "value": [
+              {
+                "files": [
+                  "file1"
+                ],
+                "value": {
+                  "fromSchema": {
+                    "files": [
+                      "file1"
+                    ],
+                    "value": "http://schemas.mycompany.com/carLoanForAml.schema.json"
+                  },
+                  "toSchema": {
+                    "files": [
+                      "file1"
+                    ],
+                    "value": "https://schemas.mycompany.com/experian/creditScore/request/v2/creditScoreRequest.avsc"
+                  },
+                  "transformation": {
+                    "files": [
+                      "file1"
+                    ],
+                    "value": "transformations/request_carloan_experian_aml/request_carloan_experian_aml.jsonata"
+                  }
+                }
+              },
+              {
+                "files": [
+                  "file1"
+                ],
+                "value": {
+                  "fromSchema": {
+                    "files": [
+                      "file1"
+                    ],
+                    "value": "http://schemas.mycompany.com/carLoanForAml.schema.json"
+                  },
+                  "toSchema": {
+                    "files": [
+                      "file1"
+                    ],
+                    "value": "https://schemas.mycompany.com/internal/pricing/request/v3/carloanspricingRequest.avsc"
+                  },
+                  "transformation": {
+                    "files": [
+                      "file1"
+                    ],
+                    "value": "transformations/request_internal_carloan_PricingService/request_internal_carloan_PricingService.jsonata"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      } )
     } )
   } )
 } )
