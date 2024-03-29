@@ -150,7 +150,7 @@ function addPropertyCommand(tc) {
                 process.exit(1);
             }
             if (opts.full === true)
-                console.log(JSON.stringify(findPartInFull(sorted, property), null, 2));
+                console.log(JSON.stringify(property === '.' ? sorted : findPartInFull(sorted, property), null, 2));
             else {
                 const simplified = tc.context.yaml.parser((0, convert_to_yaml_1.convertToYaml)(sorted, convert_to_yaml_1.defaultCommentFunction));
                 let result = property == '.' ? simplified : (0, utils_1.findPart)(simplified, property);

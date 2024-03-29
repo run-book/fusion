@@ -10,7 +10,13 @@ export interface Merged {
   value: string | number | boolean | NameAnd<Merged> | Merged[];
   files: string[];
 }
-
+export const intoMerged = ( file: string ) => ( input: any ): Merged => {
+  const t = typeof input
+  if ( t === 'string' || t === 'number' || t === 'boolean' ) return { value: input, files: [ file ] }
+  if ( Array.isArray ( input ) ) return { value: input.map ( intoMerged ( file ) ), files: [ file ] }
+  if ( t === 'object' ) return { value: Object.entries ( input ).reduce ( ( acc, [ key, value ] ) => ({ ...acc, [ key ]: intoMerged ( file ) ( value ) }), {} as NameAnd<Merged> ), files: [ file ] }
+  throw new Error ( `Don't know how to process ${t} - ${input}` )
+};
 export function mergeObjectInto ( acc: Merged, input: MergeInput ): Merged {
   if ( typeof acc.value !== 'object' )
     return mergeObjectInto ( { value: {}, files: acc.files }, input )
@@ -21,9 +27,12 @@ export function mergeObjectInto ( acc: Merged, input: MergeInput ): Merged {
   const merged = allKeys.reduce ( ( acc, key ) => {
     let accValue = accObj[ key ]
     const newValue = newObj[ key ]
-    if ( newValue === undefined ) return { ...acc, [ key ]: accValue }
-    if ( accValue === undefined ) accValue = { value: {}, files: [] }
-    return { ...acc, [ key ]: merge ( accValue, { file: input.file, yaml: newValue } ) }
+    if ( newValue === undefined )
+      return { ...acc, [ key ]: accValue }
+    if ( accValue === undefined )
+      return { ...acc, [ key ]: intoMerged ( input.file ) ( newValue ) }
+    else
+      return { ...acc, [ key ]: merge ( accValue, { file: input.file, yaml: newValue } ) }
   }, {} as NameAnd<Merged> )
   return { value: merged, files: [ ...acc.files, input.file ] }
 
@@ -31,7 +40,8 @@ export function mergeObjectInto ( acc: Merged, input: MergeInput ): Merged {
 export function mergeArrayInto ( acc: Merged, input: MergeInput ) {
   if ( Array.isArray ( acc.value ) )
     return {
-      value: [ ...acc.value, ...input.yaml.map ( v => ({ value: v, files: [ input.file ] }) ) ],
+      value: [ ...acc.value,
+        ...input.yaml.map ( intoMerged ( input.file ) ) ],
       files: [ ...acc.files, input.file ]
     }
   return mergeArrayInto ( { value: [], files: acc.files }, input )
@@ -65,11 +75,12 @@ export function mergePrimitiveInto ( acc: Merged, input: MergeInput ): Merged {
 
 
 export function merge ( acc: Merged | undefined, input: MergeInput ): Merged {
-  if ( acc.value === undefined ) return { value: input.yaml, files: [ input.file ] }
+  // if ( acc.value === undefined ) return { value: input.yaml, files: [ input.file ] }
   if ( Array.isArray ( input.yaml ) ) return postProcessArray ( mergeArrayInto ( acc, input ) )
   if ( typeof input.yaml === 'object' ) return mergeObjectInto ( acc, input )
   if ( typeof input.yaml === 'string' || typeof input.yaml === 'number' || typeof input.yaml === 'boolean' )
     return mergePrimitiveInto ( acc, input )
-  throw new Error ( `Don't know how to process ${typeof acc.value} - ${acc.value}` )
+  throw new Error ( `Don't know how to process ${typeof acc.value} - ${input.yaml}` )
 }
 
+//If I have a MergeInput and I am not merging it with anything... so for example it's a primitive in an array, or an object in an array

@@ -4,7 +4,7 @@ import { NameAnd } from "@laoban/utils";
 export type CommentFunction = ( files: string[] ) => string | undefined;
 
 export const defaultCommentFunction: CommentFunction = ( files ) => {
-  if ( files.length === 0 ) return undefined;
+  if ( files ===undefined || files.length === 0 ) return undefined;
   return `# Contributed by: ${files.join ( ', ' )}`;
 };
 

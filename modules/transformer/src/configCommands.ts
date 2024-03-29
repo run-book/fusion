@@ -144,7 +144,7 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
         process.exit ( 1 )
       }
       if ( opts.full === true )
-        console.log ( JSON.stringify ( findPartInFull ( sorted, property ), null, 2 ) )
+        console.log ( JSON.stringify ( property === '.' ? sorted : findPartInFull ( sorted, property ), null, 2 ) )
       else {
         const simplified = tc.context.yaml.parser ( convertToYaml ( sorted, defaultCommentFunction ) )
         let result = property == '.' ? simplified : findPart ( simplified, property );
