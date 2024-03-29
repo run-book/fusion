@@ -21,6 +21,9 @@
     "debug": "^4.3.4"
   },
   "devDependencies": {
+    "@laoban/variables": "1.4.45",
+    "@laoban/filesops-node": "1.4.45",
+    "@itsmworkbench/yaml": "0.0.10",
     "typescript": "^5.2.2",
     "@testing-library/jest-dom": "^6.1.4",
     "@types/jest": "^29.0.0",

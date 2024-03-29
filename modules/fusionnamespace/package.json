@@ -1,6 +1,6 @@
 {
-  "name": "@fusionconfig/utils",
-  "description": "the usual set of little functions that are very basic and not domain oriented",
+  "name": "@fusionconfig/fusionnamespace",
+  "description": "Allows access to the fusion config namespace",
   "version": "0.0.4",
   "main": "dist/index",
   "types": "dist/index",
@@ -17,6 +17,7 @@
     ]
   },
   "dependencies": {
+    "@laoban/utils": "1.4.45",
     "debug": "^4.3.4"
   },
   "devDependencies": {

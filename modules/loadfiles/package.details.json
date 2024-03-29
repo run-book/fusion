@@ -6,7 +6,11 @@
     "dependencies":    {
       "@laoban/utils": "1.4.45"
     },
-    "devDependencies": {}
+    "devDependencies": {
+      "@laoban/variables":     "1.4.45",
+      "@laoban/filesops-node": "1.4.45",
+      "@itsmworkbench/yaml":   "0.0.10"
+    }
   },
   "links":       [
   ],

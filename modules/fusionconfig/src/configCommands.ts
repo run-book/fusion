@@ -3,8 +3,7 @@ import path from "path";
 import { findPart, firstSegment, NameAnd } from "@laoban/utils";
 
 import { ThereAndBackContext } from "./context";
-import { Merged, mergeObjectInto } from "@fusionconfig/merger";
-import { convertToYaml, defaultCommentFunction } from "@fusionconfig/merger";
+import { convertToYaml, defaultCommentFunction, Merged, mergeObjectInto } from "@fusionconfig/merger";
 import { recursivelyFindFileNames } from "@fusionconfig/loadfiles";
 
 
@@ -71,8 +70,8 @@ export function listFilesCommand<Commander, Config, CleanConfig> ( tc: ContextCo
   }
 
 }
-async function mergeForCli<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig>, params: {}, parent: string, file: string, opts: NameAnd<string | boolean> ) {
-  const fileDetails = await recursivelyFindFileNames ( { fileOps: tc.context.fileOps, yaml: tc.context.yaml, dic: params }, parent, [], file, opts.debug === true )
+export async function mergeForCli<Commander, Config, CleanConfig> ( context: ThereAndBackContext, params: {}, parent: string, file: string, debug: boolean ) {
+  const fileDetails = await recursivelyFindFileNames ( { fileOps: context.fileOps, yaml: context.yaml, dic: params }, parent, [], file, debug )
   const errors = fileDetails.filter ( f => f.errors.length > 0 )
   const merged: Merged = fileDetails.reduce ( ( acc, fd ) => mergeObjectInto ( acc, fd ), { value: undefined, files: [] } )
   const { version, parameters, hierarchy, ...rest } = merged.value as any
@@ -91,7 +90,7 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
     },
     action: async ( _, opts ) => {
       const { params, file, parent } = fromOpts ( opts );
-      let { fileDetails, errors, merged, sorted } = await mergeForCli ( tc, params, parent, file, opts );
+      let { fileDetails, errors, merged, sorted } = await mergeForCli ( tc.context, params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
@@ -138,7 +137,7 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
     },
     action: async ( _, opts, property ) => {
       const { params, file, parent } = fromOpts ( opts );
-      let { fileDetails, errors, merged, sorted } = await mergeForCli ( tc, params, parent, file, opts );
+      let { fileDetails, errors, merged, sorted } = await mergeForCli ( tc.context, params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )

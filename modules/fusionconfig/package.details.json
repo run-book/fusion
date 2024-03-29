@@ -5,9 +5,9 @@
   "packageJson": {
     "dependencies":    {
       "jsonata":                    "^v2.0.4",
-      "@itsmworkbench/cli":         "0.0.5",
-      "@itsmworkbench/commander12": "0.0.5",
-      "@itsmworkbench/jsyaml":      "0.0.5",
+      "@itsmworkbench/cli":         "0.0.10",
+      "@itsmworkbench/commander12": "0.0.10",
+      "@itsmworkbench/jsyaml":      "0.0.10",
       "@laoban/filesops-node":      "1.4.45",
       "@laoban/variables":          "1.4.45",
       "@laoban/utils":              "1.4.45"
@@ -18,6 +18,7 @@
     }
   },
   "links":       [
+    "@fusionconfig/api",
     "@fusionconfig/loadfiles",
     "@fusionconfig/utils",
     "@fusionconfig/merger"

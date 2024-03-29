@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-import { CliTc, fixedConfig, makeCli } from "@itsmworkbench/cli";
-import { fileOpsNode } from "@laoban/filesops-node";
-import { Commander12, commander12Tc } from "@itsmworkbench/commander12";
-import { jsYaml } from "@itsmworkbench/jsyaml";
+import { makeCli } from "@itsmworkbench/cli";
+import { Commander12 } from "@itsmworkbench/commander12";
 import { hasErrors, reportErrors } from "@laoban/utils";
 import { configCommands } from "./src/configCommands";
-import { ThereAndBackContext, thereAndBackContext } from "./src/context";
+import { cliTc, configFinder, context, ThereAndBackContext } from "./src/context";
+import { apiCommand } from "@fusionconfig/api";
 
 export function findVersion () {
   let packageJsonFileName = "../package.json";
@@ -17,16 +16,13 @@ export function findVersion () {
 }
 
 export type NoConfig = {}
-const context: ThereAndBackContext = thereAndBackContext ( 'intellimaintain', findVersion (), fileOpsNode (), jsYaml () )
-const cliTc: CliTc<Commander12, ThereAndBackContext, NoConfig, NoConfig> = commander12Tc<ThereAndBackContext, NoConfig, NoConfig> ()
-const configFinder = fixedConfig<NoConfig> ( context )
 
-makeCli<Commander12, ThereAndBackContext, NoConfig, NoConfig> ( context, configFinder, cliTc ).then ( async ( commander ) => {
+makeCli<Commander12, ThereAndBackContext, NoConfig, NoConfig> ( context ( findVersion () ), configFinder, cliTc ).then ( async ( commander ) => {
   if ( hasErrors ( commander ) ) {
     reportErrors ( commander )
     process.exit ( 1 )
   }
   cliTc.addSubCommand ( commander, configCommands ( commander ) )
-  // cliTc.addCommands ( commander, [ apiCommand ( yaml ) ] )
+  cliTc.addCommands ( commander, [ apiCommand () ] )
   return await cliTc.execute ( commander.commander, context.args )
 } )
