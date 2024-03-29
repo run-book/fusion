@@ -1,9 +1,9 @@
 import { CommandDetails, ContextConfigAndCommander, SubCommandDetails } from "@itsmworkbench/cli";
 import path from "path";
-import { findPart, firstSegment, NameAnd } from "@laoban/utils";
+import { findPart, NameAnd } from "@laoban/utils";
 
 import { ThereAndBackContext } from "./context";
-import { loadAndMergeAndYamlParts, Merged } from "@fusionconfig/config";
+import { findPartInMerged, loadAndMergeAndYamlParts } from "@fusionconfig/config";
 import { parseParams } from "@fusionconfig/utils";
 
 
@@ -84,14 +84,6 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
     }
   }
 }
-export function findPartInFull ( dic: Merged, ref: string ): any {
-  if ( ref === undefined ) return undefined
-  if ( ref === '' ) return dic
-  const parts = ref.split ( '.' )
-  try {
-    return parts.reduce ( ( acc, part ) => acc?.value?.[ firstSegment ( part, ':' ) ], dic )
-  } catch ( e ) {return undefined}
-}
 
 
 export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): CommandDetails<Commander> {
@@ -114,7 +106,7 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
         process.exit ( 1 )
       }
       if ( opts.full === true ) {
-        console.log ( JSON.stringify ( property === '.' ? sorted : findPartInFull ( sorted, property ), null, 2 ) )
+        console.log ( JSON.stringify ( property === '.' ? sorted : findPartInMerged ( sorted, property ), null, 2 ) )
       } else {
         const simplified = tc.context.yaml.parser ( yaml )
         let result = property == '.' ? simplified : findPart ( simplified, property );

@@ -6,7 +6,9 @@
     "dependencies":    {
       "@laoban/utils": "1.4.49"
     },
-    "devDependencies": {}
+    "devDependencies": {
+      "@itsmworkbench/jsyaml": "0.0.10"
+    }
   },
   "links":       [
   ],

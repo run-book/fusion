@@ -1,4 +1,4 @@
-import { NameAnd, toArray } from "@laoban/utils";
+import { firstSegment, NameAnd, toArray } from "@laoban/utils";
 
 export type MergeInput = {
   file: string
@@ -9,6 +9,20 @@ export interface Merged {
   value: string | number | boolean | NameAnd<Merged> | Merged[];
   files: string[];
 }
+export function isMerged ( obj: any ): obj is Merged {
+  return obj?.value !== undefined && obj?.files !== undefined
+}
+
+export function findPartInMerged ( dic: Merged, ref: string ): Merged | undefined{
+  if ( ref === undefined ) return undefined
+  if ( ref === '' ) return dic
+  const parts = ref.split ( '.' )
+  try {
+    return parts.reduce ( ( acc, part ) => acc?.value?.[ part], dic )
+  } catch ( e ) {return undefined}
+}
+
+
 export const intoMerged = ( file: string ) => ( input: any ): Merged => {
   const t = typeof input
   if ( t === 'string' || t === 'number' || t === 'boolean' ) return { value: input, files: [ file ] }
@@ -82,4 +96,3 @@ export function merge ( acc: Merged | undefined, input: MergeInput ): Merged {
   throw new Error ( `Don't know how to process ${typeof acc.value} - ${input.yaml}` )
 }
 
-//If I have a MergeInput and I am not merging it with anything... so for example it's a primitive in an array, or an object in an array

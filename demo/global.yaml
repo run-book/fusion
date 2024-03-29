@@ -25,6 +25,16 @@ hierarchy:
   "Product Specific Configuration": "product/${product}/${product}.yaml"
   "Service integration details - topics and schemas": "services/services.yaml"
 
+# We want to send things to kafka topics. We need to know the schema to use. We can define the default schema for each service here.
+kafka_schemas: "service.<service>.<request_response>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
+
+task_schemas: # Unlike kafka we have a chain of responsibility. We start most specific. We use a different templating than the config story for task
+  "task product country channel": "task.<task>.<reqOrResp>.${geo}.${product}.${channel}"
+  "task product country": "task.<task>.<reqOrResp>.${geo}.${product}"
+  "task product": "task.<task>.<reqOrResp>.${product}"
+  "task": "task.<task>.<reqOrResp>."
+
+
 # the default way of implementing these capabilities. We can override them at any level. For example in the uk use experian for aml.
 capabilities:
   aml:
