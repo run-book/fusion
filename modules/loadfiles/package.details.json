@@ -4,11 +4,11 @@
   "description": "merges together yaml files keeping track of where the fields came from",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils": "1.4.45"
+      "@laoban/utils": "1.4.49"
     },
     "devDependencies": {
-      "@laoban/variables":     "1.4.45",
-      "@laoban/filesops-node": "1.4.45",
+      "@laoban/variables":     "1.4.49",
+      "@laoban/filesops-node": "1.4.49",
       "@itsmworkbench/yaml":   "0.0.10"
     }
   },

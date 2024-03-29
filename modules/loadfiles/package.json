@@ -17,12 +17,12 @@
     ]
   },
   "dependencies": {
-    "@laoban/utils": "1.4.45",
+    "@laoban/utils": "1.4.49",
     "debug": "^4.3.4"
   },
   "devDependencies": {
-    "@laoban/variables": "1.4.45",
-    "@laoban/filesops-node": "1.4.45",
+    "@laoban/variables": "1.4.49",
+    "@laoban/filesops-node": "1.4.49",
     "@itsmworkbench/yaml": "0.0.10",
     "typescript": "^5.2.2",
     "@testing-library/jest-dom": "^6.1.4",

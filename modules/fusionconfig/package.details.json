@@ -8,9 +8,9 @@
       "@itsmworkbench/cli":         "0.0.10",
       "@itsmworkbench/commander12": "0.0.10",
       "@itsmworkbench/jsyaml":      "0.0.10",
-      "@laoban/filesops-node":      "1.4.45",
-      "@laoban/variables":          "1.4.45",
-      "@laoban/utils":              "1.4.45"
+      "@laoban/filesops-node":      "1.4.49",
+      "@laoban/variables":          "1.4.49",
+      "@laoban/utils":              "1.4.49"
     },
     "devDependencies": {},
     "bin":             {
