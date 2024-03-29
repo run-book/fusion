@@ -1,9 +1,11 @@
 import { KoaPartialFunction } from "@itsmworkbench/koa";
 import { loadAndMergeAndYamlParts, LoadFilesFn } from "@fusionconfig/config";
 import path from "path";
+import { toArray } from "@laoban/utils";
+import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
 
 const matchFusion = /\/fusion\/(.*)$/;
-export const getFusion = ( loadFiles: LoadFilesFn, parent: string, debug?: boolean ): KoaPartialFunction => {
+export const getFusion = ( loadFiles: LoadFilesFn, postProcessors: PostProcessor[], parent: string, debug?: boolean ): KoaPartialFunction => {
   if ( loadFiles === undefined ) throw new Error ( 'loadFiles is undefined' )
   return ({
     isDefinedAt: ( ctx ) => {
@@ -24,10 +26,16 @@ export const getFusion = ( loadFiles: LoadFilesFn, parent: string, debug?: boole
         console.log ( 'file', file )
         console.log ( 'loadFiles', loadFiles )
       }
-      const { errors, yaml } = await loadAndMergeAndYamlParts ( loadFiles, params, fileParent, file, debug )
+      const { errors, yaml, postProcessorErrors } = await loadAndMergeAndYamlParts ( loadFiles, postProcessors, params, fileParent, file, debug )
       if ( errors.length > 0 ) {
         ctx.context.status = 400;
         ctx.context.body = JSON.stringify ( errors )
+        ctx.context.set ( 'Content-Type', 'application/json' );
+        return;
+      }
+      if ( toArray ( postProcessorErrors ).length > 0 ) {
+        ctx.context.status = 400;
+        ctx.context.body = JSON.stringify ( postProcessorErrors )
         ctx.context.set ( 'Content-Type', 'application/json' );
         return;
       }

@@ -5,15 +5,17 @@ import { getUrls, listUrls, putUrls } from "@itsmworkbench/apiurlstore";
 import { chainOfResponsibility } from "@runbook/utils";
 import { getFusion } from "./api.for.fusion";
 import { LoadFilesFn } from "@fusionconfig/config";
+import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
 
 
 export const fusionHandlers = (
   loadFile: LoadFilesFn,
+  postProcessors: PostProcessor[],
   parent: string,
   debug: boolean | undefined,
   ...handlers: KoaPartialFunction[] ): ( from: ContextAndStats ) => Promise<void> =>
   chainOfResponsibility ( defaultShowsError, //called if no matches
-    getFusion ( loadFile, parent,debug ),
+    getFusion ( loadFile, postProcessors, parent, debug ),
     ...handlers,
     notFoundIs404,
   )

@@ -7,10 +7,12 @@ import { fusionHandlers } from "./api";
 import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
 import { HasYaml } from "fusionconfig/dist/src/context";
 import { LoadFilesFn } from "@fusionconfig/config";
+import { addRequestsAndResponsesToServices, PostProcessor } from "@fusionconfig/config/dist/src/post.process";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
   loadFiles: LoadFilesFn
+  postProcessors: PostProcessor[]
 }
 export function apiCommand<Commander, Context extends ApiCommandContext, Config> (): CommandFn<Commander, Context, Config> {
   return ( context, config ) => ({
@@ -25,11 +27,11 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
     action: async ( commander, opts ) => {
       const { port, debug, directory } = opts
       let debugBoolean = debug === true;
-      console.log('directory', directory)
-      console.log('port', port)
-      console.log('debug', debug)
+      console.log ( 'directory', directory )
+      console.log ( 'port', port )
+      console.log ( 'debug', debug )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
-        fusionHandlers ( context.loadFiles, directory.toString () ,debugBoolean,) )
+        fusionHandlers ( context.loadFiles,context.postProcessors, directory.toString (), debugBoolean, ) )
     }
   })
 

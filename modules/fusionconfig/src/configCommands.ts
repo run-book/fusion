@@ -70,7 +70,8 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
     },
     action: async ( _, opts ) => {
       const { params, file, parent } = fromOpts ( opts );
-      let { fileDetails, errors, sorted, yaml } = await loadAndMergeAndYamlParts ( tc.context.loadFiles, params, parent, file, opts.debug === true );
+      let { fileDetails, errors, sorted, yaml } =
+            await loadAndMergeAndYamlParts ( tc.context.loadFiles, tc.context.postProcessors, params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
@@ -99,7 +100,8 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
     },
     action: async ( _, opts, property ) => {
       const { params, file, parent } = fromOpts ( opts );
-      let { fileDetails, errors, yaml, sorted } = await loadAndMergeAndYamlParts ( tc.context.loadFiles, params, parent, file, opts.debug === true );
+      let { fileDetails, errors, yaml, sorted } =
+            await loadAndMergeAndYamlParts ( tc.context.loadFiles, tc.context.postProcessors, params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
