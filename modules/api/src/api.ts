@@ -9,14 +9,17 @@ import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
 
 
 export const fusionHandlers = (
+  urlStore: UrlStore,
   loadFile: LoadFilesFn,
   postProcessors: PostProcessor[],
   parent: string,
   debug: boolean | undefined,
   ...handlers: KoaPartialFunction[] ): ( from: ContextAndStats ) => Promise<void> =>
   chainOfResponsibility ( defaultShowsError, //called if no matches
-    getFusion ( matchRawFusion,loadFile,[], parent, debug ),
-    getFusion ( matchFusion,loadFile, postProcessors, parent, debug ),
+    listUrls ( urlStore.list ),
+    getUrls ( urlStore ),
+    getFusion ( matchRawFusion, loadFile, [], parent, debug ),
+    getFusion ( matchFusion, loadFile, postProcessors, parent, debug ),
     ...handlers,
     notFoundIs404,
   )

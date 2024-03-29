@@ -1,2 +1,0 @@
-* C:\git\workshops\thereandbackagain/modules/transformer [tsc --noEmit false --outDir dist]
-src/transform.ts(70,148): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.

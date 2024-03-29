@@ -23,6 +23,7 @@
     "@itsmworkbench/nodeurlstore": "0.0.10",
     "@itsmworkbench/shellgit": "0.0.10",
     "@itsmworkbench/koa": "0.0.10",
+    "@fusionconfig/alldomains": "0.0.4",
     "@fusionconfig/config": "0.0.4",
     "@fusionconfig/fileopsconfig": "0.0.4",
     "debug": "^4.3.4"

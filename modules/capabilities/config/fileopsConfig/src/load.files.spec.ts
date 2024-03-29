@@ -10,16 +10,18 @@ const testDirPromise = laobanDirPromise.then ( d => d ? fileOps.join ( d, 'demo'
 const context: LoadFilesContext = { fileOps, yaml: jsYaml (), dic: { channel: 'merchantPortal', geo: 'uk', product: 'carLoan' } }
 describe ( "loadFilesIntegrationTest", () => {
   it ( "should find testDir", async () => {
-    expect ( await testDirPromise ).toBe ( '' )
+    expect ( await testDirPromise ).toBeTruthy ()
   } )
   it ( "should report missing params", async () => {
     const fileDetails = await recursivelyFindFileNames ( { ...context, dic: {} }, await testDirPromise, [], 'global.yaml' )
-    expect ( fileDetails ).toEqual ( [ {
-      "errors": [ "Illegal parameter(s) ${channel}, ${geo}, ${product}" ],
-      "exists": true,
-      "file": "global.yaml",
-      "trail": []
-    } ] )
+    expect ( fileDetails ).toEqual ( [
+      {
+        "errors": [ "Missing parameter(s) ${channel}, ${geo}, ${product}" ],
+        "exists": true,
+        "file": "global.yaml",
+        "trail": []
+      }
+    ] )
   } )
   it ( "should load the file details from test", async () => {
     const fileDetails = await recursivelyFindFileNames ( context, await testDirPromise, [], 'global.yaml' )

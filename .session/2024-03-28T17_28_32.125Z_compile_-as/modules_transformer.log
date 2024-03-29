@@ -1,2 +1,0 @@
-* C:\git\workshops\thereandbackagain/modules/transformer [tsc --noEmit false --outDir dist]
-src/configCommands.ts(38,36): error TS2344: Type 'Context' does not satisfy the constraint 'CliContext'.

@@ -2,12 +2,10 @@ import { CommandFn, HasCurrentDirectory } from "@itsmworkbench/cli";
 import { startKoa } from "@itsmworkbench/koa";
 import { nodeUrlstore } from "@itsmworkbench/nodeurlstore";
 import { shellGitsops } from "@itsmworkbench/shellgit";
-import { OrganisationUrlStoreConfigForGit } from "@itsmworkbench/urlstore";
 import { fusionHandlers } from "./api";
-import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
-import { HasYaml } from "fusionconfig/dist/src/context";
 import { LoadFilesFn } from "@fusionconfig/config";
-import { addTaskSchemasToServices, PostProcessor } from "@fusionconfig/config/dist/src/post.process";
+import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
+import { defaultOrgConfig } from "@fusionconfig/allDomains";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
@@ -30,8 +28,9 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
       console.log ( 'directory', directory )
       console.log ( 'port', port )
       console.log ( 'debug', debug )
+      const urlStore = nodeUrlstore ( shellGitsops (), defaultOrgConfig () )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
-        fusionHandlers ( context.loadFiles,context.postProcessors, directory.toString (), debugBoolean, ) )
+        fusionHandlers ( urlStore, context.loadFiles, context.postProcessors, directory.toString (), debugBoolean, ) )
     }
   })
 
