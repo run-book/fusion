@@ -5,28 +5,22 @@ services:
     description: "AML service provided by Experian for real-time background checks."
     request:
       topic: "experian.aml.request"
-      schema: "https://schemas.mycompany.com/experian/aml/request/v1/amlRequest.avsc"
     response:
       topic: "experian.aml.response"
-      schema: "https://schemas.mycompany.com/experian/aml/response/v1/amlResponse.avsc"
 
   equifax_creditCheck:
     description: "Credit score checking service provided by Equifax."
     request:
       topic: "equifax.creditScore.request"
-      schema: "https://schemas.mycompany.com/equifax/creditScore/request/v2/creditScoreRequest.avsc"
     response:
       topic: "equifax.creditScore.response"
-      schema: "https://schemas.mycompany.com/equifax/creditScore/response/v2/creditScoreResponse.avsc"
 
   experian_creditCheck:
     description: "Credit score checking service provided by Experian."
     request:
       topic: "experian.creditScore.request"
-      schema: "https://schemas.mycompany.com/experian/creditScore/request/v2/creditScoreRequest.avsc"
     response:
       topic: "experian.creditScore.response"
-      schema: "https://schemas.mycompany.com/experian/creditScore/response/v2/creditScoreResponse.avsc"
 
   internal_signatureVerification:
     description: "Internal signature verification service for document signing."

@@ -7,7 +7,7 @@ import { Commander12, commander12Tc } from "@itsmworkbench/commander12";
 import { NoConfig } from "../index";
 import { LoadFilesFn } from "@fusionconfig/config";
 import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
-import { addRequestsAndResponsesToServices, PostProcessor, SchemaNameFn } from "@fusionconfig/config/dist/src/post.process";
+import { addTaskSchemasToServices, PostProcessor, SchemaNameFn } from "@fusionconfig/config/dist/src/post.process";
 
 export type HasYaml = {
   yaml: YamlCapability
@@ -19,7 +19,7 @@ export interface ThereAndBackContext extends CliContext, HasYaml {
 
 export function postProcessors ( schemaNameFn: SchemaNameFn ): PostProcessor[] {
   return [
-    addRequestsAndResponsesToServices ( schemaNameFn )
+    addTaskSchemasToServices ( schemaNameFn )
   ]
 }
 

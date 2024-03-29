@@ -4,8 +4,9 @@ import path from "path";
 import { toArray } from "@laoban/utils";
 import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
 
-const matchFusion = /\/fusion\/(.*)$/;
-export const getFusion = ( loadFiles: LoadFilesFn, postProcessors: PostProcessor[], parent: string, debug?: boolean ): KoaPartialFunction => {
+export const matchFusion = /\/fusion\/(.*)$/;
+export const matchRawFusion = /\/fusion\/raw\/(.*)$/;
+export const getFusion = ( matchFusion: RegExp,loadFiles: LoadFilesFn, postProcessors: PostProcessor[], parent: string, debug?: boolean ): KoaPartialFunction => {
   if ( loadFiles === undefined ) throw new Error ( 'loadFiles is undefined' )
   return ({
     isDefinedAt: ( ctx ) => {

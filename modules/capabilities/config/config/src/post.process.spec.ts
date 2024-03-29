@@ -1,4 +1,4 @@
-import { addRequestsAndResponsesToServices, postProcess, PostProcessor } from "./post.process";
+import { addTaskSchemasToServices, postProcess, PostProcessor } from "./post.process";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { intoMerged } from "./merge";
 import { hasErrors } from "@laoban/utils";
@@ -44,7 +44,7 @@ describe ( 'post.process', () => {
   } );
   it ( 'should be able to post process a yaml file adding schemas to request and responses', async () => {
     const merged = intoMerged ( 'pretend.yaml' ) ( obj )
-    const result = await postProcess ( [ addRequestsAndResponsesToServices ( async () => 'somename' ) ], merged, {}, {} )
+    const result = await postProcess ( [ addTaskSchemasToServices ( async () => 'somename' ) ], merged, {}, {} )
     if ( hasErrors ( result ) ) throw new Error ( 'should not have errors\n' + JSON.stringify ( result, null, 2 ) )
     expect ( convertToYaml ( result, defaultCommentFunction ) ).toEqual ( `version:
   1 # Contributed by: pretend.yaml

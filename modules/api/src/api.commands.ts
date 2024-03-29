@@ -7,7 +7,7 @@ import { fusionHandlers } from "./api";
 import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
 import { HasYaml } from "fusionconfig/dist/src/context";
 import { LoadFilesFn } from "@fusionconfig/config";
-import { addRequestsAndResponsesToServices, PostProcessor } from "@fusionconfig/config/dist/src/post.process";
+import { addTaskSchemasToServices, PostProcessor } from "@fusionconfig/config/dist/src/post.process";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
