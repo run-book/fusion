@@ -18,6 +18,7 @@
     }
   },
   "links":       [
+    "@fusionconfig/loadfiles",
     "@fusionconfig/utils",
     "@fusionconfig/merger"
   ],

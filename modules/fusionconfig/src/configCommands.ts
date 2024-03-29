@@ -1,10 +1,11 @@
 import { CommandDetails, ContextConfigAndCommander, SubCommandDetails } from "@itsmworkbench/cli";
 import path from "path";
 import { findPart, firstSegment, NameAnd } from "@laoban/utils";
-import { recursivelyFindFileNames } from "./transform";
+
 import { ThereAndBackContext } from "./context";
 import { Merged, mergeObjectInto } from "@fusionconfig/merger";
 import { convertToYaml, defaultCommentFunction } from "@fusionconfig/merger";
+import { recursivelyFindFileNames } from "@fusionconfig/loadfiles";
 
 
 function parseParams ( params: string | boolean ) {

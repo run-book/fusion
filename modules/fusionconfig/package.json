@@ -27,6 +27,7 @@
     "@laoban/filesops-node": "1.4.45",
     "@laoban/variables": "1.4.45",
     "@laoban/utils": "1.4.45",
+    "@fusionconfig/loadfiles": "0.0.4",
     "@fusionconfig/utils": "0.0.4",
     "@fusionconfig/merger": "0.0.4",
     "debug": "^4.3.4"
