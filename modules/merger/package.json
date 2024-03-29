@@ -1,7 +1,7 @@
 {
-  "name": "@focuson/transformer",
-  "description": "Turns some json into other json",
-  "version": "0.0.1",
+  "name": "@fusionconfig/merger",
+  "description": "merges together yaml files keeping track of where the fields came from",
+  "version": "0.0.4",
   "main": "dist/index",
   "types": "dist/index",
   "browserslist": {
@@ -17,12 +17,6 @@
     ]
   },
   "dependencies": {
-    "jsonata": "^v2.0.4",
-    "@itsmworkbench/cli": "0.0.5",
-    "@itsmworkbench/commander12": "0.0.5",
-    "@itsmworkbench/jsyaml": "0.0.5",
-    "@laoban/filesops-node": "1.4.45",
-    "@laoban/variables": "1.4.45",
     "@laoban/utils": "1.4.45",
     "debug": "^4.3.4"
   },

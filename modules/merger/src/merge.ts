@@ -1,5 +1,4 @@
 import { NameAnd } from "@laoban/utils";
-import { type } from "node:os";
 
 export type MergeInput = {
   file: string

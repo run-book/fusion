@@ -3,7 +3,7 @@ import path from "path";
 import { FileOps } from "@laoban/fileops";
 import { derefence, dollarsBracesVarDefn } from "@laoban/variables";
 import { YamlCapability } from "@itsmworkbench/yaml";
-import { extractPlaceholders } from "./utils";
+import { extractPlaceholders } from "@fusionconfig/utils";
 
 export interface LegalParameter {
   legal: string[]
@@ -98,17 +98,3 @@ export async function recursivelyFindFileNames ( context: LoadContext, root: str
     f => recursivelyFindFileNames ( context, newPathForFile, [ ...trail, file ], f, debug ) )
   return [ { trail, file, exists: true, errors, yaml: yamlContent }, ...fromHierarchy ]
 }
-
-// export async function recursivelyLoad ( context: LoadContext, root: string, trail: string[], file: string ): Promise<FileAndYaml[]> {
-//   const { fileOps, fromYaml, dic } = context
-//   if ( trail.includes ( file ) ) throw new Error ( `Circular reference detected: ${trail.join ( ' -> ' )} -> ${file}` )
-//   let newFile = path.join ( root, file );
-//   const newPathForFile = path.dirname ( newFile )
-//   const content = await fileOps.loadFileOrUrl ( newFile )
-//   const derefed = derefence ( newFile, dic, content, { variableDefn: dollarsBracesVarDefn, throwError: true } )
-//   const yaml = fromYaml ( derefed )
-//   const hierarchy = toObject<string> ( yaml?.hierarchy )
-//   const fromHierarchy = await flatMapK ( Object.values ( hierarchy ), file => recursivelyLoad ( context, newPathForFile, [ ...trail, file ], file ) )
-//   return [ { file, yaml }, ...fromHierarchy ]
-//
-// }

@@ -3,8 +3,8 @@ import path from "path";
 import { findPart, firstSegment, NameAnd } from "@laoban/utils";
 import { recursivelyFindFileNames } from "./transform";
 import { ThereAndBackContext } from "./context";
-import { Merged, mergeObjectInto } from "./merge";
-import { convertToYaml, defaultCommentFunction } from "./convert.to.yaml";
+import { Merged, mergeObjectInto } from "@fusionconfig/merger";
+import { convertToYaml, defaultCommentFunction } from "@fusionconfig/merger";
 
 
 function parseParams ( params: string | boolean ) {

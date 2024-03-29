@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { CliTc, fixedConfig, makeCli } from "@itsmworkbench/cli";
 import { fileOpsNode } from "@laoban/filesops-node";
 import { Commander12, commander12Tc } from "@itsmworkbench/commander12";

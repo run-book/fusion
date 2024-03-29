@@ -1,0 +1,29 @@
+{
+  "template":    "typescript",
+  "name":        "fusionconfig",
+  "description": "Like heira but for whole files",
+  "packageJson": {
+    "dependencies":    {
+      "jsonata":                    "^v2.0.4",
+      "@itsmworkbench/cli":         "0.0.5",
+      "@itsmworkbench/commander12": "0.0.5",
+      "@itsmworkbench/jsyaml":      "0.0.5",
+      "@laoban/filesops-node":      "1.4.45",
+      "@laoban/variables":          "1.4.45",
+      "@laoban/utils":              "1.4.45"
+    },
+    "devDependencies": {},
+    "bin":             {
+      "fusion": "dist/index.js"
+    }
+  },
+  "links":       [
+    "@fusionconfig/utils",
+    "@fusionconfig/merger"
+  ],
+  "guards":      {
+    "compile": true,
+    "publish": true,
+    "test":    false
+  }
+}
