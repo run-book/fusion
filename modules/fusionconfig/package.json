@@ -28,9 +28,9 @@
     "@laoban/variables": "1.4.49",
     "@laoban/utils": "1.4.49",
     "@fusionconfig/api": "0.0.4",
-    "@fusionconfig/loadfiles": "0.0.4",
+    "@fusionconfig/config": "0.0.4",
+    "@fusionconfig/fileopsconfig": "0.0.4",
     "@fusionconfig/utils": "0.0.4",
-    "@fusionconfig/merger": "0.0.4",
     "debug": "^4.3.4"
   },
   "devDependencies": {

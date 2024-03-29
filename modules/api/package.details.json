@@ -14,8 +14,8 @@
     "devDependencies": {}
   },
   "links":       [
-    "@fusionconfig/loadfiles",
-    "@fusionconfig/merger"
+    "@fusionconfig/config",
+    "@fusionconfig/fileopsconfig"
   ],
   "guards":      {
     "compile": true,

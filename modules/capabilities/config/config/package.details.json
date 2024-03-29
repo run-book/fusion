@@ -1,7 +1,7 @@
 {
   "template":    "typescript",
-  "name":        "@fusionconfig/merger",
-  "description": "merges together yaml files keeping track of where the fields came from",
+  "name":        "@fusionconfig/config",
+  "description": "the interfaces for the configuration",
   "packageJson": {
     "dependencies":    {
       "@laoban/utils": "1.4.49"

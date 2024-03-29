@@ -19,9 +19,9 @@
   },
   "links":       [
     "@fusionconfig/api",
-    "@fusionconfig/loadfiles",
-    "@fusionconfig/utils",
-    "@fusionconfig/merger"
+    "@fusionconfig/config",
+    "@fusionconfig/fileopsconfig",
+    "@fusionconfig/utils"
   ],
   "guards":      {
     "compile": true,

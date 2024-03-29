@@ -3,8 +3,7 @@ import path from "path";
 import { findPart, firstSegment, NameAnd } from "@laoban/utils";
 
 import { ThereAndBackContext } from "./context";
-import { convertToYaml, defaultCommentFunction, Merged, mergeObjectInto } from "@fusionconfig/merger";
-import { recursivelyFindFileNames } from "@fusionconfig/loadfiles";
+import { loadAndMergeAndYamlParts, loadAndMergeParts, Merged } from "@fusionconfig/config";
 
 
 function parseParams ( params: string | boolean ) {
@@ -52,7 +51,7 @@ export function listFilesCommand<Commander, Config, CleanConfig> ( tc: ContextCo
     },
     action: async ( _, opts ) => {
       const { params, file, parent } = fromOpts ( opts );
-      const fileDetails = await recursivelyFindFileNames ( { fileOps: tc.context.fileOps, yaml: tc.context.yaml, dic: params }, parent, [], file, opts.debug === true )
+      const fileDetails = await tc.context.loadFiles ( params, parent, file, opts.debug === true )
       const errors = fileDetails.filter ( f => f.errors.length > 0 )
       if ( opts.errors )
         errors.forEach ( f => console.log ( f ) )
@@ -70,14 +69,6 @@ export function listFilesCommand<Commander, Config, CleanConfig> ( tc: ContextCo
   }
 
 }
-export async function mergeForCli<Commander, Config, CleanConfig> ( context: ThereAndBackContext, params: {}, parent: string, file: string, debug: boolean ) {
-  const fileDetails = await recursivelyFindFileNames ( { fileOps: context.fileOps, yaml: context.yaml, dic: params }, parent, [], file, debug )
-  const errors = fileDetails.filter ( f => f.errors.length > 0 )
-  const merged: Merged = fileDetails.reduce ( ( acc, fd ) => mergeObjectInto ( acc, fd ), { value: undefined, files: [] } )
-  const { version, parameters, hierarchy, ...rest } = merged.value as any
-  let sorted = { value: { version, parameters, hierarchy, ...rest }, files: merged.files };
-  return { fileDetails, errors, merged, sorted };
-}
 export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): CommandDetails<Commander> {
   return {
     cmd: 'merge',
@@ -90,24 +81,16 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
     },
     action: async ( _, opts ) => {
       const { params, file, parent } = fromOpts ( opts );
-      let { fileDetails, errors, merged, sorted } = await mergeForCli ( tc.context, params, parent, file, opts.debug === true );
+      let { fileDetails, errors, sorted, yaml } = await loadAndMergeAndYamlParts ( tc.context.loadFiles, params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
         process.exit ( 1 )
       }
       if ( opts.full === true )
-        console.log ( JSON.stringify ( merged.value, null, 2 ) )
+        console.log ( JSON.stringify ( sorted.value, null, 2 ) )
       else {
-        console.log ( `# ${JSON.stringify ( params )}` )
-        console.log ( "#" )
-        console.log ( "# Files" )
-        fileDetails.filter ( f => f.exists ).forEach ( ( { yaml, ...rest } ) => console.log ( `# ${JSON.stringify ( rest )}` ) )
-        console.log ( "#" )
-        console.log ( "# Files not found" )
-        fileDetails.filter ( f => !f.exists ).forEach ( ( { yaml, ...rest } ) => console.log ( `# ${JSON.stringify ( rest )}` ) )
-        console.log ( "#" )
-        console.log ( convertToYaml ( sorted, defaultCommentFunction ) )
+        console.log ( yaml )
       }
     }
   }
@@ -132,21 +115,19 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
       '--debug': { description: 'Show debug information' },
       '--full': { description: 'Show more data about the files' },
       '--keys': { description: 'If an object shows the keys' },
-
-
     },
     action: async ( _, opts, property ) => {
       const { params, file, parent } = fromOpts ( opts );
-      let { fileDetails, errors, merged, sorted } = await mergeForCli ( tc.context, params, parent, file, opts.debug === true );
+      let { fileDetails, errors, yaml, sorted } = await loadAndMergeAndYamlParts ( tc.context.loadFiles, params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
         process.exit ( 1 )
       }
-      if ( opts.full === true )
+      if ( opts.full === true ) {
         console.log ( JSON.stringify ( property === '.' ? sorted : findPartInFull ( sorted, property ), null, 2 ) )
-      else {
-        const simplified = tc.context.yaml.parser ( convertToYaml ( sorted, defaultCommentFunction ) )
+      } else {
+        const simplified = tc.context.yaml.parser ( yaml )
         let result = property == '.' ? simplified : findPart ( simplified, property );
         if ( opts.keys ) {
           if ( typeof result === 'object' )

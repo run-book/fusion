@@ -1,23 +1,20 @@
 import { fileOpsNode } from "@laoban/filesops-node";
 import { findFileUp } from "@laoban/fileops";
 import { jsYaml } from "@itsmworkbench/jsyaml";
-import { mergeForCli } from "./configCommands";
-import { thereAndBackContext, ThereAndBackContext } from "./context";
-
-import { convertToYaml, defaultCommentFunction } from "@fusionconfig/merger";
+import { loadAndMergeAndYamlParts, LoadFilesFn } from "@fusionconfig/config";
+import { findConfigUsingFileops } from "./load.files";
 
 const fileOps = fileOpsNode ()
 const laobanDirPromise = findFileUp ( process.cwd (), async s => fileOps.isFile ( fileOps.join ( s, 'laoban.json' ) ) )
 const testDirPromise = laobanDirPromise.then ( d => d ? fileOps.join ( d, 'demo' ) : undefined )
 let params = { channel: 'merchantPortal', geo: 'uk', product: 'carLoan' };
-const context: ThereAndBackContext = thereAndBackContext ( 'intellimaintain', 'someVersion', fileOpsNode (), jsYaml () )
 
+const loadFiles: LoadFilesFn = findConfigUsingFileops ( fileOps, jsYaml () )
 
 describe ( "merging global.yaml", () => {
   it ( "should have a mergeForCli", async () => {
-    const { fileDetails, merged, sorted, errors } = await mergeForCli ( context, params, await testDirPromise, 'global.yaml', false )
+    const { fileDetails, sorted, errors, yaml } = await loadAndMergeAndYamlParts ( loadFiles, params, await testDirPromise, 'global.yaml', false )
     expect ( errors ).toEqual ( [] )
-    const yaml = convertToYaml ( sorted, defaultCommentFunction )
     expect ( yaml ).toEqual ( `version:
   1 # Contributed by: global.yaml, services/services.yaml
 parameters:

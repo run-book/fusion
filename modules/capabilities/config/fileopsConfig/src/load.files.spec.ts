@@ -13,7 +13,7 @@ describe ( "loadFilesIntegrationTest", () => {
     expect ( await testDirPromise ).toBe ( '' )
   } )
   it ( "should report missing params", async () => {
-    const fileDetails = await recursivelyFindFileNames ( { ...context, dic: {} }, await testDirPromise, [], 'global.yaml', false )
+    const fileDetails = await recursivelyFindFileNames ( { ...context, dic: {} }, await testDirPromise, [], 'global.yaml' )
     expect ( fileDetails ).toEqual ( [ {
       "errors": [ "Illegal parameter(s) ${channel}, ${geo}, ${product}" ],
       "exists": true,
@@ -22,7 +22,7 @@ describe ( "loadFilesIntegrationTest", () => {
     } ] )
   } )
   it ( "should load the file details from test", async () => {
-    const fileDetails = await recursivelyFindFileNames ( context, await testDirPromise, [], 'global.yaml', false )
+    const fileDetails = await recursivelyFindFileNames ( context, await testDirPromise, [], 'global.yaml' )
     expect ( fileDetails.map ( ( { yaml, ...rest } ) => rest ) ).toEqual ( [
       { "errors": [], "exists": true, "file": "global.yaml", "trail": [] },
       { "errors": [], "exists": false, "file": "geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml", "trail": [ "global.yaml" ] },

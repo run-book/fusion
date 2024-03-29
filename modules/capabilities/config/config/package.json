@@ -1,6 +1,6 @@
 {
-  "name": "@fusionconfig/fusionnamespace",
-  "description": "Allows access to the fusion config namespace",
+  "name": "@fusionconfig/config",
+  "description": "the interfaces for the configuration",
   "version": "0.0.4",
   "main": "dist/index",
   "types": "dist/index",

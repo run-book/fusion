@@ -1,7 +1,7 @@
 {
   "template":    "typescript",
-  "name":        "@fusionconfig/loadfiles",
-  "description": "merges together yaml files keeping track of where the fields came from",
+  "name":        "@fusionconfig/fileopsconfig",
+  "description": "loads the merged configuration from the file system",
   "packageJson": {
     "dependencies":    {
       "@laoban/utils": "1.4.49"
@@ -13,6 +13,7 @@
     }
   },
   "links":       [
+    "@fusionconfig/config"
   ],
   "guards":      {
     "compile": true,
