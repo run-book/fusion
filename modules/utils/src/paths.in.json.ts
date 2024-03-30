@@ -1,4 +1,5 @@
-import { ErrorsAnd } from "@laoban/utils";
+import { ErrorsAnd, hasErrors } from "@laoban/utils";
+import { Validate } from "./validate";
 
 export type PathsInJson = {
   [ key: string ]: PathsInJson | string;
@@ -60,7 +61,74 @@ export async function validatePathsInJson ( paths: PathsInJson, validate: Valida
   return validateRecursively ( paths );
 }
 
+export function foldPathsToJson<Acc> (
+  paths: PathsInJson,
+  foldFn: ( acc: Acc, path: string ) => Acc,
+  zero: Acc,
+  currentPath: string[] = []
+): Acc {
+  return Object.entries ( paths ).reduce<Acc> ( ( acc, [ key, value ] ) => {
+    // If the value is a string, it's a leaf node, so apply foldFn to it.
+    if ( typeof value === "string" ) {
+      return foldFn ( acc, [ ...currentPath, key, value ].join ( '.' ) );
+    } else {
+      // Otherwise, recurse into the object.
+      return foldPathsToJson ( value, foldFn, acc, [ ...currentPath, key ] );
+    }
+  }, zero );
+}
 
+export function mapPaths<T> ( paths: PathsInJson, fn: ( path: string ) => T ): T[] {
+  return Object.entries ( paths ).reduce<T[]> ( ( acc, [ key, value ] ) => {
+    if ( typeof value === 'string' ) {
+      return acc.concat ( fn ( value ) );
+    } else {
+      return acc.concat ( mapPaths ( value, fn ) );
+    }
+  }, [] );
+}
+export function mapPathsK<T> ( paths: PathsInJson, fn: ( path: string ) => Promise<T> ): Promise<T[]> {
+  return Object.entries ( paths ).reduce<Promise<T[]>> ( async ( accPromise, [ key, value ] ) => {
+    const acc = await accPromise;
+    if ( typeof value === 'string' ) {
+      return acc.concat ( await fn ( value ) );
+    } else {
+      return acc.concat ( await mapPathsK ( value, fn ) );
+    }
+  }, Promise.resolve ( [] ) );
+}
+
+export function flatMapPaths<T> ( paths: PathsInJson, fn: ( path: string ) => T[] ): T[] {
+  return Object.entries ( paths ).reduce<T[]> ( ( acc, [ key, value ] ) => {
+    if ( typeof value === 'string' ) {
+      return acc.concat ( fn ( value ) );
+    } else {
+      return acc.concat ( flatMapPaths ( value, fn ) );
+    }
+  }, [] );
+}
+
+export async function foldPathsToJsonK<Acc> (
+  paths: PathsInJson,
+  foldFn: ( acc: Acc, path: string ) => Promise<Acc>,
+  zero: Acc,
+  currentPath: string[] = []
+): Promise<Acc> {
+  let accumulator: Acc = zero;
+
+  for ( const [ key, value ] of Object.entries ( paths ) ) {
+    const newPath = currentPath.concat ( key );
+
+    if ( typeof value === "string" ) {
+      // If it's a leaf node, apply foldFn to it, and wait for the result
+      accumulator = await foldFn ( accumulator, value );
+    } else {
+      // If it's not a leaf, recursively process the child node
+      accumulator = await foldPathsToJsonK ( value, foldFn, accumulator, newPath );
+    }
+  }
+  return accumulator;
+}
 export function getPath ( path: string, pathInJson: PathsInJson ): string | undefined {
   const segments = path.split ( '/' );
   const currentNode = segments.reduce<PathsInJson | string | undefined> (
@@ -71,3 +139,77 @@ export function getPath ( path: string, pathInJson: PathsInJson ): string | unde
 
 export const findFirstPath = ( paths: string[], pathInJson: PathsInJson ): string | undefined =>
   paths.find ( path => getPath ( path, pathInJson ) );
+
+
+export async function findPathAndErrors ( paths: string[], validateK: ( path: string ) => Promise<string[]> ): Promise<PathAndErrors[]> {
+  return paths.reduce<Promise<PathAndErrors[]>> ( async ( accPromise, path ) => {
+    const acc = await accPromise;
+    const errors = await validateK ( path );
+    acc.push ( { path, errors } );
+    return acc;
+  }, Promise.resolve ( [] ) );
+}
+export type PathAndErrors = {
+  path: string;
+  errors: string[];
+};
+export type PathContentAndErrors<T> = PathAndErrors & { content?: T };
+export type PathAndT<T> = { path: string, t: T };
+
+
+type ContentAndErrors<T> = {
+  content?: T;
+  errors: string[];
+
+}
+//
+//
+// export function pathToPathContentAndErrors<T> ( loadFn: ( s: string ) => Promise<string>,
+//                                                 parser: ( path: string, s: string ) => T,
+//                                                 validate: Validate<PathAndT<T>> ) {
+//   return async ( context: string, path: string ): Promise<PathContentAndErrors<T>> => {
+//     async function load ( path: string ): Promise<ErrorsAnd<string>> {
+//       try {
+//         return await loadFn ( path );
+//       } catch ( e ) {
+//         return [ e.message ]
+//       }
+//     }
+//     function parse ( path: string, string: string ): ErrorsAnd<T> {
+//       try {
+//         return parser ( path, string );
+//       } catch ( e ) {
+//         return [ context + ' ' + e.message ]
+//       }
+//     }
+//     console.log ( 'pathToPathContentAndErrors', path )
+//     const string = await load ( path )
+//     console.log ( 'pathToPathContentAndErrors - string', string )
+//     if ( hasErrors ( string ) ) return { path, errors: string }
+//     const content = parse ( path, string );
+//     console.log ( 'pathToPathContentAndErrors - content', content )
+//     if ( hasErrors ( content ) ) return { path, errors: content }
+//     const errors = validate ( context + ' ' + path, { path, t: content } );
+//     console.log ( 'pathToPathContentAndErrors - errors', errors )
+//     return { path, errors, content };
+//   };
+// }
+//
+// export async function findPathAndContentAndErrors<T> (
+//   context: string,
+//   paths: PathsInJson,
+//   loadFn: ( s: string ) => Promise<string>,
+//   parser: ( path: string, s: string ) => T,
+//   validate: Validate<PathAndT<T>> ): Promise<PathContentAndErrors<T>[]> {
+//   const foldFn = pathToPathContentAndErrors ( loadFn, parser, validate );
+//   let result = await foldPathsToJsonK<PathContentAndErrors<T>[]> ( paths,
+//     async ( acc, path ) => {
+//       console.log ( 'findPathAndContentAndErrors - path is', path )
+//       const contentAndErrors = await foldFn ( context, path );
+//       console.log ( 'findPathAndContentAndErrors - contentAndErrors', contentAndErrors )
+//       acc.push ( contentAndErrors );
+//       return acc;
+//     }, [] );
+//   console.log('findPathAndContentAndErrors - result', result)
+//   return result
+// }

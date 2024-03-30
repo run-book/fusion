@@ -1,5 +1,5 @@
 import { ErrorsAnd } from "@laoban/utils";
-import { findFirstPath, getPath, pathListToJson, PathsInJson, validatePathsInJson } from "./paths.in.json";
+import { findFirstPath, findPathAndErrors, foldPathsToJson, foldPathsToJsonK, getPath, PathAndErrors, pathListToJson, PathsInJson, validatePathsInJson } from "./paths.in.json";
 
 describe ( 'pathListToJson', () => {
   it ( 'correctly converts a list of paths to a JSON structure without violations', () => {
@@ -162,3 +162,95 @@ describe ( 'findFirstPath', () => {
     expect ( findFirstPath ( paths, pathInJson ) ).toBe ( 'folder/subfolder/file.txt' );
   } );
 } );
+
+
+describe('foldPathsToJson', () => {
+  it('should accumulate paths with _X appended', () => {
+    const testPaths: PathsInJson = {
+      home: {
+        kitchen: "sink",
+        bedroom: "lamp"
+      },
+      garden: "fountain"
+    };
+
+    // Define the fold function to accumulate paths into a string array, appending "_X" to each
+    const testFoldFn = (acc: string[], path: string): string[] => {
+      return [...acc, path + '_X']; // Ensure _X is appended here for clarity
+    };
+
+    // The initial value for the accumulator is an empty array
+    const expectedResult = [
+      "home.kitchen.sink_X",
+      "home.bedroom.lamp_X",
+      "garden.fountain_X"
+    ];
+
+    // Execute foldPathsToJson with the testPaths, testFoldFn, and an empty array as the initial accumulator
+    const result = foldPathsToJson(testPaths, testFoldFn, []);
+
+    // Expect the result to equal the expectedResult
+    expect(result).toEqual(expectedResult);
+  });
+});
+
+
+describe('foldPathsToJsonK', () => {
+  it('should asynchronously accumulate paths with _X appended', async () => {
+    // Simulated PathsInJson object
+    const paths: PathsInJson = {
+      home: {
+        kitchen: "sink",
+        bedroom: "lamp"
+      },
+      garden: "fountain"
+    };
+
+    // Asynchronous fold function that appends "_X" to each path and simulates a delay
+    const asyncFoldFn = async (acc: string[], path: string): Promise<string[]> => {
+      // Simulate delay
+      await new Promise(resolve => setTimeout(resolve, 10));
+      return [...acc, path + '_X'];
+    };
+
+    // Expected result
+    const expectedResult = [
+      "home.kitchen.sink_X",
+      "home.bedroom.lamp_X",
+      "garden.fountain_X"
+    ];
+
+    // Execute the fold function asynchronously and await its result
+    const result = await foldPathsToJsonK(paths, asyncFoldFn, []);
+
+    // Assert that the result matches the expected array of paths with '_X'
+    expect(result).toEqual(expectedResult);
+  });
+});
+
+
+describe('findPathAndErrors', () => {
+  // Mock `fetchErrorsForPath` for testing
+  const fetchErrorsForPath = async (path: string): Promise<string[]> => {
+    if (!path.endsWith('.txt')) {
+      return [`Error: '${path}' does not end with .txt`];
+    }
+    return [];
+  };
+
+  it('should accumulate errors for paths not ending in .txt', async () => {
+    const paths = ['file1.txt', 'file2.doc', 'file3.txt', 'file4.jpg'];
+
+    const expected: PathAndErrors[] = [
+      { path: 'file1.txt', errors: [] },
+      { path: 'file2.doc', errors: [`Error: 'file2.doc' does not end with .txt`] },
+      { path: 'file3.txt', errors: [] },
+      { path: 'file4.jpg', errors: [`Error: 'file4.jpg' does not end with .txt`] },
+    ];
+
+    const result = await findPathAndErrors(paths, fetchErrorsForPath);
+
+    // Use toEqual for deep equality comparison
+    expect(result).toEqual(expected);
+  });
+});
