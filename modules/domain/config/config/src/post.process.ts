@@ -44,25 +44,6 @@ export async function postProcess ( processors: PostProcessor[], sorted: Merged,
 }
 
 
-//sample input
-// internal_pricingService:
-//   description: "Internal pricing service for product and service pricing adjustments."
-//   request:
-//     topic: "internal.pricing.request"
-//   response:
-//     topic: "internal.pricing.response"
-//
-//sample output. The contributed by is critical it tells us where the schema came from... which customisation was used. Note that the response example has a uk specific schema but the request doesn't
-// internal_pricingService:
-//   description: "Internal pricing service for product and service pricing adjustments."
-//   request:
-//     topic: "internal.pricing.request"
-//     schema: "itsmid/org/schema/<someGitShaThatWasTheFileAtTheTimeWeCreatedThis>" # Contributed by schemabot:itsm/org/schema/task.internal_pricingService.request.
-//   response:
-//     topic: "internal.pricing.response"
-//     schema: "itsmid/org/schema/<someGitShaThatWasTheFileAtTheTimeWeCreatedThis>" # Contributed by schemabot:itsm/org/schema/task.internal_pricingService.response.uk.
-
-
 export function addNameStringToMerged ( merged: Merged, name: string, value: string, addedBy: string ): ErrorsAnd<Merged> {
   if ( typeof merged.value !== 'object' ) return [ `Was trying to add ${name}:${value} # ${addedBy} but is not an object` ]
   const newMerged = { value, files: [ addedBy ] }
@@ -91,12 +72,12 @@ export function addAllFieldsInMergedToMerge ( merged: Merged, value: Merged, add
   }
   return merged
 }
-export function removeServices (): PostProcessor {
+export function removeKey ( key: string ): PostProcessor {
   return {
-    key: 'services',
+    key,
     postProcess:
-      async ( full: Merged, services: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
-        full.value[ 'services' ] = undefined
+      async ( full: Merged, ignore: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
+        full.value[ key ] = undefined
         return full
       }
   }

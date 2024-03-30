@@ -6,7 +6,7 @@ import { jsYaml } from "@itsmworkbench/jsyaml";
 import { Commander12, commander12Tc } from "@itsmworkbench/commander12";
 import { UrlStore } from "@itsmworkbench/urlstore";
 import { NoConfig } from "../index";
-import { CommentFactoryFunction, defaultCommentFactoryFunction, LoadFilesFn, PostProcessor, removeServices, } from "@fusionconfig/config";
+import { CommentFactoryFunction, defaultCommentFactoryFunction, LoadFilesFn, PostProcessor, removeKey, } from "@fusionconfig/config";
 import { addTaskDetails, defaultSchemaNameFn, SchemaNameFn, } from "@fusionconfig/tasks";
 import { addTransformersToTasks, defaultTransformerNameFn, TransformerNameFn } from "@fusionconfig/transformer";
 import { addKafkaSchemasToServices, defaultKafkaNameFn } from "@fusionconfig/services";
@@ -30,7 +30,7 @@ export function postProcessors ( schemaNameFn: SchemaNameFn, transformerNameFn: 
     addKafkaSchemasToServices ( defaultKafkaNameFn ( urlStore.loadNamed ) ),
     addTaskDetails ( schemaNameFn ),
     addTransformersToTasks ( transformerNameFn ),
-    removeServices ()
+    removeKey ( 'services' )
   ]
 }
 
