@@ -15,3 +15,4 @@ export function defaultOrgConfig (): OrganisationUrlStoreConfigForGit {
     nameSpaceDetails: allDomainDetails ()
   }
 }
+

@@ -1,4 +1,4 @@
-import { NameSpaceDetails, NameSpaceDetailsForGit, nameSpaceDetailsForGit } from "@itsmworkbench/urlstore";
+import { NameSpaceDetailsForGit, nameSpaceDetailsForGit } from "@itsmworkbench/urlstore";
 
 
 export const transformNs: NameSpaceDetailsForGit =

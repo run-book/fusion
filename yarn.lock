@@ -372,6 +372,16 @@
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
 
+"@itsmworkbench/cli@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/cli/-/cli-0.0.7.tgz#8d21e10ccbeee119109dec34e7d03da1d7865cc8"
+  integrity sha512-uu5vP+F3uHWB8y6/3ZLQNiB7rSTCpBGNdrY7vPkKWsJ+OV/AAZ+XqpyhjU3i/f2zDUUb0svbS443gr7q3d76RQ==
+  dependencies:
+    "@itsmworkbench/utils" "0.0.7"
+    "@laoban/fileops" "1.4.45"
+    "@laoban/utils" "1.4.45"
+    debug "^4.3.4"
+
 "@itsmworkbench/commander12@0.0.13":
   version "0.0.13"
   resolved "https://registry.yarnpkg.com/@itsmworkbench/commander12/-/commander12-0.0.13.tgz#13ff2644738113d28237a3480f6b40a72d01c9af"
@@ -379,6 +389,16 @@
   dependencies:
     "@itsmworkbench/cli" "0.0.13"
     commander "^v12.0.0"
+    debug "^4.3.4"
+
+"@itsmworkbench/config@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/config/-/config-0.0.7.tgz#ddc76fbdfc4a7cd9610055c47d800f2e07f4c4a0"
+  integrity sha512-W4RXUp8X+hmw10YjMfhMMR6EZARex1aF6DmQH0mCiLRzK1KDDKu2wEDEwQGo1addSXPIwAdzHyTOapuIlH/qXA==
+  dependencies:
+    "@itsmworkbench/cli" "0.0.7"
+    "@itsmworkbench/utils" "0.0.7"
+    "@laoban/utils" "1.4.45"
     debug "^4.3.4"
 
 "@itsmworkbench/domain@0.0.13":
@@ -534,6 +554,15 @@
   version "0.0.13"
   resolved "https://registry.yarnpkg.com/@itsmworkbench/utils/-/utils-0.0.13.tgz#bbfb96d711616633d26ca57d87a773337e0c6852"
   integrity sha512-M2RdI92FqIHrF17FteXbMn6j/Sz3Sl2B94vIpmTLMRTwvym2LgFANVaGbnp5MZMigehEHBVnIQ+/4m+CG2gP7A==
+  dependencies:
+    "@focuson/lens" "1.44.3"
+    debug "^4.3.4"
+    node "^v14.4.0"
+
+"@itsmworkbench/utils@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/utils/-/utils-0.0.7.tgz#10c1dd43cc140bf96d613885d4a92fc7dee1666b"
+  integrity sha512-poSH5P3U2738yZzdjRfoPtHDRsOiWeu/+eeFxuwBo4tPQHpl05abECamR4EQ+Tt520j5Cl+tyoo/Q5PlzJv+1Q==
   dependencies:
     "@focuson/lens" "1.44.3"
     debug "^4.3.4"

@@ -1,4 +1,4 @@
-import { findPartInMerged, Merged } from "./merge";
+import { Merged } from "./merge";
 
 export function findStringArray ( merged: Merged): string[] {
   let value = merged.value;
