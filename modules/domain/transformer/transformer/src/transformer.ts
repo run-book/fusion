@@ -25,7 +25,7 @@ export type TransformMetaSummary = {
   id: string
   task: string
   service: string
-  direction: string
+  reqOrResp: string
   converter: string
 }
 export type TransformerPathAndLoadResult = {
@@ -58,19 +58,19 @@ export async function loadAllTransformersFromFileSystem ( fileOps: FileOps, urlS
   return await loadAllTransformers ( json, urlStore )
 }
 
+export const loadOneTransformerPathAndLoadResult = ( urlStore: UrlStore, path: string ) => async ( tm: TransformerMeta ): Promise<ErrorsAnd<TransformerPathAndLoadResult>> => mapErrors ( await urlStore.loadNamed<string> ( tm.url ), loaded => {
+  const summary: TransformMetaSummary = {
+    path, url: loaded.url,
+    id: loaded.id, task: tm.task, service: tm.service,
+    reqOrResp: transformerDirection ( tm ),
+    converter: loaded.result
+  }
+  return { tm, loaded, path, summary }
+} );
+
 export async function loadAllTransformers ( json: PathsInJson, urlStore: UrlStore ): Promise<MetasAndErrors> {
-  const x: ErrorsAnd<TransformerPathAndLoadResult>[] = await mapPathsK ( json, path => {
-    return mapErrorsK ( pathToTransformerMeta ( path ), async tm =>
-      mapErrors ( await urlStore.loadNamed<string> ( tm.url ), loaded => {
-        const summary: TransformMetaSummary = {
-          path, url: loaded.url,
-          id: loaded.id, task: tm.task, service: tm.service,
-          direction: transformerDirection ( tm ),
-          converter: loaded.result
-        }
-        return { tm, loaded, path, summary }
-      } ) )
-  } )
+  const x: ErrorsAnd<TransformerPathAndLoadResult>[] = await mapPathsK ( json, path =>
+    mapErrorsK ( pathToTransformerMeta ( path ), loadOneTransformerPathAndLoadResult ( urlStore, path ) ) )
   const errors: string[] = []
   const metas: TransformerPathAndLoadResult[] = []
   x.forEach ( x => {
@@ -91,17 +91,17 @@ export async function loadAllTransformers ( json: PathsInJson, urlStore: UrlStor
 //.<task>.<service>.serviceToTask/ other stuff.jsonata
 //so we need to to split by /
 
-const sToT = 'service_to_task'
-const tToS = 'task_to_service'
+export const serviceToTask = 'service_to_task'
+export const taskToService = 'task_to_service'
 export function pathToTransformerMeta ( path: string ): ErrorsAnd<TransformerMeta> {
   const parts = path.split ( '/' )
-  if ( parts.length < 3 ) return [ `Path ${path} does not have enough parts. Expecting <task>.<service>.${sToT}/.. or <task>.<service>.${tToS}/...` ]
+  if ( parts.length < 3 ) return [ `Path ${path} does not have enough parts. Expecting <task>.<service>.${serviceToTask}/.. or <task>.<service>.${taskToService}/...` ]
   const task = parts[ 0 ]
   const service = parts[ 1 ]
   const direction = parts[ 2 ]
-  if ( direction !== sToT && direction !== tToS ) return [ `Path ${path} does not have the correct 'direction' ${direction}. Expecting <task>.<service>.${sToT}/.. or <task>.<service>.${tToS}/...` ]
+  if ( direction !== serviceToTask && direction !== taskToService ) return [ `Path ${path} does not have the correct 'direction' ${direction}. Expecting <task>.<service>.${serviceToTask}/.. or <task>.<service>.${taskToService}/...` ]
   const url = pathToTransformerUrl ( path )
-  if ( direction === tToS ) {
+  if ( direction === taskToService ) {
     return { task, service, request: true, url }
   } else
     return { task, service, response: true, url }

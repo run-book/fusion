@@ -4,12 +4,12 @@
 
 
 # Here we define the chain of responsibility to go looking for the right transformation
-# We can use <task>, <service> and <reqOrResp> in the path. ReqOrResp is either 'request' or 'response'
+# We can use <task>, <service> and <direction> in the path. ReqOrResp is either 'service_to_task' or 'task_to_service'
 
 where:
    transformers:
-     - "<service>/<task>/<reqOrResp>/${geo}/${product}/${channel}"
-     - "<service>/<task>/<reqOrResp>/${geo}/${product}"
-     - "<service>/<task>/<reqOrResp>/${product}"
-     - "<service>/<task>/<reqOrResp>"
+     - "<service>/<task>/<direction>/${geo}/${product}/${channel}"
+     - "<service>/<task>/<direction>/${geo}/${product}"
+     - "<service>/<task>/<direction>/${product}"
+     - "<service>/<task>/<direction>"
 

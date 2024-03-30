@@ -108,37 +108,32 @@ export function flatMapPaths<T> ( paths: PathsInJson, fn: ( path: string ) => T[
   }, [] );
 }
 
-export async function foldPathsToJsonK<Acc> (
-  paths: PathsInJson,
-  foldFn: ( acc: Acc, path: string ) => Promise<Acc>,
-  zero: Acc,
-  currentPath: string[] = []
-): Promise<Acc> {
-  let accumulator: Acc = zero;
-
-  for ( const [ key, value ] of Object.entries ( paths ) ) {
-    const newPath = currentPath.concat ( key );
-
-    if ( typeof value === "string" ) {
-      // If it's a leaf node, apply foldFn to it, and wait for the result
-      accumulator = await foldFn ( accumulator, value );
-    } else {
-      // If it's not a leaf, recursively process the child node
-      accumulator = await foldPathsToJsonK ( value, foldFn, accumulator, newPath );
-    }
-  }
-  return accumulator;
-}
-export function getPath ( path: string, pathInJson: PathsInJson ): string | undefined {
+export function getPath ( path: string, pathInJson: PathsInJson ): string | PathsInJson {
   const segments = path.split ( '/' );
   const currentNode = segments.reduce<PathsInJson | string | undefined> (
     ( current, segment ) =>
       typeof current === 'string' || current === undefined ? undefined : current[ segment ], pathInJson );
-  return typeof currentNode === 'string' ? currentNode : undefined;
+  return currentNode;
 }
 
+
+export function getPathIgnoreLast ( inputPath: string, pathsInJson: PathsInJson ): string | undefined {
+  const endNode = getPath ( inputPath, pathsInJson );
+  if ( typeof endNode === 'string' ) return undefined//this is a file. We want to find the last directory
+  if ( typeof endNode !== 'object' ) return undefined//shouldn't be needed
+  if ( endNode === undefined ) return undefined //gone off the end of the path
+  const endPath: PathsInJson = endNode
+  let entries = Object.entries ( endPath );
+  for ( let entry of entries ) {
+    const [ name, value ] = entry
+    if ( typeof value === 'string' ) return value
+  }
+  return undefined
+}
+
+
 export const findFirstPath = ( paths: string[], pathInJson: PathsInJson ): string | undefined =>
-  paths.find ( path => getPath ( path, pathInJson ) );
+  paths.map ( path => getPathIgnoreLast ( path, pathInJson ) ).find ( x => x );
 
 
 export async function findPathAndErrors ( paths: string[], validateK: ( path: string ) => Promise<string[]> ): Promise<PathAndErrors[]> {

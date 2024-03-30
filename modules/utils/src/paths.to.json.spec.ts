@@ -1,5 +1,5 @@
 import { ErrorsAnd } from "@laoban/utils";
-import { findFirstPath, findPathAndErrors, foldPathsToJson, foldPathsToJsonK, getPath, PathAndErrors, pathListToJson, PathsInJson, validatePathsInJson } from "./paths.in.json";
+import { findFirstPath, findPathAndErrors, foldPathsToJson, getPath, getPathIgnoreLast, PathAndErrors, pathListToJson, PathsInJson, validatePathsInJson } from "./paths.in.json";
 
 describe ( 'pathListToJson', () => {
   it ( 'correctly converts a list of paths to a JSON structure without violations', () => {
@@ -107,6 +107,7 @@ describe ( 'validatePathsInJson', () => {
     expect ( errors.length ).toBe ( 1 ); // Only one error expected
   } );
 } );
+
 describe ( 'getPath', () => {
   const pathInJson: PathsInJson = {
     folder: {
@@ -123,8 +124,11 @@ describe ( 'getPath', () => {
     expect ( getPath ( 'folder/subfolder/file.txt', pathInJson ) ).toBe ( 'folder/subfolder/file.txt' );
   } );
 
-  it ( 'should return undefined for a directory path', () => {
-    expect ( getPath ( 'folder/subfolder', pathInJson ) ).toBeUndefined ();
+  it ( 'should return what is there for a directory', () => {
+    expect ( getPath ( 'folder/subfolder', pathInJson ) ).toEqual({
+      "anotherFile.txt": "folder/subfolder/anotherFile.txt",
+      "file.txt": "folder/subfolder/file.txt"
+    });
   } );
 
   it ( 'should return undefined for a non-existent path', () => {
@@ -134,6 +138,33 @@ describe ( 'getPath', () => {
   it ( 'should handle root level files correctly', () => {
     expect ( getPath ( 'rootFile.txt', pathInJson ) ).toBe ( 'rootFile.txt' );
   } );
+} );
+
+describe ( 'getPathIgnoreLast', () => {
+  const pathInJson: PathsInJson = {
+    folder: {
+      subfolder: {
+        'file.txt': 'folder/subfolder/file.txt',
+        anotherFolder: { 'anotherFile.txt': 'folder/subfolder/anotherFolder/anotherFile.txt' }
+      },
+    },
+    'rootFile.txt': 'rootFile.txt'
+  };
+
+  it ( 'should return the path for a valid file path', () => {
+    expect ( getPathIgnoreLast ( 'folder/subfolder', pathInJson ) ).toBe ( 'folder/subfolder/file.txt' );
+    expect ( getPathIgnoreLast ( 'folder/subfolder/anotherFolder', pathInJson ) ).toBe ( 'folder/subfolder/anotherFolder/anotherFile.txt' );
+  } );
+
+  it ( 'should return undefined for a directory path', () => {
+    expect ( getPathIgnoreLast ( 'folder', pathInJson ) ).toBeUndefined ();
+  } );
+
+  it ( 'should return undefined for a non-existent path', () => {
+    expect ( getPathIgnoreLast ( 'non/existent/path.txt', pathInJson ) ).toBeUndefined ();
+    expect ( getPathIgnoreLast ( 'non/existent', pathInJson ) ).toBeUndefined ();
+  } );
+
 } );
 
 describe ( 'findFirstPath', () => {
@@ -148,7 +179,7 @@ describe ( 'findFirstPath', () => {
   };
 
   it ( 'should find the first existing file path', () => {
-    const paths = [ 'nonexistent.txt', 'folder/subfolder/file.txt', 'folder/subfolder/anotherFile.txt' ];
+    const paths = [ 'nonexistent.txt', 'folder', 'folder/subfolder' ];
     expect ( findFirstPath ( paths, pathInJson ) ).toBe ( 'folder/subfolder/file.txt' );
   } );
 
@@ -164,8 +195,8 @@ describe ( 'findFirstPath', () => {
 } );
 
 
-describe('foldPathsToJson', () => {
-  it('should accumulate paths with _X appended', () => {
+describe ( 'foldPathsToJson', () => {
+  it ( 'should accumulate paths with _X appended', () => {
     const testPaths: PathsInJson = {
       home: {
         kitchen: "sink",
@@ -175,8 +206,8 @@ describe('foldPathsToJson', () => {
     };
 
     // Define the fold function to accumulate paths into a string array, appending "_X" to each
-    const testFoldFn = (acc: string[], path: string): string[] => {
-      return [...acc, path + '_X']; // Ensure _X is appended here for clarity
+    const testFoldFn = ( acc: string[], path: string ): string[] => {
+      return [ ...acc, path + '_X' ]; // Ensure _X is appended here for clarity
     };
 
     // The initial value for the accumulator is an empty array
@@ -187,70 +218,36 @@ describe('foldPathsToJson', () => {
     ];
 
     // Execute foldPathsToJson with the testPaths, testFoldFn, and an empty array as the initial accumulator
-    const result = foldPathsToJson(testPaths, testFoldFn, []);
+    const result = foldPathsToJson ( testPaths, testFoldFn, [] );
 
     // Expect the result to equal the expectedResult
-    expect(result).toEqual(expectedResult);
-  });
-});
+    expect ( result ).toEqual ( expectedResult );
+  } );
+} );
 
 
-describe('foldPathsToJsonK', () => {
-  it('should asynchronously accumulate paths with _X appended', async () => {
-    // Simulated PathsInJson object
-    const paths: PathsInJson = {
-      home: {
-        kitchen: "sink",
-        bedroom: "lamp"
-      },
-      garden: "fountain"
-    };
-
-    // Asynchronous fold function that appends "_X" to each path and simulates a delay
-    const asyncFoldFn = async (acc: string[], path: string): Promise<string[]> => {
-      // Simulate delay
-      await new Promise(resolve => setTimeout(resolve, 10));
-      return [...acc, path + '_X'];
-    };
-
-    // Expected result
-    const expectedResult = [
-      "home.kitchen.sink_X",
-      "home.bedroom.lamp_X",
-      "garden.fountain_X"
-    ];
-
-    // Execute the fold function asynchronously and await its result
-    const result = await foldPathsToJsonK(paths, asyncFoldFn, []);
-
-    // Assert that the result matches the expected array of paths with '_X'
-    expect(result).toEqual(expectedResult);
-  });
-});
-
-
-describe('findPathAndErrors', () => {
+describe ( 'findPathAndErrors', () => {
   // Mock `fetchErrorsForPath` for testing
-  const fetchErrorsForPath = async (path: string): Promise<string[]> => {
-    if (!path.endsWith('.txt')) {
-      return [`Error: '${path}' does not end with .txt`];
+  const fetchErrorsForPath = async ( path: string ): Promise<string[]> => {
+    if ( !path.endsWith ( '.txt' ) ) {
+      return [ `Error: '${path}' does not end with .txt` ];
     }
     return [];
   };
 
-  it('should accumulate errors for paths not ending in .txt', async () => {
-    const paths = ['file1.txt', 'file2.doc', 'file3.txt', 'file4.jpg'];
+  it ( 'should accumulate errors for paths not ending in .txt', async () => {
+    const paths = [ 'file1.txt', 'file2.doc', 'file3.txt', 'file4.jpg' ];
 
     const expected: PathAndErrors[] = [
       { path: 'file1.txt', errors: [] },
-      { path: 'file2.doc', errors: [`Error: 'file2.doc' does not end with .txt`] },
+      { path: 'file2.doc', errors: [ `Error: 'file2.doc' does not end with .txt` ] },
       { path: 'file3.txt', errors: [] },
-      { path: 'file4.jpg', errors: [`Error: 'file4.jpg' does not end with .txt`] },
+      { path: 'file4.jpg', errors: [ `Error: 'file4.jpg' does not end with .txt` ] },
     ];
 
-    const result = await findPathAndErrors(paths, fetchErrorsForPath);
+    const result = await findPathAndErrors ( paths, fetchErrorsForPath );
 
     // Use toEqual for deep equality comparison
-    expect(result).toEqual(expected);
-  });
-});
+    expect ( result ).toEqual ( expected );
+  } );
+} );
