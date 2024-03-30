@@ -1,10 +1,3 @@
-task_schemas: # Unlike kafka we have a chain of responsibility. We start most specific. We use a different templating than the config story for task
-  - "task/<task>/<reqOrResp>/${geo}/${product}/${channel}"
-  - "task/<task>/<reqOrResp>"
-  - "task/<task>/<reqOrResp>/${geo}/${product}"
-  - "task/<task>/<reqOrResp>/${product}"
-
-
 # These are Camunda external tasks and correspond to blocks on the BPMN diagram.
 # Here we say the default service to use for each task.
 # This can be overriden at any level in the hierarchy. i.e. in the uk we could pick a different aml service.
@@ -17,6 +10,15 @@ task_schemas: # Unlike kafka we have a chain of responsibility. We start most sp
 #  - the topic name to listen for the response on
 
 # these details are filled in by the post processor so we don't have to do this manually
+
+
+# Unlike kafka we have a chain of responsibility to find the 'right' task description. We start most specific. We use a different templating than the config story for task
+# This is because in different countries/products we might choose to have a different service to implement the task.
+task_schemas:
+  - "task/<task>/<reqOrResp>/${geo}/${product}/${channel}"
+  - "task/<task>/<reqOrResp>"
+  - "task/<task>/<reqOrResp>/${geo}/${product}"
+  - "task/<task>/<reqOrResp>/${product}"
 
 tasks:
   aml:

@@ -1,0 +1,14 @@
+# A transformation is how we turn the data that is in one schema to another
+# Typically we transform from the task request schema to the service request schema
+# then with the response we turn it from the service response schema to the task response schema
+
+
+# Here we define the chain of responsibility to go looking for the right transformation
+# We can use <task>, <service> and <reqOrResp> in the path. ReqOrResp is either 'request' or 'response'
+
+transformers:
+  - "<service>/<task>/<reqOrResp>/${geo}/${product}/${channel}"
+  - "<service>/<task>/<reqOrResp>/${geo}/${product}"
+  - "<service>/<task>/<reqOrResp>/${product}"
+  - "<service>/<task>/<reqOrResp>"
+
