@@ -1,4 +1,4 @@
-import { addTaskSchemasToServices, defaultKafkaNameFn, postProcess, PostProcessor } from "./post.process";
+import { addKafkaSchemasToServices, defaultKafkaNameFn, postProcess, PostProcessor } from "./post.process";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { intoMerged } from "./merge";
 import { hasErrors } from "@laoban/utils";
@@ -59,7 +59,7 @@ describe ( 'post.process', () => {
   } );
   it ( 'should be able to post process a yaml file adding schemas to request and responses', async () => {
     const merged = intoMerged ( 'pretend.yaml' ) ( obj )
-    const result = await postProcess ( [ addTaskSchemasToServices ( defaultKafkaNameFn ( fakeLoadNamed ) ) ], merged, {} )
+    const result = await postProcess ( [ addKafkaSchemasToServices ( defaultKafkaNameFn ( fakeLoadNamed ) ) ], merged, {} )
     if ( hasErrors ( result ) ) throw new Error ( 'should not have errors\n' + JSON.stringify ( result, null, 2 ) )
     expect ( convertToYaml ( result, defaultCommentFunction ) ).toEqual ( `version:
   1 # Contributed by: pretend.yaml

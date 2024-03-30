@@ -1,6 +1,7 @@
 import { findPartInMerged, isMerged, Merged } from "./merge";
 import { ErrorsAnd, hasErrors, mapErrors, NameAnd } from "@laoban/utils";
 import { NamedLoadResult, NamedUrl, UrlLoadNamedFn, writeUrl } from "@itsmworkbench/urlstore";
+import { findStringArray } from "./extract.from.merged";
 
 
 //This is an implied contract at the moment that config is the actual json object that sorted represents.
@@ -61,10 +62,7 @@ export async function postProcess ( processors: PostProcessor[], sorted: Merged,
 //     topic: "internal.pricing.response"
 //     schema: "itsmid/org/schema/<someGitShaThatWasTheFileAtTheTimeWeCreatedThis>" # Contributed by schemabot:itsm/org/schema/task.internal_pricingService.response.uk.
 
-type NameParams = {
-  serviceName: string
-  topicName: string
-}
+
 
 export function addNameStringToMerged ( merged: Merged, name: string, value: string, addedBy: string ): ErrorsAnd<Merged> {
   if ( typeof merged.value !== 'object' ) return [ `Was trying to add ${name}:${value} # ${addedBy} but is not an object` ]
@@ -72,16 +70,21 @@ export function addNameStringToMerged ( merged: Merged, name: string, value: str
   merged.value[ name ] = newMerged
   return merged
 }
+export function addNameMergedToMerged ( merged: Merged, name: string, value: Merged, addedBy: string ): ErrorsAnd<Merged> {
+  if ( typeof merged.value !== 'object' ) return [ `Was trying to add ${name}:${JSON.stringify ( value )} # ${addedBy} but is not an object` ]
+  merged.value[ name ] = value
+  return merged
+}
 
-export type SchemaNameFn = ( nameParams: NameParams, requestOrResponse: string, tastSchemas: string[] ) => Promise<ErrorsAnd<NamedLoadResult<any>>>
+export type SchemaNameFn = ( task :string, requestOrResponse: string, tastSchemas: string[] ) => Promise<ErrorsAnd<NamedLoadResult<any>>>
 export type KafkaNameFn = ( kafkaSchemaName: string ) => Promise<ErrorsAnd<NamedLoadResult<any>>>
 export const defaultSchemaNameFn = ( nameToId: UrlLoadNamedFn, debug?: boolean ): SchemaNameFn =>
-  async ( nameParams: NameParams, requestOrResponse: string, taskSchemas: string[] ): Promise<ErrorsAnd<NamedLoadResult<any>>> => {
+  async ( task: string, requestOrResponse: string, taskSchemas: string[] ): Promise<ErrorsAnd<NamedLoadResult<any>>> => {
     const realTaskNames = taskSchemas.map ( t =>
-      t.replace ( /<task>/g, nameParams.serviceName ).replace ( /<reqOrResp>/g, requestOrResponse ) )
+      t.replace ( /<task>/g, task ).replace ( /<reqOrResp>/g, requestOrResponse ) )
     const taskUrls: NamedUrl[] = realTaskNames.map ( t => ({ scheme: 'itsm', organisation: 'org', namespace: 'schema', name: t }) )
     if ( debug ) {
-      console.log ( 'topicName', nameParams.topicName )
+      console.log ( 'taskName', task )
       console.log ( 'requestOrResponse', requestOrResponse )
       console.log ( 'taskSchemas', taskSchemas )
       console.log ( 'realTaskNames', realTaskNames )
@@ -91,7 +94,7 @@ export const defaultSchemaNameFn = ( nameToId: UrlLoadNamedFn, debug?: boolean )
       const found: ErrorsAnd<NamedLoadResult<any>> = await nameToId ( url )
       if ( !hasErrors ( found ) ) return { ...found, url: writeUrl ( url ) }
     }
-    return [ `No schema found for ${nameParams.serviceName}/${nameParams.topicName}/${requestOrResponse} in ${realTaskNames}` ]
+    return [ `No schema found for ${task}/${requestOrResponse} in ${realTaskNames}` ]
   }
 
 export function defaultKafkaNameFn ( loadNamed: UrlLoadNamedFn ): KafkaNameFn {
@@ -115,26 +118,8 @@ export async function addRequestOrResponseToService ( serviceName: string, servi
       addNameStringToMerged ( request, 'kafka_schema_id', kafka.id, addedBy ) ) )
 }
 
-// export async function addRequestOrResponseToService ( serviceName: string, service: Merged, requestOrResponse: string, kafkaSchemaString: string, taskSchemaNames: string[], addedBy: string, nameFn: SchemaNameFn, kafkaNameFn: KafkaNameFn ): Promise<ErrorsAnd<Merged>> {
-//   const request = findPartInMerged ( service, requestOrResponse )
-//   const requestTopic: Merged = findPartInMerged ( request, 'topic' )
-//   const topicName = requestTopic.value
-//   if ( !topicName ) return [ `addRequestToSchema(${serviceName})- No topic found in ${requestOrResponse}` ]
-//   if ( typeof topicName !== 'string' ) return [ `addRequestToSchema(${serviceName}) ${requestOrResponse}- Topic must be a string but is ${JSON.stringify ( topicName )}` ]
-//   const nameParams = { serviceName, topicName }
-//
-//   return mapErrors ( await nameFn ( nameParams, requestOrResponse, taskSchemaNames ), async ( requestLoaded: NamedLoadResult<any> ) =>
-//     mapErrors ( addNameStringToMerged ( request, 'task_schema_name', requestLoaded.url, addedBy ), ( ignore ) => {
-//       const kafkaSchemaName = kafkaSchemaString.replace ( /<service>/g, serviceName ).replace ( /<reqOrResp>/g, requestOrResponse )
-//       return mapErrors ( addNameStringToMerged ( request, 'task_schema_id', requestLoaded.id, addedBy ), ignore =>
-//         mapErrors ( addNameStringToMerged ( request, 'kafka_schema', kafkaSchemaName, addedBy ), async ignore =>
-//           mapErrors ( await kafkaNameFn ( kafkaSchemaName ), kafka =>
-//             addNameStringToMerged ( request, 'kafka_schema_id', kafka.id, addedBy ) ) ) )
-//     } ) )
-// }
-//
 
-export function addTaskSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostProcessor {
+export function addKafkaSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostProcessor {
   return {
     key: 'services',
     postProcess:
@@ -160,6 +145,54 @@ export function addTaskSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostProce
       }
   }
 }
+export async function addRequestOrResponseToTask ( taskName: string, task: Merged, requestOrResponse: string, taskSchemaNames: string[], addedBy: string, nameFn: SchemaNameFn ): Promise<ErrorsAnd<Merged>> {
+  return mapErrors ( await nameFn ( taskName, requestOrResponse, taskSchemaNames ), async ( requestLoaded: NamedLoadResult<any> ) =>
+    mapErrors ( addNameStringToMerged ( task, `${requestOrResponse}_schema_name`, requestLoaded.url, addedBy ), ( ignore ) =>
+      addNameStringToMerged ( task, `${requestOrResponse}schema_id`, requestLoaded.id, addedBy ) ) )
+}
+
+
+export function addTaskDetails ( nameFn: SchemaNameFn ): PostProcessor {
+  return {
+    key: 'tasks',
+    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> => {
+      if ( typeof tasks.value !== 'object' ) return [ 'tasks is not an object' ]
+
+      const taskSchemas = findPartInMerged ( full, 'task_schemas' )
+      if ( !taskSchemas ) return [ 'No task_schemas found. These are used to control where we look for schemas' ]
+      const taskSchemaNames = findStringArray ( taskSchemas )
+      if ( taskSchemaNames.length === 0 ) return [ `No task_schemas found. These are used to control where we look for schemas - had value but wasn't an array of string. This might look like  "task.<task>.<reqOrResp>.\${geo}.\${product}.\${channel}"` ]
+      const services = findPartInMerged ( full, 'services' )
+      if ( !services ) return [ 'No services found' ]
+
+      const taskNames = Object.keys ( tasks.value )
+      const errors: string[] = []
+      for ( let taskName of taskNames ) {
+        const task = findPartInMerged ( tasks, taskName )
+        const serviceName = findPartInMerged ( task, 'service' )?.value
+        if ( !serviceName ) errors.push ( `No service found for tasks ${taskName}. This is mandatory field: we need to know which service will be providing the task` )
+        else if ( typeof serviceName !== 'string' ) errors.push ( `The service found for tasks ${taskName} was not a string. It should just be the service name. It was ${JSON.stringify ( serviceName )}` )
+        else {
+          const service = findPartInMerged ( services, serviceName )
+          if ( !service ) errors.push ( `Service ${serviceName} not found for task ${taskName}. This was added by the file ${task.files} at tasks.${taskName}.service` )
+          else {
+            const serviceDetails = addNameMergedToMerged ( task, 'service_details', service, 'addTaskSchemasToServices' )
+            if ( hasErrors ( serviceDetails ) ) errors.push ( ...serviceDetails )
+            else {
+              const req = await addRequestOrResponseToTask ( taskName, task, 'request', taskSchemaNames, 'addTaskSchemasToServices', nameFn )
+              if ( hasErrors ( req ) ) errors.push ( ...req )
+              const res = await addRequestOrResponseToTask ( taskName, task, 'response', taskSchemaNames, 'addTaskSchemasToServices', nameFn )
+              if ( hasErrors ( res ) ) errors.push ( ...res )
+              addNameStringToMerged ( task, 'debug', serviceName, 'addTaskSchemasToServices' )
+            }
+          }
+        }
+      }
+      if ( errors.length > 0 ) return [ `Error processing 'addTaskSchemasToServices'`, ...errors ]
+    }
+  }
+}
+
 //
 // export function addTaskSchemasToServices ( nameFn: SchemaNameFn, kafkaNameFn: KafkaNameFn ): PostProcessor {
 //   return {

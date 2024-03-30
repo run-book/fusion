@@ -26,6 +26,6 @@ tasks:
   signatureVerification:
     service: internal_signatureVerification
   pricing:
-    service: services.internal_pricingService
+    service: internal_pricingService
   limitManagement:
-    service: services.internal_limitManagement
+    service: internal_limitManagement

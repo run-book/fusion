@@ -6,9 +6,9 @@ import { jsYaml } from "@itsmworkbench/jsyaml";
 import { Commander12, commander12Tc } from "@itsmworkbench/commander12";
 import { UrlStore } from "@itsmworkbench/urlstore";
 import { NoConfig } from "../index";
-import { LoadFilesFn } from "@fusionconfig/config";
+import { addTaskDetails, LoadFilesFn } from "@fusionconfig/config";
 import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
-import { addTaskSchemasToServices, defaultKafkaNameFn, defaultSchemaNameFn, PostProcessor, SchemaNameFn } from "@fusionconfig/config";
+import { addKafkaSchemasToServices, defaultKafkaNameFn, defaultSchemaNameFn, PostProcessor, SchemaNameFn } from "@fusionconfig/config";
 import { nodeUrlstore } from "@itsmworkbench/nodeurlstore";
 import { shellGitsops } from "@itsmworkbench/shellgit";
 import { defaultOrgConfig } from "@fusionconfig/alldomains";
@@ -24,7 +24,8 @@ export interface ThereAndBackContext extends CliContext, HasYaml {
 
 export function postProcessors ( schemaNameFn: SchemaNameFn, urlStore: UrlStore ): PostProcessor[] {
   return [
-    addTaskSchemasToServices ( defaultKafkaNameFn ( urlStore.loadNamed ) )
+    addKafkaSchemasToServices ( defaultKafkaNameFn ( urlStore.loadNamed ) ),
+    addTaskDetails (schemaNameFn)
   ]
 }
 
