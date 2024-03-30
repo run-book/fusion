@@ -1,6 +1,7 @@
-import { convertToYaml, defaultCommentFunction } from "./convert.to.yaml";
+import { convertToYaml, defaultCommentFactoryFunction, } from "./convert.to.yaml";
 import { Merged } from "./merge";
 
+const defaultCommentFunction = defaultCommentFactoryFunction ( 85 )
 describe ( 'convertToYaml', () => {
   it ( 'converts primitive values to YAML', () => {
     const merged: Merged = { value: 'Hello, World!', files: [ 'source1.yaml' ] };
@@ -53,7 +54,7 @@ describe ( 'convertToYaml', () => {
     };
     const yamlString = convertToYaml ( merged, defaultCommentFunction );
     expect ( yamlString ).toEqual ( 'nested:\n' +
-          '  key:\n' +
+      '  key:\n' +
       '    nestedValue # Contributed by: source2.yaml\n' );
   } );
 } );

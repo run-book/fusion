@@ -1,16 +1,22 @@
 import { Merged } from "./merge";
 import { NameAnd } from "@laoban/utils";
 
-export type CommentFunction = ( files: string[] ) => string | undefined;
+//the primstring is 'if a primitive this is the indent and value'. This allows us to justify the comments
+//Currently we only use this for primitives but let's not build that dependency into the type
+export type CommentFunction = ( files: string[], primString?: string ) => string | undefined;
+export type CommentFactoryFunction = ( commentOffset: number ) => CommentFunction
 
-export const defaultCommentFunction: CommentFunction = ( files ) => {
+export const defaultCommentOffset: string = '85'
+export const defaultCommentFactoryFunction: CommentFactoryFunction = ( minOffset: number ): CommentFunction => ( files, primString ) => {
   if ( files === undefined || files.length === 0 ) return undefined;
-  return `# Contributed by: ${files.join ( ', ' )}`;
+  const padding = primString === undefined ? '' : ' '.repeat ( Math.max ( 0, minOffset - primString.length ) )
+  return `${padding}# Added by: ${files.join ( ', ' )}`;
 };
 
 export function convertPrimitiveToYaml ( value: string | number | boolean, files: string[], commentFunc: CommentFunction, depth: number ): string {
   const indent = '  '.repeat ( depth );
-  const comment = commentFunc ( files );
+  const indentAndValue = `${indent}${value}`;
+  const comment = commentFunc ( files, indentAndValue );
   return `${indent}${value}${comment ? ` ${comment}` : ''}\n`;
 }
 
@@ -45,9 +51,6 @@ export function convertObjectToYaml ( obj: NameAnd<Merged>, commentFunc: Comment
 }
 
 export function convertToYaml ( merged: Merged, commentFunc: CommentFunction, depth: number = 0 ): string {
-  const indent = '  '.repeat ( depth );
-  const comment = commentFunc ( merged.files );
-
   // Handle primitive types directly
   if ( typeof merged.value !== 'object' ) {
     return convertPrimitiveToYaml ( merged.value, merged.files, commentFunc, depth );

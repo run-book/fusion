@@ -7,54 +7,54 @@ version: 1
 #   the name is the name of the schema in a way that the schema registry can find it
 #   the id is the precise current value of the schema (based on the git hash)
 
-# TODO rename to service_schemas
-kafka_schemas: "service/<service>/<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
+where:
+   services: "service/<service>/<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
 
 services:
   experian_aml:
-    description: "AML service provided by Experian for real-time background checks."
+    serviceDescription: "AML service provided by Experian for real-time background checks."
     request:
       topic: "experian.aml.request"
     response:
       topic: "experian.aml.response"
 
   equifax_creditCheck:
-    description: "Credit score checking service provided by Equifax."
+    serviceDescription: "Credit score checking service provided by Equifax."
     request:
       topic: "equifax.creditScore.request"
     response:
       topic: "equifax.creditScore.response"
 
   experian_creditCheck:
-    description: "Credit score checking service provided by Experian."
+    serviceDescription: "Credit score checking service provided by Experian."
     request:
       topic: "experian.creditScore.request"
     response:
       topic: "experian.creditScore.response"
 
   internal_signatureVerification:
-    description: "Internal signature verification service for document signing."
+    serviceDescription: "Internal signature verification service for document signing."
     request:
       topic: "internal.signatureVerification.request"
     response:
       topic: "internal.signatureVerification.response"
 
   internal_pricingService:
-    description: "Internal pricing service for product and service pricing adjustments."
+    serviceDescription: "Internal pricing service for product and service pricing adjustments."
     request:
       topic: "internal.pricing.request"
     response:
       topic: "internal.pricing.response"
 
   internal_carloan_PricingService:
-    description: "Internal pricing service for carloans"
+    serviceDescription: "Internal pricing service for carloans"
     request:
       topic: "internal.pricing.request"
     response:
       topic: "internal.pricing.response"
 
   internal_limitManagement:
-    description: "Limit management service for transaction and account limits."
+    serviceDescription: "Limit management service for transaction and account limits."
     request:
       topic: "internal.limitManagement.request"
     response:

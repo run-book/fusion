@@ -6,9 +6,8 @@ import { jsYaml } from "@itsmworkbench/jsyaml";
 import { Commander12, commander12Tc } from "@itsmworkbench/commander12";
 import { UrlStore } from "@itsmworkbench/urlstore";
 import { NoConfig } from "../index";
-import { addTaskDetails, LoadFilesFn, removeServices } from "@fusionconfig/config";
+import { addKafkaSchemasToServices, addTaskDetails, addTransformersToTasks, CommentFactoryFunction, defaultCommentFactoryFunction, defaultKafkaNameFn, defaultSchemaNameFn, defaultTransformerNameFn, LoadFilesFn, PostProcessor, removeServices, SchemaNameFn, TransformerNameFn } from "@fusionconfig/config";
 import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
-import { addKafkaSchemasToServices, defaultKafkaNameFn, defaultSchemaNameFn, PostProcessor, SchemaNameFn } from "@fusionconfig/config";
 import { nodeUrlstore } from "@itsmworkbench/nodeurlstore";
 import { shellGitsops } from "@itsmworkbench/shellgit";
 import { defaultOrgConfig } from "@fusionconfig/alldomains";
@@ -20,24 +19,39 @@ export interface ThereAndBackContext extends CliContext, HasYaml {
   urlStore: UrlStore
   loadFiles: LoadFilesFn
   postProcessors: PostProcessor[]
+  commentFactoryFn: CommentFactoryFunction
 }
 
-export function postProcessors ( schemaNameFn: SchemaNameFn, urlStore: UrlStore ): PostProcessor[] {
+export function postProcessors ( schemaNameFn: SchemaNameFn, transformerNameFn: TransformerNameFn, urlStore: UrlStore ): PostProcessor[] {
   return [
     addKafkaSchemasToServices ( defaultKafkaNameFn ( urlStore.loadNamed ) ),
-    addTaskDetails (schemaNameFn),
-    removeServices()
+    addTaskDetails ( schemaNameFn ),
+    addTransformersToTasks ( transformerNameFn ),
+    removeServices ()
   ]
 }
 
 export function makeContext ( version: string ): ThereAndBackContext {
   const urlStore = nodeUrlstore ( shellGitsops (), defaultOrgConfig () )
   const schemaNameFn = defaultSchemaNameFn ( urlStore.loadNamed )
-  return thereAndBackContext ( 'fusion', version, fileOpsNode (), jsYaml (), schemaNameFn, urlStore )
+  const transformerNameFn = defaultTransformerNameFn ( urlStore.loadNamed )
+  return thereAndBackContext ( 'fusion', version, fileOpsNode (), jsYaml (), schemaNameFn, transformerNameFn, defaultCommentFactoryFunction, urlStore )
 }
 export const cliTc: CliTc<Commander12, ThereAndBackContext, NoConfig, NoConfig> = commander12Tc<ThereAndBackContext, NoConfig, NoConfig> ()
 export const configFinder = fixedConfig<NoConfig> ( makeContext )
 
-export function thereAndBackContext ( name: string, version: string, fileOps: FileOps, yaml: YamlCapability, schemaNameFn: SchemaNameFn, urlStore: UrlStore ): ThereAndBackContext {
-  return { ...cliContext ( name, version, fileOps ), yaml, loadFiles: findConfigUsingFileops ( fileOps, yaml ), postProcessors: postProcessors ( schemaNameFn, urlStore ), urlStore }
+export function thereAndBackContext ( name: string, version: string,
+                                      fileOps: FileOps, yaml: YamlCapability,
+                                      schemaNameFn: SchemaNameFn,
+                                      transformerNameFn: TransformerNameFn,
+                                      commentFactoryFn: CommentFactoryFunction,
+                                      urlStore: UrlStore ): ThereAndBackContext {
+  return {
+    ...cliContext ( name, version, fileOps ),
+    yaml,
+    loadFiles: findConfigUsingFileops ( fileOps, yaml ),
+    postProcessors: postProcessors ( schemaNameFn, transformerNameFn, urlStore ),
+    commentFactoryFn,
+    urlStore
+  }
 }

@@ -1,9 +1,11 @@
-import { addKafkaSchemasToServices, defaultKafkaNameFn, postProcess, PostProcessor } from "./post.process";
+import { addKafkaSchemasToServices, defaultKafkaNameFn, postProcess } from "./post.process";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { intoMerged } from "./merge";
 import { hasErrors } from "@laoban/utils";
-import { convertToYaml, defaultCommentFunction } from "./convert.to.yaml";
+import { convertToYaml, defaultCommentFactoryFunction } from "./convert.to.yaml";
 import { NamedLoadResult, UrlLoadNamedFn, writeUrl } from "@itsmworkbench/urlstore";
+
+const defaultCommentFunction = defaultCommentFactoryFunction ( 85 )
 
 const yamlAsText = `
 version: 1

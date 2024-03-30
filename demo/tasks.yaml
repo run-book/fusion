@@ -14,20 +14,26 @@
 
 # Unlike kafka we have a chain of responsibility to find the 'right' task description. We start most specific. We use a different templating than the config story for task
 # This is because in different countries/products we might choose to have a different service to implement the task.
-task_schemas:
-  - "task/<task>/<reqOrResp>/${geo}/${product}/${channel}"
-  - "task/<task>/<reqOrResp>"
-  - "task/<task>/<reqOrResp>/${geo}/${product}"
-  - "task/<task>/<reqOrResp>/${product}"
+where:
+  tasks:
+    - "task/<task>/<reqOrResp>/${geo}/${product}/${channel}"
+    - "task/<task>/<reqOrResp>"
+    - "task/<task>/<reqOrResp>/${geo}/${product}"
+    - "task/<task>/<reqOrResp>/${product}"
 
 tasks:
   aml:
-    service: equifax_creditCheck
+    taskDescription: "AML check for customer"
+    service: experian_aml
   creditCheck:
+    taskDescription: "Credit check for customer"
     service: experian_creditCheck
   signatureVerification:
+    taskDescription: "Signature verification for document signing"
     service: internal_signatureVerification
   pricing:
+    taskDescription: "Pricing service for product and service pricing adjustments"
     service: internal_pricingService
   limitManagement:
+    taskDescription: "Limit management service for transaction and account limits"
     service: internal_limitManagement

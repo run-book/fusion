@@ -1,7 +1,7 @@
 import { fileOpsNode } from "@laoban/filesops-node";
 import { findFileUp } from "@laoban/fileops";
 import { jsYaml } from "@itsmworkbench/jsyaml";
-import { loadAndMergeAndYamlParts, LoadFilesFn } from "@fusionconfig/config";
+import { defaultCommentFactoryFunction, loadAndMergeAndYamlParts, LoadFilesFn } from "@fusionconfig/config";
 import { findConfigUsingFileops } from "./load.files";
 
 const fileOps = fileOpsNode ()
@@ -10,11 +10,11 @@ const testDirPromise = laobanDirPromise.then ( d => d ? fileOps.join ( d, 'demo'
 let params = { channel: 'merchantPortal', geo: 'uk', product: 'carLoan' };
 
 const loadFiles: LoadFilesFn = findConfigUsingFileops ( fileOps, jsYaml () )
-
+const defaultCommentFunction = defaultCommentFactoryFunction ( 85 )
 describe ( "merging global.yaml", () => {
   it ( "should have a mergeForCli", async () => {
     const { fileDetails, sorted, errors, yaml } =
-            await loadAndMergeAndYamlParts ( loadFiles, [],params, await testDirPromise, 'global.yaml', false )
+            await loadAndMergeAndYamlParts ( loadFiles, [], defaultCommentFunction,params, await testDirPromise, 'global.yaml', false )
     expect ( errors ).toEqual ( [] )
     expect ( yaml ).toEqual ( `# {"channel":"merchantPortal","geo":"uk","product":"carLoan"}
 #

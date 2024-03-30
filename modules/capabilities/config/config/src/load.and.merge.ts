@@ -1,7 +1,7 @@
 import { FileDetails, LoadFilesFn } from "./config";
 import { hasErrors, NameAnd } from "@laoban/utils";
 import { Merged, mergeObjectInto } from "./merge";
-import { convertToYaml, defaultCommentFunction } from "./convert.to.yaml";
+import { CommentFunction, convertToYaml } from "./convert.to.yaml";
 import { postProcess, PostProcessor } from "./post.process";
 
 export type LoadedAndMergedParts = {
@@ -28,13 +28,13 @@ export async function loadAndMergeParts ( loadFiles: LoadFilesFn, params: NameAn
 
 const makeComment = ( fileDetails: FileDetails[] ): string =>
   fileDetails.map ( ( { yaml, ...rest } ) => `# ${JSON.stringify ( rest )}` ).join ( '\n' );
-export async function loadAndMergeAndYamlParts ( loadFiles: LoadFilesFn, postProcessors: PostProcessor[], params: NameAnd<string>, parent: string, file: string, debug?: boolean ): Promise<LoadedAndMergedAndYamlParts> {
+export async function loadAndMergeAndYamlParts ( loadFiles: LoadFilesFn, postProcessors: PostProcessor[], commentFn: CommentFunction, params: NameAnd<string>, parent: string, file: string, debug?: boolean ): Promise<LoadedAndMergedAndYamlParts> {
   if ( debug ) console.log ( 'loadAndMergeAndYamlParts', { loadFiles, params, parent, file } )
   const parts = await loadAndMergeParts ( loadFiles, params, parent, file, debug )
   const { fileDetails, errors, sorted } = parts
   if ( debug ) console.log ( 'parts - filedetails and errors', JSON.stringify ( { fileDetails, errors }, null, 2 ) )
 
-  const result = await postProcess ( postProcessors, sorted,  params ) // TODO config still to be added
+  const result = await postProcess ( postProcessors, sorted, params ) // TODO config still to be added
   if ( hasErrors ( result ) ) return { ...parts, postProcessorErrors: result, yaml: undefined }
 
   const yaml = errors.length > 0 ? undefined : `# ${JSON.stringify ( params )}
@@ -45,7 +45,7 @@ ${(makeComment ( fileDetails.filter ( f => f.exists ) ))}
 # Files not found
 ${makeComment ( fileDetails.filter ( f => !f.exists ) )}
 #
-${convertToYaml ( sorted, defaultCommentFunction )}
+${convertToYaml ( sorted, commentFn )}
 `
   return { ...parts, yaml }
 }
