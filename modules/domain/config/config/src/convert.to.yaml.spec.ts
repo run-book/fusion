@@ -1,18 +1,18 @@
 import { convertToYaml, defaultCommentFactoryFunction, } from "./convert.to.yaml";
 import { Merged } from "./merge";
 
-const defaultCommentFunction = defaultCommentFactoryFunction ( 85 )
+const defaultCommentFunction = defaultCommentFactoryFunction ( 20 )
 describe ( 'convertToYaml', () => {
   it ( 'converts primitive values to YAML', () => {
     const merged: Merged = { value: 'Hello, World!', files: [ 'source1.yaml' ] };
     const yamlString = convertToYaml ( merged, defaultCommentFunction );
-    expect ( yamlString ).toEqual ( 'Hello, World! # Contributed by: source1.yaml\n' );
+    expect ( yamlString ).toEqual ( 'Hello, World!        # Added by: source1.yaml\n' );
   } );
 
   it ( 'includes comments for primitive values when requested', () => {
     const merged: Merged = { value: 42, files: [ 'source1.yaml' ] };
     const yamlString = convertToYaml ( merged, defaultCommentFunction );
-    expect ( yamlString ).toEqual ( '42 # Contributed by: source1.yaml\n' );
+    expect ( yamlString ).toEqual ( '42                   # Added by: source1.yaml\n' );
   } );
 
   it ( 'converts arrays to YAML', () => {
@@ -24,9 +24,9 @@ describe ( 'convertToYaml', () => {
       files: [ 'sourcex.yaml' ]
     };
     const yamlString = convertToYaml ( merged, defaultCommentFunction );
-    expect ( yamlString ).toEqual (
-      '- item1 # Contributed by: source1.yaml\n' +
-      '- item2 # Contributed by: source2.yaml\n' );
+    expect ( yamlString ).toEqual ( '' +
+      '- item1              # Added by: source1.yaml\n' +
+      '- item2              # Added by: source2.yaml\n' );
   } );
 
   it ( 'converts objects to YAML', () => {
@@ -55,6 +55,6 @@ describe ( 'convertToYaml', () => {
     const yamlString = convertToYaml ( merged, defaultCommentFunction );
     expect ( yamlString ).toEqual ( 'nested:\n' +
       '  key:\n' +
-      '    nestedValue # Contributed by: source2.yaml\n' );
+      '    nestedValue      # Added by: source2.yaml\n' );
   } );
 } );

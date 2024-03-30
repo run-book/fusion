@@ -20,143 +20,153 @@ describe ( "merging global.yaml", () => {
 #
 # Files
 # {"trail":[],"file":"global.yaml","exists":true,"errors":[]}
-# {"trail":["global.yaml"],"file":"product/carLoan/carLoan.yaml","exists":true,"errors":[]}
-# {"trail":["global.yaml"],"file":"services/services.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"tasks.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"services.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"transformations.yaml","exists":true,"errors":[]}
 #
 # Files not found
 # {"trail":["global.yaml"],"file":"geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml","exists":false,"errors":[]}
 # {"trail":["global.yaml"],"file":"geo/uk/carLoan/uk_carLoan.yaml","exists":false,"errors":[]}
 # {"trail":["global.yaml"],"file":"geo/uk_overrides.yaml","exists":false,"errors":[]}
+# {"trail":["global.yaml"],"file":"product/carLoan/carLoan.yaml","exists":false,"errors":[]}
 #
 version:
-  1 # Contributed by: global.yaml, services/services.yaml
+  1                                                                                   # Added by: global.yaml, services.yaml
 parameters:
   product:
     legal:
-      - instantLoan # Contributed by: global.yaml
-      - mortgage # Contributed by: global.yaml
-      - creditCard # Contributed by: global.yaml
-      - carLoan # Contributed by: global.yaml
+      - instantLoan                                                                   # Added by: global.yaml
+      - mortgage                                                                      # Added by: global.yaml
+      - creditCard                                                                    # Added by: global.yaml
+      - carLoan                                                                       # Added by: global.yaml
   geo:
     legal:
-      - uk # Contributed by: global.yaml
-      - sw # Contributed by: global.yaml
-      - ca # Contributed by: global.yaml
+      - uk                                                                            # Added by: global.yaml
+      - sw                                                                            # Added by: global.yaml
+      - ca                                                                            # Added by: global.yaml
   channel:
     legal:
-      - customerPortal # Contributed by: global.yaml
-      - merchantPortal # Contributed by: global.yaml
-      - selfServicePortal # Contributed by: global.yaml
+      - customerPortal                                                                # Added by: global.yaml
+      - merchantPortal                                                                # Added by: global.yaml
+      - selfServicePortal                                                             # Added by: global.yaml
 hierarchy:
   Channel Specific Configuration:
-    geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml # Contributed by: global.yaml
+    geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml                      # Added by: global.yaml
   This Product in This Country:
-    geo/uk/carLoan/uk_carLoan.yaml # Contributed by: global.yaml
+    geo/uk/carLoan/uk_carLoan.yaml                                                    # Added by: global.yaml
   Geo Specific Configuration:
-    geo/uk_overrides.yaml # Contributed by: global.yaml
+    geo/uk_overrides.yaml                                                             # Added by: global.yaml
   Product Specific Configuration:
-    product/carLoan/carLoan.yaml # Contributed by: global.yaml
-  Service integration details - topics and schemas:
-    services/services.yaml # Contributed by: global.yaml
-capabilities:
-  aml:
-    service:
-      services.equifax_creditCheck # Contributed by: global.yaml
-  creditCheck:
-    service:
-      services.experian_creditCheck # Contributed by: global.yaml
-  signatureVerification:
-    service:
-      services.internal_signatureVerification # Contributed by: global.yaml
-  pricing:
-    service:
-      services.internal_pricingService # Contributed by: global.yaml
-  limitManagement:
-    service:"services.internal_limitManagement" # Contributed by: global.yaml
-kafka_schemas:
-  service.<service>.<reqOrResp> # Contributed by: global.yaml
+    product/carLoan/carLoan.yaml                                                      # Added by: global.yaml
+  All the tasks that are in Camunda:
+    tasks.yaml                                                                        # Added by: global.yaml
+  All the services we can use:
+    services.yaml                                                                     # Added by: global.yaml
+  The transformer locations:
+    transformations.yaml                                                              # Added by: global.yaml
 services:
   experian_aml:
-    description:
-      AML service provided by Experian for real-time background checks. # Contributed by: services/services.yaml
+    serviceDescription:
+      AML service provided by Experian for real-time background checks.               # Added by: services.yaml
     request:
       topic:
-        experian.aml.request # Contributed by: services/services.yaml
+        experian.aml.request                                                          # Added by: services.yaml
     response:
       topic:
-        experian.aml.response # Contributed by: services/services.yaml
+        experian.aml.response                                                         # Added by: services.yaml
   equifax_creditCheck:
-    description:
-      Credit score checking service provided by Equifax. # Contributed by: services/services.yaml
+    serviceDescription:
+      Credit score checking service provided by Equifax.                              # Added by: services.yaml
     request:
       topic:
-        equifax.creditScore.request # Contributed by: services/services.yaml
+        equifax.creditScore.request                                                   # Added by: services.yaml
     response:
       topic:
-        equifax.creditScore.response # Contributed by: services/services.yaml
+        equifax.creditScore.response                                                  # Added by: services.yaml
   experian_creditCheck:
-    description:
-      Credit score checking service provided by Experian. # Contributed by: services/services.yaml
+    serviceDescription:
+      Credit score checking service provided by Experian.                             # Added by: services.yaml
     request:
       topic:
-        experian.creditScore.request # Contributed by: services/services.yaml
+        experian.creditScore.request                                                  # Added by: services.yaml
     response:
       topic:
-        experian.creditScore.response # Contributed by: services/services.yaml
+        experian.creditScore.response                                                 # Added by: services.yaml
   internal_signatureVerification:
-    description:
-      Internal signature verification service for document signing. # Contributed by: services/services.yaml
+    serviceDescription:
+      Internal signature verification service for document signing.                   # Added by: services.yaml
     request:
       topic:
-        internal.signatureVerification.request # Contributed by: services/services.yaml
+        internal.signatureVerification.request                                        # Added by: services.yaml
     response:
       topic:
-        internal.signatureVerification.response # Contributed by: services/services.yaml
+        internal.signatureVerification.response                                       # Added by: services.yaml
   internal_pricingService:
-    description:
-      Internal pricing service for product and service pricing adjustments. # Contributed by: services/services.yaml
+    serviceDescription:
+      Internal pricing service for product and service pricing adjustments.           # Added by: services.yaml
     request:
       topic:
-        internal.pricing.request # Contributed by: services/services.yaml
+        internal.pricing.request                                                      # Added by: services.yaml
     response:
       topic:
-        internal.pricing.response # Contributed by: services/services.yaml
+        internal.pricing.response                                                     # Added by: services.yaml
   internal_carloan_PricingService:
-    description:
-      Internal pricing service for carloans # Contributed by: services/services.yaml
+    serviceDescription:
+      Internal pricing service for carloans                                           # Added by: services.yaml
     request:
       topic:
-        internal.pricing.request # Contributed by: services/services.yaml
+        internal.pricing.request                                                      # Added by: services.yaml
     response:
       topic:
-        internal.pricing.response # Contributed by: services/services.yaml
+        internal.pricing.response                                                     # Added by: services.yaml
   internal_limitManagement:
-    description:
-      Limit management service for transaction and account limits. # Contributed by: services/services.yaml
+    serviceDescription:
+      Limit management service for transaction and account limits.                    # Added by: services.yaml
     request:
       topic:
-        internal.limitManagement.request # Contributed by: services/services.yaml
+        internal.limitManagement.request                                              # Added by: services.yaml
     response:
       topic:
-        internal.limitManagement.response # Contributed by: services/services.yaml
-task_schemas:
-  - task.<task>.<reqOrResp>.uk.carLoan.merchantPortal # Contributed by: global.yaml
-  - task.<task>.<reqOrResp> # Contributed by: global.yaml
-  - task.<task>.<reqOrResp>.uk.carLoan # Contributed by: global.yaml
-  - task.<task>.<reqOrResp>.carLoan # Contributed by: global.yaml
-transformations:
-  - fromSchema:
-      http://schemas.mycompany.com/carLoanForAml.schema.json # Contributed by: product/carLoan/carLoan.yaml
-    toSchema:
-      https://schemas.mycompany.com/experian/creditScore/request/v2/creditScoreRequest.avsc # Contributed by: product/carLoan/carLoan.yaml
-    transformation:
-      transformations/request_carloan_experian_aml/request_carloan_experian_aml.jsonata # Contributed by: product/carLoan/carLoan.yaml
-  - fromSchema:
-      http://schemas.mycompany.com/carLoanForAml.schema.json # Contributed by: product/carLoan/carLoan.yaml
-    toSchema:
-      https://schemas.mycompany.com/internal/pricing/request/v3/carloanspricingRequest.avsc # Contributed by: product/carLoan/carLoan.yaml
-    transformation:
-      transformations/request_internal_carloan_PricingService/request_internal_carloan_PricingService.jsonata # Contributed by: product/carLoan/carLoan.yaml
+        internal.limitManagement.response                                             # Added by: services.yaml
+tasks:
+  aml:
+    taskDescription:
+      AML check for customer                                                          # Added by: tasks.yaml
+    service:
+      experian_aml                                                                    # Added by: tasks.yaml
+  creditCheck:
+    taskDescription:
+      Credit check for customer                                                       # Added by: tasks.yaml
+    service:
+      experian_creditCheck                                                            # Added by: tasks.yaml
+  signatureVerification:
+    taskDescription:
+      Signature verification for document signing                                     # Added by: tasks.yaml
+    service:
+      internal_signatureVerification                                                  # Added by: tasks.yaml
+  pricing:
+    taskDescription:
+      Pricing service for product and service pricing adjustments                     # Added by: tasks.yaml
+    service:
+      internal_pricingService                                                         # Added by: tasks.yaml
+  limitManagement:
+    taskDescription:
+      Limit management service for transaction and account limits                     # Added by: tasks.yaml
+    service:
+      internal_limitManagement                                                        # Added by: tasks.yaml
+where:
+  services:
+    service/<service>/<reqOrResp>                                                     # Added by: services.yaml
+  tasks:
+    - task/<task>/<reqOrResp>/uk/carLoan/merchantPortal                               # Added by: tasks.yaml
+    - task/<task>/<reqOrResp>                                                         # Added by: tasks.yaml
+    - task/<task>/<reqOrResp>/uk/carLoan                                              # Added by: tasks.yaml
+    - task/<task>/<reqOrResp>/carLoan                                                 # Added by: tasks.yaml
+  transformers:
+    - <service>/<task>/<reqOrResp>/uk/carLoan/merchantPortal                          # Added by: transformations.yaml
+    - <service>/<task>/<reqOrResp>/uk/carLoan                                         # Added by: transformations.yaml
+    - <service>/<task>/<reqOrResp>/carLoan                                            # Added by: transformations.yaml
+    - <service>/<task>/<reqOrResp>                                                    # Added by: transformations.yaml
 
 ` )
 

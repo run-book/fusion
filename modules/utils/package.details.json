@@ -1,9 +1,10 @@
 {
   "template":    "typescript",
-    "name":        "@fusionconfig/utils",
+  "name":        "@fusionconfig/utils",
   "description": "the usual set of little functions that are very basic and not domain oriented",
   "packageJson": {
     "dependencies":    {
+      "@laoban/utils": "1.4.49"
     },
     "devDependencies": {}
   },

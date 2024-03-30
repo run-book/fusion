@@ -5,5 +5,5 @@ export const transformNs: NameSpaceDetailsForGit =
                nameSpaceDetailsForGit ( 'transformer', {
                  parser: async ( id: string, s: string ) => {},
                  writer: ( s: string ) => s + "_written",
-                 extension: 'json',
+                 extension: 'jsonata',
                } )
