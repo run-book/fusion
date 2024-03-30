@@ -5,7 +5,6 @@ import { hasErrors, reportErrors } from "@laoban/utils";
 import { configCommands } from "./src/configCommands";
 import { cliTc, configFinder, makeContext, ThereAndBackContext } from "./src/context";
 import { apiCommand } from "@fusionconfig/api";
-import { defaultSchemaNameFn } from "@fusionconfig/config/dist/src/post.process";
 
 export function findVersion () {
   let packageJsonFileName = "../package.json";

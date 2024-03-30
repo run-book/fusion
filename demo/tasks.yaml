@@ -1,0 +1,31 @@
+task_schemas: # Unlike kafka we have a chain of responsibility. We start most specific. We use a different templating than the config story for task
+  - "task/<task>/<reqOrResp>/${geo}/${product}/${channel}"
+  - "task/<task>/<reqOrResp>"
+  - "task/<task>/<reqOrResp>/${geo}/${product}"
+  - "task/<task>/<reqOrResp>/${product}"
+
+
+# These are Camunda external tasks and correspond to blocks on the BPMN diagram.
+# Here we say the default service to use for each task.
+# This can be overriden at any level in the hierarchy. i.e. in the uk we could pick a different aml service.
+# And in the uk for a carloan with a merchant we could pick a different aml service again.
+
+# For each of these tasks at run time we need
+#  - the topic name to send the request to
+#  - the schema to use for the request (we record the name and the precise value using the id)
+#  - the schema to use for the response (we record the name and the precise value using the id)
+#  - the topic name to listen for the response on
+
+# these details are filled in by the post processor so we don't have to do this manually
+
+tasks:
+  aml:
+    service: equifax_creditCheck
+  creditCheck:
+    service: experian_creditCheck
+  signatureVerification:
+    service: internal_signatureVerification
+  pricing:
+    service: services.internal_pricingService
+  limitManagement:
+    service: services.internal_limitManagement

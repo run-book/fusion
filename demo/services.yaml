@@ -1,5 +1,15 @@
 version: 1
 
+# Here we are defining all the services that are available in the system.
+# A service is two topics in Kafka. One for requests and one for responses.
+
+# The post processor will add the schema id and name
+#   the name is the name of the schema in a way that the schema registry can find it
+#   the id is the precise current value of the schema (based on the git hash)
+
+# TODO rename to service_schemas
+kafka_schemas: "service/<service>/<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
+
 services:
   experian_aml:
     description: "AML service provided by Experian for real-time background checks."

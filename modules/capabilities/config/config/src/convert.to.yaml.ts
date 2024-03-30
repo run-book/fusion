@@ -4,7 +4,7 @@ import { NameAnd } from "@laoban/utils";
 export type CommentFunction = ( files: string[] ) => string | undefined;
 
 export const defaultCommentFunction: CommentFunction = ( files ) => {
-  if ( files ===undefined || files.length === 0 ) return undefined;
+  if ( files === undefined || files.length === 0 ) return undefined;
   return `# Contributed by: ${files.join ( ', ' )}`;
 };
 
@@ -26,11 +26,22 @@ export function convertArrayToYaml ( array: Merged[], commentFunc: CommentFuncti
 
 export function convertObjectToYaml ( obj: NameAnd<Merged>, commentFunc: CommentFunction, depth: number ): string {
   let yamlStr = '';
-  Object.entries ( obj ).forEach ( ( [ key, value ] ) => {
-    const indent = '  '.repeat ( depth );
-    yamlStr += `${indent}${key}:\n${convertToYaml ( value, commentFunc, depth + 1 )}`;
-  } );
-  return yamlStr;
+  try {
+    Object.entries ( obj ).forEach ( ( [ key, value ] ) => {
+      const indent = '  '.repeat ( depth );
+      try {
+        if ( value !== undefined )
+          yamlStr += `${indent}${key}:\n${convertToYaml ( value, commentFunc, depth + 1 )}`;
+      } catch ( e ) {
+        console.log ( 'Error in convertObjectToYaml for ', key, value )
+        throw e
+      }
+    } );
+    return yamlStr;
+  } catch ( e ) {
+    console.log ( 'Error in convertObjectToYaml', obj, commentFunc, depth )
+    throw e
+  }
 }
 
 export function convertToYaml ( merged: Merged, commentFunc: CommentFunction, depth: number = 0 ): string {
@@ -44,8 +55,8 @@ export function convertToYaml ( merged: Merged, commentFunc: CommentFunction, de
 
   // Delegate to specific functions based on type
   if ( Array.isArray ( merged.value ) ) {
-    return  convertArrayToYaml ( merged.value, commentFunc, depth );
+    return convertArrayToYaml ( merged.value, commentFunc, depth );
   } else {
-    return  convertObjectToYaml ( merged.value, commentFunc, depth );
+    return convertObjectToYaml ( merged.value, commentFunc, depth );
   }
 }

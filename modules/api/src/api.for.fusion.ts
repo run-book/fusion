@@ -2,7 +2,7 @@ import { KoaPartialFunction } from "@itsmworkbench/koa";
 import { loadAndMergeAndYamlParts, LoadFilesFn } from "@fusionconfig/config";
 import path from "path";
 import { toArray } from "@laoban/utils";
-import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
+import { PostProcessor } from "@fusionconfig/config";
 
 export const matchFusion = /\/fusion\/(.*)$/;
 export const matchRawFusion = /\/fusion\/raw\/(.*)$/;

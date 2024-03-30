@@ -23,27 +23,10 @@ hierarchy:
   "This Product in This Country": "geo/${geo}/${product}/${geo}_${product}.yaml"
   "Geo Specific Configuration": "geo/${geo}_overrides.yaml"
   "Product Specific Configuration": "product/${product}/${product}.yaml"
-  "Service integration details - topics and schemas": "services/services.yaml"
+  "All the tasks that are in Camunda": "tasks.yaml"
+  "All the services we can use": "services.yaml"
 
-# We want to send things to kafka topics. We need to know the schema to use. We can define the default schema for each service here.
-kafka_schemas: "itsm/org/schema/service/<service>/<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
+#Naming
+# Tasks are external tasks in Camunda
+# Services are kafka topics that we send things to
 
-task_schemas: # Unlike kafka we have a chain of responsibility. We start most specific. We use a different templating than the config story for task
-  - "task/<task>/<reqOrResp>/${geo}/${product}/${channel}"
-  - "task/<task>/<reqOrResp>"
-  - "task/<task>/<reqOrResp>/${geo}/${product}"
-  - "task/<task>/<reqOrResp>/${product}"
-
-
-# the default way of implementing these capabilities. We can override them at any level. For example in the uk use experian for aml.
-capabilities:
-  aml:
-    service: "services.equifax_creditCheck"
-  creditCheck:
-    service: "services.experian_creditCheck"
-  signatureVerification:
-    service: "services.internal_signatureVerification"
-  pricing:
-    service: "services.internal_pricingService"
-  limitManagement:
-    service:"services.internal_limitManagement"

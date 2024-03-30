@@ -2,7 +2,7 @@ import { CommandFn, HasCurrentDirectory } from "@itsmworkbench/cli";
 import { startKoa } from "@itsmworkbench/koa";
 import { fusionHandlers } from "./api";
 import { LoadFilesFn } from "@fusionconfig/config";
-import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
+import { PostProcessor } from "@fusionconfig/config";
 import { UrlStore } from "@itsmworkbench/urlstore";
 
 

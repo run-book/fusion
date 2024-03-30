@@ -1,8 +1,9 @@
-import { addTaskSchemasToServices, postProcess, PostProcessor } from "./post.process";
+import { addTaskSchemasToServices, defaultKafkaNameFn, postProcess, PostProcessor } from "./post.process";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { intoMerged } from "./merge";
 import { hasErrors } from "@laoban/utils";
 import { convertToYaml, defaultCommentFunction } from "./convert.to.yaml";
+import { NamedLoadResult, UrlLoadNamedFn, writeUrl } from "@itsmworkbench/urlstore";
 
 const yamlAsText = `
 version: 1
@@ -37,7 +38,16 @@ services:
 
 const yamlCapability = jsYaml ()
 const obj = yamlCapability.parser ( yamlAsText )
-
+const fakeLoadNamed: UrlLoadNamedFn = async ( url ) => {
+  const result: NamedLoadResult<any> = {
+    url: writeUrl ( url ),
+    mimeType: 'application/json',
+    id: 'id for ' + url.name,
+    result: 'something',
+    fileSize: 100
+  }
+  return result;
+}
 describe ( 'post.process', () => {
   it ( 'should return input if no post processors', async () => {
     const merged = intoMerged ( 'pretend.yaml' ) ( obj )
@@ -49,7 +59,7 @@ describe ( 'post.process', () => {
   } );
   it ( 'should be able to post process a yaml file adding schemas to request and responses', async () => {
     const merged = intoMerged ( 'pretend.yaml' ) ( obj )
-    const result = await postProcess ( [ addTaskSchemasToServices ( async () => 'somename' ) ], merged, {} )
+    const result = await postProcess ( [ addTaskSchemasToServices ( defaultKafkaNameFn ( fakeLoadNamed ) ) ], merged, {} )
     if ( hasErrors ( result ) ) throw new Error ( 'should not have errors\n' + JSON.stringify ( result, null, 2 ) )
     expect ( convertToYaml ( result, defaultCommentFunction ) ).toEqual ( `version:
   1 # Contributed by: pretend.yaml

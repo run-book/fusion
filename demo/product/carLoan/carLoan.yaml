@@ -1,8 +1,0 @@
-transformations:
-  - fromSchema: "http://schemas.mycompany.com/carLoanForAml.schema.json"
-    toSchema: "https://schemas.mycompany.com/experian/creditScore/request/v2/creditScoreRequest.avsc"
-    transformation: "transformations/request_carloan_experian_aml/request_carloan_experian_aml.jsonata"
-
-  - fromSchema: "http://schemas.mycompany.com/carLoanForAml.schema.json"
-    toSchema: "https://schemas.mycompany.com/internal/pricing/request/v3/carloanspricingRequest.avsc"
-    transformation: "transformations/request_internal_carloan_PricingService/request_internal_carloan_PricingService.jsonata"

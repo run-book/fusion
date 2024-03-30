@@ -5,7 +5,7 @@ import { getUrls, listUrls, putUrls } from "@itsmworkbench/apiurlstore";
 import { chainOfResponsibility } from "@runbook/utils";
 import { getFusion, matchFusion, matchRawFusion } from "./api.for.fusion";
 import { LoadFilesFn } from "@fusionconfig/config";
-import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
+import { PostProcessor } from "@fusionconfig/config";
 
 
 export const fusionHandlers = (
