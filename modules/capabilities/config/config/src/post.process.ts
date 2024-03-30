@@ -26,16 +26,16 @@ export type PostProcessor = {
   //sorted Value is the current value of the key we return a new value.
   //promise so that we can async things like file system look ups
   //ErrorsAnd so that we can return errors
-  postProcess: ( full: Merged, sortedValue: Merged, params: NameAnd<string> ) => Promise<ErrorsAnd<Merged>>
+  postProcess: ( full: Merged, sortedValue: Merged, params: NameAnd<string>, debug: boolean | undefined ) => Promise<ErrorsAnd<Merged>>
 }
 
-export async function postProcess ( processors: PostProcessor[], sorted: Merged, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> {
+export async function postProcess ( processors: PostProcessor[], sorted: Merged, params: NameAnd<string>, debug?: boolean ): Promise<ErrorsAnd<Merged>> {
   const acc = sorted
   const errors: string[] = []
   for ( let p of processors ) {
     const value = acc.value[ p.key ]
     if ( isMerged ( value ) ) {
-      const result = await p.postProcess ( sorted, value, params )
+      const result = await p.postProcess ( sorted, value, params, debug )
       if ( hasErrors ( result ) ) errors.push ( ...result )
     }
   }
@@ -159,14 +159,17 @@ export function addKafkaSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostProc
   return {
     key: 'services',
     postProcess:
-      async ( full: Merged, services: Merged, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> => {
+      async ( full: Merged, services: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
+        if(debug)console.log ( 'addKafkaSchemasToServices' )
         if ( typeof services.value !== 'object' ) return [ 'services is not an object' ]
 
         const kafkaSchemas = findPartInMerged ( full, 'where.services' )
         if ( !kafkaSchemas ) return [ 'No where.services found. This string controls how we look for a schema. It would normally be  "service.<service>.<reqOrResp>"' ]
         const kafkaSchemaString = kafkaSchemas.value
         if ( typeof kafkaSchemaString !== 'string' ) return [ `kafka_schema found but not a string. This string controls how we look for a schema. It would normally be  "service.<service>.<reqOrResp>"` ]
-
+        if ( debug ) {
+          console.log ( 'kafkaSchemaString', kafkaSchemaString )
+        }
 
         const serviceNames = Object.keys ( services.value )
         const errors: string[] = []
@@ -193,7 +196,9 @@ export async function addRequestOrResponseToTask ( taskName: string, task: Merge
 export function addTaskDetails ( nameFn: SchemaNameFn ): PostProcessor {
   return {
     key: 'tasks',
-    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> => {
+    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
+      if(debug)console.log ( 'addTaskDetails' )
+
       if ( typeof tasks.value !== 'object' ) return [ 'tasks is not an object' ]
 
       const taskSchemas = findPartInMerged ( full, 'where.tasks' )
@@ -204,6 +209,10 @@ export function addTaskDetails ( nameFn: SchemaNameFn ): PostProcessor {
       if ( !services ) return [ 'No services found' ]
 
       const taskNames = Object.keys ( tasks.value )
+      if ( debug ) {
+        console.log ( 'taskNames', taskNames, )
+        console.log ( 'taskSchemaNames', taskSchemaNames, )
+      }
       const errors: string[] = []
       for ( let taskName of taskNames ) {
         const task = findPartInMerged ( tasks, taskName )
@@ -246,16 +255,18 @@ export async function addTransformerToRequestOrResponse ( transformerNameFn: Tra
 export function addTransformersToTasks ( transformerNameFn: TransformerNameFn ): PostProcessor {
   return {
     key: 'tasks',
-    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> => {
-      console.log ( 'addTransformersToTasks' )
+    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
+      if(debug)console.log ( 'addTransformersToTasks' )
       if ( typeof tasks.value !== 'object' ) return [ 'tasks is not an object' ]
       const transformers = findPartInMerged ( full, 'where.transformers' )
       if ( !transformers ) return [ 'No where.transformers found. These are used to control where we look for transformers' ]
       const transformerNames = findStringArray ( transformers )
       if ( transformerNames.length === 0 ) return [ `No where.transformers found. These are used to control where we look for transformers - had value but wasn't an array of string. This might look like  "task.<task>.<reqOrResp>.\${geo}.\${product}.\${channel}"` ]
       const taskNames = Object.keys ( tasks.value )
-      console.log ( 'taskNames', taskNames, )
-      console.log ( 'transformerNames', transformerNames, )
+      if ( debug ) {
+        console.log ( 'taskNames', taskNames, )
+        console.log ( 'transformerNames', transformerNames, )
+      }
       const errors: string[] = []
       for ( let taskName of taskNames ) {
         const task = findPartInMerged ( tasks, taskName )
@@ -278,7 +289,7 @@ export function removeServices (): PostProcessor {
   return {
     key: 'services',
     postProcess:
-      async ( full: Merged, services: Merged, params: NameAnd<string> ): Promise<ErrorsAnd<Merged>> => {
+      async ( full: Merged, services: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
         full.value[ 'services' ] = undefined
         return full
       }

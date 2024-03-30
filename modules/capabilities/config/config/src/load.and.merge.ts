@@ -34,7 +34,7 @@ export async function loadAndMergeAndYamlParts ( loadFiles: LoadFilesFn, postPro
   const { fileDetails, errors, sorted } = parts
   if ( debug ) console.log ( 'parts - filedetails and errors', JSON.stringify ( { fileDetails, errors }, null, 2 ) )
 
-  const result = await postProcess ( postProcessors, sorted, params ) // TODO config still to be added
+  const result = await postProcess ( postProcessors, sorted, params, debug )
   if ( hasErrors ( result ) ) return { ...parts, postProcessorErrors: result, yaml: undefined }
 
   const yaml = errors.length > 0 ? undefined : `# ${JSON.stringify ( params )}

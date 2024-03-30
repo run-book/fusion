@@ -12,7 +12,8 @@ function fromOpts ( opts: NameAnd<string | boolean> ) {
   const file = opts.file as string
   const parent = path.dirname ( file )
   const commentOffset = parseInt ( opts.commentOffset as string )
-  return { params, file: path.basename ( file ), parent, commentOffset };
+  const raw = opts.raw === true
+  return { params, file: path.basename ( file ), parent, commentOffset, raw };
 }
 export function viewConfigCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, any, Config, CleanConfig> ): CommandDetails<Commander> {
   return {
@@ -67,13 +68,15 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
       '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
       '-p, --params <params>': { description: 'The parameters to use. Comma seperated attribute=value' },
       '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
+      '--raw': { description: `Don't run the post processors` },
       '--debug': { description: 'Show debug information' },
       '--full': { description: 'Show more data about the files' }
     },
     action: async ( _, opts ) => {
-      const { params, file, parent, commentOffset } = fromOpts ( opts );
+      const { params, file, parent, commentOffset, raw } = fromOpts ( opts );
+      const postProcessors = raw ? [] : tc.context.postProcessors
       let { fileDetails, errors, sorted, yaml } =
-            await loadAndMergeAndYamlParts ( tc.context.loadFiles, tc.context.postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
+            await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
@@ -99,12 +102,14 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
       '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
       '--debug': { description: 'Show debug information' },
       '--full': { description: 'Show more data about the files' },
+      '--raw': { description: `Don't run the post processors` },
       '--keys': { description: 'If an object shows the keys' },
     },
     action: async ( _, opts, property ) => {
-      const { params, file, parent, commentOffset } = fromOpts ( opts );
+      const { params, file, parent, commentOffset, raw } = fromOpts ( opts );
+      const postProcessors = raw ? [] : tc.context.postProcessors
       let { fileDetails, errors, yaml, sorted } =
-            await loadAndMergeAndYamlParts ( tc.context.loadFiles, tc.context.postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
+            await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
         console.log ( 'Errors:' )
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
