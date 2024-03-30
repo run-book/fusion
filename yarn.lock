@@ -350,210 +350,210 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
-"@itsmworkbench/apiurlstore@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/apiurlstore/-/apiurlstore-0.0.10.tgz#c3a3fe846fe4a1a0a594bfea813bd0d39713ce06"
-  integrity sha512-J5TEj9vuQUSygH2hBR6NiCy6TP/DbS2hiTmtlM4JC5DyRFSvnmwzLezP3OSMG4l2bkCJrjluwZxmtfxEW9fGPA==
+"@itsmworkbench/apiurlstore@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/apiurlstore/-/apiurlstore-0.0.12.tgz#5ce50864fb63dd83a2f5052117c6f27a022c1dd5"
+  integrity sha512-ZJyjuMefEtjaxIkao5hsVoRv/mvl252yK6QUBfxoT+8i0St0y/HEKMUuMnDNmMVxbKj4kfid6bOo3TsY7YE16g==
   dependencies:
-    "@itsmworkbench/koa" "0.0.10"
-    "@itsmworkbench/urlstore" "0.0.10"
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/koa" "0.0.12"
+    "@itsmworkbench/urlstore" "0.0.12"
+    "@itsmworkbench/utils" "0.0.12"
     "@laoban/utils" "1.4.45"
     "@laoban/variables" "1.4.45"
     debug "^4.3.4"
 
-"@itsmworkbench/cli@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/cli/-/cli-0.0.10.tgz#592be7d5f9e229c4a8233cb8717a6bdc6a529fef"
-  integrity sha512-HoizZFrzF+yANAd9w+2zD9ovMhTlCnjI1xa1ALyir6ojaMlO6ghcjGkiU/sy2LTRlWwTv5eb0nRADUQ1r8+1vA==
+"@itsmworkbench/cli@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/cli/-/cli-0.0.12.tgz#af4d36fbb903f3bec369dd23385425047d760ee6"
+  integrity sha512-IEy30OnHYqGTw3GXRvzfLAk/sgxhLoP66njSa4H1cVdHp+XKA1t4gjwP1kGYVKmtt7By5+BWV0ozKeis3J0XTQ==
   dependencies:
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/utils" "0.0.12"
     "@laoban/fileops" "1.4.45"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
 
-"@itsmworkbench/commander12@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/commander12/-/commander12-0.0.10.tgz#ba83111e0219543d75604abf5d054847b4c602f2"
-  integrity sha512-V9FTQxwFi8qxqRo6w0rlNk3SqFSTLJmUVgYr5/kmXfZxlzg0F1O+Dhmur5JV/OgXBc+a8V++NPjTFGQNQCnYHg==
+"@itsmworkbench/commander12@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/commander12/-/commander12-0.0.12.tgz#a6924d929ff13a93b32861fe8df639204ab5c8c7"
+  integrity sha512-3tJ50CN+V+tq2/rK2f9KgYKJQLH7nKhaoqtimHY0VDBqlfHdd3jKAR2zrUGiT1JToyMk5zi/iyHahefezwBOLQ==
   dependencies:
-    "@itsmworkbench/cli" "0.0.10"
+    "@itsmworkbench/cli" "0.0.12"
     commander "^v12.0.0"
     debug "^4.3.4"
 
-"@itsmworkbench/domain@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/domain/-/domain-0.0.10.tgz#9cac77cbb41a3fe36ddc5e49952e87b2c2d875b5"
-  integrity sha512-H/+gCFzwh6it5fDR4UXQ/SH7MqbK1pQIV0suKuHXOMWq0W4YqUMAbrH+D0FRs9r78HEBKQ9JfuZfCQFQm7TfxA==
+"@itsmworkbench/domain@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/domain/-/domain-0.0.12.tgz#7ed2c54fc7a10d9fc7bc09c738fd42e3f19ad04e"
+  integrity sha512-qNO5b5QvGRj5jH5UQ7tTXpyV43eN14OiD3WekYxuMO69r9rXryhxN4zLE6PPY//4foMkftu+KZt8IEYzJS51HA==
   dependencies:
     "@focuson/lens" "1.44.3"
     "@focuson/state" "1.44.3"
-    "@itsmworkbench/events" "0.0.10"
-    "@itsmworkbench/eventstore" "0.0.10"
-    "@itsmworkbench/utils" "0.0.10"
-    "@itsmworkbench/variables" "0.0.10"
-    "@itsmworkbench/yaml" "0.0.10"
+    "@itsmworkbench/events" "0.0.12"
+    "@itsmworkbench/eventstore" "0.0.12"
+    "@itsmworkbench/utils" "0.0.12"
+    "@itsmworkbench/variables" "0.0.12"
+    "@itsmworkbench/yaml" "0.0.12"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
 
-"@itsmworkbench/events@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/events/-/events-0.0.10.tgz#0d59858212e4fc8e83c4df93dc036e9e12e5f6e0"
-  integrity sha512-4x+gjj96E6jAzNOo6GReSjnKQPRLLjNFmtwEXWosJyuNu65YFJcUf+rYsXaP9o5Q6zIxktkDXbNV5GOxY+v9xA==
+"@itsmworkbench/events@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/events/-/events-0.0.12.tgz#e95ead4b05e4c12d17794add869a37a95d9f58f0"
+  integrity sha512-3VaYN1Fv0pm+rinXTC5TQiVgxLOT09hyywEZaXvuQ24XmHj7WWtexmHhoD9zxPgBQHKJHbaJdwuNPsKVcUosHQ==
   dependencies:
     "@focuson/lens" "1.44.3"
-    "@itsmworkbench/optics" "0.0.10"
-    "@itsmworkbench/urlstore" "0.0.10"
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/optics" "0.0.12"
+    "@itsmworkbench/urlstore" "0.0.12"
+    "@itsmworkbench/utils" "0.0.12"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
     node "^v14.4.0"
 
-"@itsmworkbench/eventstore@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/eventstore/-/eventstore-0.0.10.tgz#3059534c923f09c124b259b94ab80d0169b55e9d"
-  integrity sha512-krLE8w3YEmtIdLmBG7m1ELi0uQHPnhMWEad+z315yRQyQ5ItmDT1xujV6JV6DRtSOJ7h1NL4nG45fYlk95YOew==
+"@itsmworkbench/eventstore@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/eventstore/-/eventstore-0.0.12.tgz#fbf894cbcc6dec339b50a408ce31ff851b55fff6"
+  integrity sha512-TveozlBt+7iaIZyFKU+1GqoPYs3X059V9YeW/ZfZ0IUUWGRfQdyeCh+FTXWLO85cmAH6HWHh7B67JqLFae6dsQ==
   dependencies:
     "@focuson/lens" "1.44.3"
-    "@itsmworkbench/events" "0.0.10"
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/events" "0.0.12"
+    "@itsmworkbench/utils" "0.0.12"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
     node "^v14.4.0"
 
-"@itsmworkbench/fileloading@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/fileloading/-/fileloading-0.0.10.tgz#2fed8134780a5de3c703a037effb1254046b12a4"
-  integrity sha512-nY1ofB2gKD78e4mM/1t7KP5zYoGW7+THB1o6EAr/HtjF1/KoZ6pqRojJQkkrej6Wtnb7oS56XkDB8EQM9bv65Q==
+"@itsmworkbench/fileloading@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/fileloading/-/fileloading-0.0.12.tgz#88e7b15bcb954dfcfa217ce7403389e9f8588db2"
+  integrity sha512-cpn4Rd0R/pkMk5o506tmjFtsjHSxhKrp8PC5jXZkC/wmctfk7dorlE44Ly9ss3S+dcZF/7UFRPLjPk7xKz5Nng==
   dependencies:
     "@focuson/lens" "1.44.3"
-    "@itsmworkbench/events" "0.0.10"
-    "@itsmworkbench/eventstore" "0.0.10"
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/events" "0.0.12"
+    "@itsmworkbench/eventstore" "0.0.12"
+    "@itsmworkbench/utils" "0.0.12"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
     node "^v14.4.0"
 
-"@itsmworkbench/git@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/git/-/git-0.0.10.tgz#2e86882f0f7ece3d956abb65c60978c725e74f85"
-  integrity sha512-9lHEMF+2Y47cZbQgJVx14hnEVg/o23d9pzjj1mZ/EFMvF6DkkRlB6ArdHpMBLwgz9xkshkVCNpd5P6eQNTHi3g==
+"@itsmworkbench/git@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/git/-/git-0.0.12.tgz#9e9ccf06340f29ef2f2085c7499e78d78e34b1a4"
+  integrity sha512-WBtTkzKECgKO3OsmgqERJKKoolJ/mo2RZ24boiuvLPKVHBJpx5ENGANX3uNjgVbO20szve3XkjTk6kSky1jqjA==
   dependencies:
-    "@itsmworkbench/domain" "0.0.10"
-    "@itsmworkbench/shell" "0.0.10"
+    "@itsmworkbench/domain" "0.0.12"
+    "@itsmworkbench/shell" "0.0.12"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
 
-"@itsmworkbench/jsyaml@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/jsyaml/-/jsyaml-0.0.10.tgz#dce357f6377d75cfd31ac201c597c6c19ad23975"
-  integrity sha512-ayKCYSv+4WXGkV5qgD3/ko6+WWBEnnVKYK2BtqD1u4avpAcfybWblwneSLjVhRbaFJsEs6CbaLYkhF+56oWoMA==
+"@itsmworkbench/jsyaml@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/jsyaml/-/jsyaml-0.0.12.tgz#e853f9bd5b7778bb9477b41ef429000d420daf03"
+  integrity sha512-50idXpq35kuFjxDSlFu0mFkGdUTo3tDmeC4QFWaraWu3YCXI6pmP3NDilFLX9Qbr5XsY+Az9ukvpbTIpm1i2lA==
   dependencies:
-    "@itsmworkbench/yaml" "0.0.10"
+    "@itsmworkbench/yaml" "0.0.12"
     debug "^4.3.4"
     js-yaml "^4.1.0"
 
-"@itsmworkbench/koa@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/koa/-/koa-0.0.10.tgz#d520812a302824c7b4d6f050b10aa2536929221f"
-  integrity sha512-ANNhEFZbmaCWSx0SsPgFeCCDp6VjD1sGjWdI9SzDe19DEqKMs0t/e21VhElU6/EqvZKvLYivFeqy0Q4P0Yu7kw==
+"@itsmworkbench/koa@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/koa/-/koa-0.0.12.tgz#ee3aebdcbc82c9a6144a2b1b36464a715fd7eb47"
+  integrity sha512-sJV9k/Rn8H9KVbUJ0kbRgmzp6KIqPiH6BF5qQdRqKdALavY3Nh1j3nme/zFN+dXkP3E1Lk0w4deQ7jn3ZNwhsA==
   dependencies:
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/utils" "0.0.12"
     "@koa/cors" "^5.0.0"
     debug "^4.3.4"
     koa "^2.14.2"
 
-"@itsmworkbench/nodeshell@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/nodeshell/-/nodeshell-0.0.10.tgz#9369553e920e48e8aa1960718256d1b9b802b738"
-  integrity sha512-cNOqGvYVw9Dry6sepwadGTwuszzkHdzRFGY0yo46UzU+ZFk/nYeNIzK/CsUKo61ZizoVXhAgdv9Ui27rnKtbXw==
+"@itsmworkbench/nodeshell@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/nodeshell/-/nodeshell-0.0.12.tgz#9930f9242321d9b65080b158f0d27f4a5a5ff406"
+  integrity sha512-HH//zocasvGGjPZtUkVXYrb5sK5jPyhBiG9tSNfq+UgGm81nBg6Kt181+7t55EVAG/fzjSM8MzD7mHqqzNYaLw==
   dependencies:
-    "@itsmworkbench/shell" "0.0.10"
-    "@itsmworkbench/urlstore" "0.0.10"
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/shell" "0.0.12"
+    "@itsmworkbench/urlstore" "0.0.12"
+    "@itsmworkbench/utils" "0.0.12"
     "@laoban/utils" "1.4.45"
     "@laoban/variables" "1.4.45"
     debug "^4.3.4"
 
-"@itsmworkbench/nodeurlstore@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/nodeurlstore/-/nodeurlstore-0.0.10.tgz#879620a4ac112822a6328a7f1abdd129618ce62f"
-  integrity sha512-iPe0o0AX6N1ZVjgIYsJdKpjV8bvtkzxl1tHP1hba/iqn9gMQ/TlZOUkkq8hgsESc9Jzvfvh5m04H79yTH7Wl3w==
+"@itsmworkbench/nodeurlstore@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/nodeurlstore/-/nodeurlstore-0.0.12.tgz#8a1d6dd6bc3264be9bc11fb6431bb70c3d43747b"
+  integrity sha512-uNW8zqAzRdybkLHIqdgAIeYjn60pQk/h+AhqX86NWbYPkg+i9Q7PkWTpryYy3T9jJJ/UCBDFStTR4T9xiWHZjg==
   dependencies:
-    "@itsmworkbench/domain" "0.0.10"
-    "@itsmworkbench/fileloading" "0.0.10"
-    "@itsmworkbench/git" "0.0.10"
-    "@itsmworkbench/urlstore" "0.0.10"
+    "@itsmworkbench/domain" "0.0.12"
+    "@itsmworkbench/fileloading" "0.0.12"
+    "@itsmworkbench/git" "0.0.12"
+    "@itsmworkbench/urlstore" "0.0.12"
     "@laoban/fileops" "1.4.45"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
     node "^v14.4.0"
 
-"@itsmworkbench/optics@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/optics/-/optics-0.0.10.tgz#9504d183f3e291ba374d85a3ec58c6923d5c27bb"
-  integrity sha512-mQjBxSJmkasH+YHF/+LTcSSxvEvbSLLEaScMVdRUykek2jtUhxbG17biQeoOaUXUspq7EKEaDzepnpV+Qy4f7Q==
+"@itsmworkbench/optics@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/optics/-/optics-0.0.12.tgz#12d8ee65c775120800b287f296eec9f31eba7663"
+  integrity sha512-TDMeIgk29sZXpUbbhC1z0kFLakcpBzO51XXpYi4uf7KB+f/u1R+mI1FvHJ26x++xJd1YZuJbr/qJWX0lVirYmw==
   dependencies:
     "@focuson/lens" "1.44.3"
     debug "^4.3.4"
 
-"@itsmworkbench/shell@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/shell/-/shell-0.0.10.tgz#53ce3f864f34235ff09984b150879c8512a3d28b"
-  integrity sha512-0+fRTtO/bylH+gmaDnr+FcPOvhdPJuc5FVfQzs1kUhlB9z+KbkHpS/FcI5heZeFgBLlRVKRbT1R+WWvSm5ZNdA==
+"@itsmworkbench/shell@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/shell/-/shell-0.0.12.tgz#ace1d34ac8fb1a8502ecfb3dec812c3f74964aac"
+  integrity sha512-zeCgJs8E/xk1EYFsJdiKQDzeq/Ii/kjp2e+51adGi2jg4wHQUM3sptLwvvv/mWb+q42JKe+vh4xKtptDq2y1dw==
   dependencies:
-    "@itsmworkbench/urlstore" "0.0.10"
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/urlstore" "0.0.12"
+    "@itsmworkbench/utils" "0.0.12"
     "@laoban/utils" "1.4.45"
     "@laoban/variables" "1.4.45"
     debug "^4.3.4"
 
-"@itsmworkbench/shellgit@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/shellgit/-/shellgit-0.0.10.tgz#f2b0a30d42b894f6522188ae65f1d00daf804ca1"
-  integrity sha512-XzTteX5GA9mHXlhZ82YjedMs04DuYWXlrA1ZzO7V3sdlxzhjPv2otU16ftjsGfLDXhbonvEQqoe1neuLEGY3Vg==
+"@itsmworkbench/shellgit@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/shellgit/-/shellgit-0.0.12.tgz#440f2c69c4c5bc6f3d670060efa8f56205414b88"
+  integrity sha512-5TTSgcrEyvEHuBMIVN1iAxtz+hDzNGJjUNQXLqykKGvfW4U7cBGKg82O7pBrqWLANlxTZYC08z9UUTutF+NjUA==
   dependencies:
-    "@itsmworkbench/domain" "0.0.10"
-    "@itsmworkbench/git" "0.0.10"
-    "@itsmworkbench/nodeshell" "0.0.10"
-    "@itsmworkbench/shell" "0.0.10"
+    "@itsmworkbench/domain" "0.0.12"
+    "@itsmworkbench/git" "0.0.12"
+    "@itsmworkbench/nodeshell" "0.0.12"
+    "@itsmworkbench/shell" "0.0.12"
     "@laoban/fileops" "1.4.45"
     "@laoban/filesops-node" "1.4.45"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
 
-"@itsmworkbench/urlstore@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/urlstore/-/urlstore-0.0.10.tgz#0a255cdbd03fb59858e7dae20f6d17ff7d3814b9"
-  integrity sha512-GUUz2iUG6i+F1JHwCo8guROlmaHe+w4kR5FwqLQ4g7OkHLcJbsdoSxAM3OqGOZl9r07Znii2Bw2mQcWaAgAx2A==
+"@itsmworkbench/urlstore@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/urlstore/-/urlstore-0.0.12.tgz#9c390fe278138d9ec98e533b19d3d62e85c7d1d3"
+  integrity sha512-JHIyycb0GfzCXFxad7IfBdLc9gRSF4XIZcKuL9bWEFmc/mx7UUfqa+RG9WFey50nAIUYsfnFo+Hvbmw65/pzwg==
   dependencies:
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
 
-"@itsmworkbench/utils@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/utils/-/utils-0.0.10.tgz#02ea2a10faa560fcc4ad33ed0a7cc2950e03932d"
-  integrity sha512-jqHNYn3QlNg81BlO7b2fuXLZqG7tvQzdUezM8jIdWbMuFd/llEFoPQuO5Dct14NPGAPcQn57Li4zQ2w1Jr3dMw==
+"@itsmworkbench/utils@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/utils/-/utils-0.0.12.tgz#bd2c078560467f8fd97638f67955f7ce27424aeb"
+  integrity sha512-vo7ExnaCuR62eM8+qPmGeII3AB1CprlZy7Roc5oWSOpbYm3DExGAsRTJUwi9j/Mw4ggoFv5k/gfT3u+GhzjhBQ==
   dependencies:
     "@focuson/lens" "1.44.3"
     debug "^4.3.4"
     node "^v14.4.0"
 
-"@itsmworkbench/variables@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/variables/-/variables-0.0.10.tgz#9c7dac6b0c85a280d311b09aec8c8d989982098c"
-  integrity sha512-sjHGt3/tKlXSmrdCio9rfDrK/VRlfIGxNzcaGS5QK6XYVOO3ytT4L7NiQl2JjoTeNCkwij9VqYyYhDL73ft50w==
+"@itsmworkbench/variables@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/variables/-/variables-0.0.12.tgz#15504a7a9a50fc47d41da545e3cecca6686ba05a"
+  integrity sha512-Uh73Acpz4kVIxu7xuxWx2gGX0b/E9+UMS2KiG/rjwUYsUACu5v4su4rSrrdUh9BaOKe/986JATeTZ3cRyIn/zw==
   dependencies:
     "@focuson/lens" "1.44.3"
-    "@itsmworkbench/utils" "0.0.10"
+    "@itsmworkbench/utils" "0.0.12"
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"
     node "^v14.4.0"
 
-"@itsmworkbench/yaml@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@itsmworkbench/yaml/-/yaml-0.0.10.tgz#07d8a425f7366d8f367148b7daa76e294b493137"
-  integrity sha512-f+VDSyK3YMO9tX6tkURpk3wMlHJ0kABiL/VmhfBeTJjA8p4HIimZG8/Oz3ZyIu54rN7Vl1o62OgV2q7+jcaTqQ==
+"@itsmworkbench/yaml@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@itsmworkbench/yaml/-/yaml-0.0.12.tgz#1ebca8a104af7f2fa00c0d917b64f6b11563ffab"
+  integrity sha512-n724/lDCqnTIQTY7uKCv2khjEeVQdVZo7aPKlnIYxKCCGF7Khx43PM8Poqiaa4wiQNMHU6xvOvbGj0gur5ee/g==
   dependencies:
     "@laoban/utils" "1.4.45"
     debug "^4.3.4"

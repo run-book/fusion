@@ -1,16 +1,15 @@
 import { CommandFn, HasCurrentDirectory } from "@itsmworkbench/cli";
 import { startKoa } from "@itsmworkbench/koa";
-import { nodeUrlstore } from "@itsmworkbench/nodeurlstore";
-import { shellGitsops } from "@itsmworkbench/shellgit";
 import { fusionHandlers } from "./api";
 import { LoadFilesFn } from "@fusionconfig/config";
 import { PostProcessor } from "@fusionconfig/config/dist/src/post.process";
-import { defaultOrgConfig } from "@fusionconfig/allDomains";
+import { UrlStore } from "@itsmworkbench/urlstore";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
   loadFiles: LoadFilesFn
   postProcessors: PostProcessor[]
+  urlStore: UrlStore
 }
 export function apiCommand<Commander, Context extends ApiCommandContext, Config> (): CommandFn<Commander, Context, Config> {
   return ( context, config ) => ({
@@ -28,9 +27,8 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
       console.log ( 'directory', directory )
       console.log ( 'port', port )
       console.log ( 'debug', debug )
-      const urlStore = nodeUrlstore ( shellGitsops (), defaultOrgConfig () )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
-        fusionHandlers ( urlStore, context.loadFiles, context.postProcessors, directory.toString (), debugBoolean, ) )
+        fusionHandlers ( context.urlStore, context.loadFiles, context.postProcessors, directory.toString (), debugBoolean, ) )
     }
   })
 

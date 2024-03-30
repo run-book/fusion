@@ -1,7 +1,7 @@
 {
   "name": "fusionconfig",
   "description": "Like heira but for whole files",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "main": "dist/index",
   "types": "dist/index",
   "bin": {
@@ -21,16 +21,17 @@
   },
   "dependencies": {
     "jsonata": "^v2.0.4",
-    "@itsmworkbench/cli": "0.0.10",
-    "@itsmworkbench/commander12": "0.0.10",
-    "@itsmworkbench/jsyaml": "0.0.10",
+    "@itsmworkbench/cli": "0.0.12",
+    "@itsmworkbench/commander12": "0.0.12",
+    "@itsmworkbench/jsyaml": "0.0.12",
+    "@itsmworkbench/nodeurlstore": "0.0.12",
     "@laoban/filesops-node": "1.4.49",
     "@laoban/variables": "1.4.49",
     "@laoban/utils": "1.4.49",
-    "@fusionconfig/api": "0.0.4",
-    "@fusionconfig/config": "0.0.4",
-    "@fusionconfig/fileopsconfig": "0.0.4",
-    "@fusionconfig/utils": "0.0.4",
+    "@fusionconfig/api": "0.0.7",
+    "@fusionconfig/config": "0.0.7",
+    "@fusionconfig/fileopsconfig": "0.0.7",
+    "@fusionconfig/utils": "0.0.7",
     "debug": "^4.3.4"
   },
   "devDependencies": {

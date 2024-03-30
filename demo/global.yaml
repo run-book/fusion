@@ -26,13 +26,13 @@ hierarchy:
   "Service integration details - topics and schemas": "services/services.yaml"
 
 # We want to send things to kafka topics. We need to know the schema to use. We can define the default schema for each service here.
-kafka_schemas: "service.<service>.<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
+kafka_schemas: "itsm/org/schema/service/<service>/<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
 
 task_schemas: # Unlike kafka we have a chain of responsibility. We start most specific. We use a different templating than the config story for task
-  - "task.<task>.<reqOrResp>.${geo}.${product}.${channel}"
-  - "task.<task>.<reqOrResp>"
-  - "task.<task>.<reqOrResp>.${geo}.${product}"
-  - "task.<task>.<reqOrResp>.${product}"
+  - "task/<task>/<reqOrResp>/${geo}/${product}/${channel}"
+  - "task/<task>/<reqOrResp>"
+  - "task/<task>/<reqOrResp>/${geo}/${product}"
+  - "task/<task>/<reqOrResp>/${product}"
 
 
 # the default way of implementing these capabilities. We can override them at any level. For example in the uk use experian for aml.

@@ -4,31 +4,38 @@ import { FileOps } from "@laoban/fileops";
 import { fileOpsNode } from "@laoban/filesops-node";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { Commander12, commander12Tc } from "@itsmworkbench/commander12";
+import { UrlStore } from "@itsmworkbench/urlstore";
 import { NoConfig } from "../index";
 import { LoadFilesFn } from "@fusionconfig/config";
 import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
-import { addTaskSchemasToServices, PostProcessor, SchemaNameFn } from "@fusionconfig/config/dist/src/post.process";
+import { addTaskSchemasToServices, defaultKafkaNameFn, defaultSchemaNameFn, PostProcessor, SchemaNameFn } from "@fusionconfig/config/dist/src/post.process";
+import { nodeUrlstore } from "@itsmworkbench/nodeurlstore";
+import { shellGitsops } from "@itsmworkbench/shellgit";
+import { defaultOrgConfig } from "@fusionconfig/alldomains";
 
 export type HasYaml = {
   yaml: YamlCapability
 }
 export interface ThereAndBackContext extends CliContext, HasYaml {
+  urlStore: UrlStore
   loadFiles: LoadFilesFn
   postProcessors: PostProcessor[]
 }
 
-export function postProcessors ( schemaNameFn: SchemaNameFn ): PostProcessor[] {
+export function postProcessors ( schemaNameFn: SchemaNameFn, urlStore: UrlStore ): PostProcessor[] {
   return [
-    addTaskSchemasToServices ( schemaNameFn )
+    addTaskSchemasToServices ( schemaNameFn, defaultKafkaNameFn ( urlStore.loadNamed ) )
   ]
 }
 
-export function makeContext ( version: string, schemaNameFn: SchemaNameFn ): ThereAndBackContext {
-  return thereAndBackContext ( 'fusion', version, fileOpsNode (), jsYaml (), schemaNameFn )
+export function makeContext ( version: string ): ThereAndBackContext {
+  const urlStore = nodeUrlstore ( shellGitsops (), defaultOrgConfig () )
+  const schemaNameFn = defaultSchemaNameFn ( urlStore.loadNamed )
+  return thereAndBackContext ( 'fusion', version, fileOpsNode (), jsYaml (), schemaNameFn, urlStore )
 }
 export const cliTc: CliTc<Commander12, ThereAndBackContext, NoConfig, NoConfig> = commander12Tc<ThereAndBackContext, NoConfig, NoConfig> ()
 export const configFinder = fixedConfig<NoConfig> ( makeContext )
 
-export function thereAndBackContext ( name: string, version: string, fileOps: FileOps, yaml: YamlCapability, schemaNameFn: SchemaNameFn ): ThereAndBackContext {
-  return { ...cliContext ( name, version, fileOps ), yaml, loadFiles: findConfigUsingFileops ( fileOps, yaml ), postProcessors: postProcessors ( schemaNameFn ) }
+export function thereAndBackContext ( name: string, version: string, fileOps: FileOps, yaml: YamlCapability, schemaNameFn: SchemaNameFn, urlStore: UrlStore ): ThereAndBackContext {
+  return { ...cliContext ( name, version, fileOps ), yaml, loadFiles: findConfigUsingFileops ( fileOps, yaml, urlStore ), postProcessors: postProcessors ( schemaNameFn, urlStore ), urlStore }
 }

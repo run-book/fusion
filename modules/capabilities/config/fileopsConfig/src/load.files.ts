@@ -5,6 +5,7 @@ import { derefence, dollarsBracesVarDefn } from "@laoban/variables";
 import { YamlCapability } from "@itsmworkbench/yaml";
 import { extractPlaceholders } from "@fusionconfig/utils";
 import { FileDetails, LoadFilesFn, validateHierarchy, validateParameters } from "@fusionconfig/config";
+import { UrlStore } from "@itsmworkbench/urlstore";
 
 
 function toObject<T> ( x: undefined | NameAnd<T> | T ): NameAnd<T> {
@@ -17,13 +18,14 @@ function toObject<T> ( x: undefined | NameAnd<T> | T ): NameAnd<T> {
 export type LoadFilesContext = {
   fileOps: FileOps
   yaml: YamlCapability,
+  urlStore: any
   dic: any
   debug?: boolean
 }
 
-export const findConfigUsingFileops = ( fileOps: FileOps, yaml: YamlCapability ): LoadFilesFn =>
+export const findConfigUsingFileops = ( fileOps: FileOps, yaml: YamlCapability, urlStore: UrlStore ): LoadFilesFn =>
   ( params: NameAnd<string>, parent: string, file: string, debug?: boolean ) => {
-    return recursivelyFindFileNames ( { fileOps, yaml, dic: params, debug }, parent, [], file )
+    return recursivelyFindFileNames ( { fileOps, yaml, dic: params, debug, urlStore }, parent, [], file )
   }
 
 export async function recursivelyFindFileNames ( context: LoadFilesContext, root: string, trail: string[], file: string ): Promise<FileDetails[]> {

@@ -1,7 +1,7 @@
 {
   "name": "@fusionconfig/utils",
   "description": "the usual set of little functions that are very basic and not domain oriented",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "main": "dist/index",
   "types": "dist/index",
   "browserslist": {

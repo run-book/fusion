@@ -18,8 +18,7 @@ export function findVersion () {
 
 export type NoConfig = {}
 
-const schemaNameFn = defaultSchemaNameFn ( async () => true )
-const context = makeContext ( findVersion (), schemaNameFn );
+const context = makeContext ( findVersion () );
 makeCli<Commander12, ThereAndBackContext, NoConfig, NoConfig> ( context, configFinder, cliTc ).then ( async ( commander ) => {
   if ( hasErrors ( commander ) ) {
     reportErrors ( commander )

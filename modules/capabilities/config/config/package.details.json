@@ -4,11 +4,12 @@
   "description": "the interfaces for the configuration",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":   "1.4.49",
-      "@laoban/fileops": "1.4.49"
+      "@laoban/utils":           "1.4.49",
+      "@laoban/fileops":         "1.4.49",
+      "@itsmworkbench/urlstore": "0.0.12"
     },
     "devDependencies": {
-      "@itsmworkbench/jsyaml": "0.0.10"
+      "@itsmworkbench/jsyaml": "0.0.12"
     }
   },
   "links":       [

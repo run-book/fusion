@@ -7,9 +7,10 @@
       "@laoban/utils": "1.4.49"
     },
     "devDependencies": {
-      "@laoban/variables":     "1.4.49",
-      "@laoban/filesops-node": "1.4.49",
-      "@itsmworkbench/yaml":   "0.0.10"
+      "@laoban/variables":       "1.4.49",
+      "@laoban/filesops-node":   "1.4.49",
+      "@itsmworkbench/urlstore": "0.0.12",
+      "@itsmworkbench/yaml":   "0.0.12"
     }
   },
   "links":       [
