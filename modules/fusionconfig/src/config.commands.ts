@@ -13,8 +13,8 @@ function fromOpts ( opts: NameAnd<string | boolean> ) {
   const parent = path.dirname ( file )
   const commentOffset = parseInt ( opts.commentOffset as string )
   const raw = opts.raw === true
-  const directory = opts.directory as string
-  return { params, file: path.basename ( file ), parent, commentOffset, raw, directory };
+  const urlStore = opts.urlStore as string
+  return { params, file: path.basename ( file ), parent, commentOffset, raw, urlStore };
 }
 export function viewConfigCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, any, Config, CleanConfig> ): CommandDetails<Commander> {
   return {
@@ -69,14 +69,59 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
       '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
       '-p, --params <params>': { description: 'The parameters to use. Comma seperated attribute=value' },
       '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
-      '-d, --directory <directory>': { description: 'The directory that files are served from', default: tc.context.currentDirectory },
+      '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: tc.context.currentDirectory },
       '--raw': { description: `Don't run the post processors` },
       '--debug': { description: 'Show debug information' },
       '--full': { description: 'Show more data about the files' }
     },
     action: async ( _, opts ) => {
-      const { params, file, parent, commentOffset, raw, directory } = fromOpts ( opts );
-      const postProcessors = raw ? [] : tc.context.postProcessors ( directory )
+      const { params, file, parent, commentOffset, raw, urlStore } = fromOpts ( opts );
+      const postProcessors = raw ? [] : tc.context.postProcessors ( urlStore )
+      let { fileDetails, errors, postProcessorErrors, sorted, yaml } =
+            await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
+
+      if ( errors.length > 0 ) {
+        console.log ( 'Errors:' )
+        fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
+        process.exit ( 1 )
+      }
+      if ( postProcessorErrors?.length > 0 ) {
+        console.log ( 'Post Processor Errors:' )
+        postProcessorErrors.forEach ( f => console.log ( f ) )
+        process.exit ( 1 )
+      }
+      if ( opts.full === true )
+        console.log ( JSON.stringify ( sorted.value, null, 2 ) )
+      else {
+        console.log ( yaml )
+      }
+    }
+  }
+}
+
+export function checkPermutationsCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): CommandDetails<Commander> {
+  return {
+    cmd: 'check',
+    description: 'Checks all the permutations',
+    options: {
+      '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
+      '-p, --params <params>': { description: 'The parameters to use. Comma seperated attribute=value' },
+      '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
+      '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: tc.context.currentDirectory },
+      '--raw': { description: `Don't run the post processors` },
+      '--debug': { description: 'Show debug information' },
+      '--full': { description: 'Show more data about the files' }
+    },
+    action: async ( _, opts ) => {
+      const { params, file, parent, commentOffset, raw, urlStore } = fromOpts ( opts );
+      const initialFile = await tc.context.fileOps.loadFileOrUrl ( file )
+      console.log ( 'initialFile', initialFile )
+      const initialFileAsYaml = tc.context.yaml.parser ( initialFile )
+      const parameters = initialFileAsYaml.parameters
+      console.log ( 'parameters', parameters )
+
+      process.exit ( 0 )
+      const postProcessors = raw ? [] : tc.context.postProcessors ( urlStore )
       let { fileDetails, errors, sorted, yaml } =
             await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
@@ -93,7 +138,6 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
   }
 }
 
-
 export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): CommandDetails<Commander> {
   return {
     cmd: 'property <property>',
@@ -102,14 +146,15 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
       '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
       '-p, --params <params>': { description: 'The parameters to use. Comma seperated attribute=value' },
       '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
+      '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: tc.context.currentDirectory },
       '--debug': { description: 'Show debug information' },
       '--full': { description: 'Show more data about the files' },
       '--raw': { description: `Don't run the post processors` },
       '--keys': { description: 'If an object shows the keys' },
     },
     action: async ( _, opts, property ) => {
-      const { params, file, parent, commentOffset, raw, directory } = fromOpts ( opts );
-      const postProcessors = raw ? [] : tc.context.postProcessors ( directory )
+      const { params, file, parent, commentOffset, raw, urlStore } = fromOpts ( opts );
+      const postProcessors = raw ? [] : tc.context.postProcessors ( urlStore )
       let { fileDetails, errors, yaml, sorted } =
             await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
@@ -144,6 +189,7 @@ export function configCommands<Commander, Config, CleanConfig> ( tc: ContextConf
     cmd: 'config',
     description: 'Config commands',
     commands: [
+      checkPermutationsCommand<Commander, Config, CleanConfig> ( tc ),
       viewConfigCommand<Commander, Config, CleanConfig> ( tc ),
       listFilesCommand<Commander, Config, CleanConfig> ( tc ),
       mergeFilesCommand<Commander, Config, CleanConfig> ( tc ),

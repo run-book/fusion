@@ -1,14 +1,8 @@
-import { findChildFiles } from "fusionconfig/dist/src/find.files";
-import { defaultIgnoreFilter, FileOps } from "@laoban/fileops";
-import path from "path";
-import { transformNs } from "./transformer";
-import { pathListToJson, putIntoFromToMap, removeLastExtension } from "@fusionconfig/utils";
-import { collect, ErrorsAnd, flatMap, flatMapErrors, hasErrors, mapErrors, NameAnd } from "@laoban/utils";
+import { putIntoFromToMap, removeLastExtension } from "@fusionconfig/utils";
+import { collect, ErrorsAnd, flatMap, flatMapErrors, hasErrors, NameAnd } from "@laoban/utils";
 import { Trans, TransAndMeta } from "./domain.transform";
-import { NamedLoadResult, NamedUrl, parseNamedUrlOrThrow } from "@itsmworkbench/urlstore";
+import { NamedLoadResult, NamedUrl, parseNamedUrlOrErrors } from "@itsmworkbench/urlstore";
 import { UrlLoadNamedFn } from "@itsmworkbench/urlstore/dist/src/url.load.and.store";
-
-
 
 
 interface NamedLoadResultAndPathAndUrl<T> {
@@ -22,13 +16,14 @@ export interface TransMapAndErrors {
   errors: string[]
 }
 
-export const defaultPathToUrl = ( org: string ) => ( path: string ) => parseNamedUrlOrThrow ( `itsm/${removeLastExtension(path)}` );
+export const defaultPathToUrl = ( org: string ) => ( path: string ) => parseNamedUrlOrErrors ( `itsm/${removeLastExtension ( path )}` );
 export async function loadAndMapTrans ( load: UrlLoadNamedFn,
                                         paths: string[],
                                         validate: ( context: string, trans: Trans ) => string[],
-                                        pathToUrl: ( path: string ) => NamedUrl ): Promise<TransMapAndErrors> {
+                                        pathToUrl: ( path: string ) => ErrorsAnd<NamedUrl> ): Promise<TransMapAndErrors> {
   const loadResult: ErrorsAnd<NamedLoadResultAndPathAndUrl<Trans>>[] = await Promise.all ( paths.map ( async path => {
     const url = pathToUrl ( path )
+    if ( hasErrors ( url ) ) return url.map( e => `Loading transformer ${path} - ${e}`)
     return flatMapErrors ( await load<Trans> ( url ), result => {
       const errors = validate ( `loading transformer at ${url.url}`, result.result )
       if ( errors.length > 0 ) return errors

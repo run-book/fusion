@@ -26,6 +26,7 @@ export interface ThereAndBackContext extends CliContext, HasYaml {
 }
 
 export function postProcessors ( fileOps: FileOps, schemaNameFn: SchemaNameFn, urlStore: UrlStore, directory: string ): PostProcessor[] {
+  if ( !directory ) throw new Error ( 'No directory' )
   return [
     addKafkaSchemasToServices ( defaultKafkaNameFn ( urlStore.loadNamed ) ),
     addTaskDetails ( schemaNameFn ),
