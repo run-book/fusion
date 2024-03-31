@@ -27,11 +27,12 @@ describe ( "loadFilesIntegrationTest", () => {
     const fileDetails = await recursivelyFindFileNames ( context, await testDirPromise, [], 'global.yaml' )
     expect ( fileDetails.map ( ( { yaml, ...rest } ) => rest ) ).toEqual ( [
       { "errors": [], "exists": true, "file": "global.yaml", "trail": [] },
-      { "errors": [], "exists": false, "file": "geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml", "trail": [ "global.yaml" ] },
-      { "errors": [], "exists": false, "file": "geo/uk/carLoan/uk_carLoan.yaml", "trail": [ "global.yaml" ] },
-      { "errors": [], "exists": false, "file": "geo/uk_overrides.yaml", "trail": [ "global.yaml" ] },
-      { "errors": [], "exists": false, "file": "product/carLoan/carLoan.yaml", "trail": [ "global.yaml" ] },
+      { "errors": [], "exists": true, "file": "services.yaml", "trail": [ "global.yaml" ] },
       { "errors": [], "exists": true, "file": "tasks.yaml", "trail": [ "global.yaml" ] },
-      { "errors": [], "exists": true, "file": "services.yaml", "trail": [ "global.yaml" ] }] )
+      { "errors": [], "exists": false, "file": "product/carLoan/carLoan.yaml", "trail": [ "global.yaml" ] },
+      { "errors": [], "exists": true, "file": "geo/uk/uk_overrides.yaml", "trail": [ "global.yaml" ] },
+      { "errors": [], "exists": false, "file": "geo/uk/carLoan/uk_carLoan.yaml", "trail": [ "global.yaml" ] },
+      { "errors": [], "exists": false, "file": "geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml", "trail": [ "global.yaml" ] }
+    ] )
   } )
 } )

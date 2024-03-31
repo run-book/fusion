@@ -1,4 +1,4 @@
-import { firstSegment, NameAnd, toArray } from "@laoban/utils";
+import { NameAnd, toArray } from "@laoban/utils";
 
 export type MergeInput = {
   file: string
@@ -13,26 +13,30 @@ export function isMerged ( obj: any ): obj is Merged {
   return obj?.value !== undefined && obj?.files !== undefined
 }
 
-export function findPartInMerged ( dic: Merged, ref: string ): Merged | undefined{
+export function findPartInMerged ( dic: Merged, ref: string ): Merged | undefined {
   if ( ref === undefined ) return undefined
   if ( ref === '' ) return dic
   const parts = ref.split ( '.' )
   try {
-    return parts.reduce ( ( acc, part ) => acc?.value?.[ part], dic )
+    return parts.reduce ( ( acc, part ) => acc?.value?.[ part ], dic )
   } catch ( e ) {return undefined}
 }
 
 
 export const intoMerged = ( file: string ) => ( input: any ): Merged => {
   const t = typeof input
-  if ( t === 'string' || t === 'number' || t === 'boolean' ) return { value: input, files: [ file ] }
-  if ( Array.isArray ( input ) ) return { value: input.map ( intoMerged ( file ) ), files: [ file ] }
-  if ( t === 'object' ) return { value: Object.entries ( input ).reduce ( ( acc, [ key, value ] ) => ({ ...acc, [ key ]: intoMerged ( file ) ( value ) }), {} as NameAnd<Merged> ), files: [ file ] }
-  throw new Error ( `Don't know how to process ${t} - ${input}` )
+  try {
+    if ( t === 'string' || t === 'number' || t === 'boolean' ) return { value: input, files: [ file ] }
+    if ( Array.isArray ( input ) ) return { value: input.map ( intoMerged ( file ) ), files: [ file ] }
+    if ( t === 'object' ) return { value: Object.entries ( input ).reduce ( ( acc, [ key, value ] ) => ({ ...acc, [ key ]: intoMerged ( file ) ( value ) }), {} as NameAnd<Merged> ), files: [ file ] }
+  } catch ( e ) {
+    throw new Error ( `Being added by ${file} Don't know how to process ${input}\n ${e}` )
+  }
+  throw new Error ( `Being added by ${file} Don't know how to process ${t} - ${input}` )
 };
 export function mergeObjectInto ( acc: Merged, input: MergeInput ): Merged {
   if ( typeof acc?.value !== 'object' )
-    return mergeObjectInto ( { value: {}, files: toArray(acc?.files) }, input )
+    return mergeObjectInto ( { value: {}, files: toArray ( acc?.files ) }, input )
   const accObj = acc.value as NameAnd<Merged>
   const newObj = input.yaml as NameAnd<any>
   if ( newObj === undefined ) return acc
@@ -57,7 +61,7 @@ export function mergeArrayInto ( acc: Merged, input: MergeInput ) {
         ...input.yaml.map ( intoMerged ( input.file ) ) ],
       files: [ ...acc.files, input.file ]
     }
-  return mergeArrayInto ( { value: [], files: toArray(acc?.files) }, input )
+  return mergeArrayInto ( { value: [], files: toArray ( acc?.files ) }, input )
 }
 export function postProcessArray ( acc: Merged ): Merged {
   if ( !Array.isArray ( acc.value ) ) return acc

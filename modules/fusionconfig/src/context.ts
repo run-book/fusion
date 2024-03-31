@@ -32,7 +32,7 @@ export function postProcessors ( fileOps: FileOps, schemaNameFn: SchemaNameFn, l
     addKafkaSchemasToServices ( defaultKafkaNameFn ( load ) ),
     addTaskDetails ( schemaNameFn ),
     addTransformersToTasks ( findCachedOrRawTransMapAndErrors ( fileOps, directory, load ) ( cached ) ),
-    removeKey ( 'services' )
+    // removeKey ( 'services' )
   ]
 }
 

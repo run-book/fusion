@@ -1,6 +1,8 @@
 version: 1
 
-mortgage:
-     capabilities: #only the ones that are different.
-          creditCheck: "services.experian_creditCheck"
+tasks:
+     creditCheck:
+          taskDescription: "Credit check for customer. In the UK we use Equifax"
+          service: equifax_creditCheck
+
 

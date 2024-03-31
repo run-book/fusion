@@ -20,17 +20,17 @@ describe ( "merging global.yaml", () => {
 #
 # Files
 # {"trail":[],"file":"global.yaml","exists":true,"errors":[]}
-# {"trail":["global.yaml"],"file":"tasks.yaml","exists":true,"errors":[]}
 # {"trail":["global.yaml"],"file":"services.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"tasks.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"geo/uk/uk_overrides.yaml","exists":true,"errors":[]}
 #
 # Files not found
-# {"trail":["global.yaml"],"file":"geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml","exists":false,"errors":[]}
-# {"trail":["global.yaml"],"file":"geo/uk/carLoan/uk_carLoan.yaml","exists":false,"errors":[]}
-# {"trail":["global.yaml"],"file":"geo/uk_overrides.yaml","exists":false,"errors":[]}
 # {"trail":["global.yaml"],"file":"product/carLoan/carLoan.yaml","exists":false,"errors":[]}
+# {"trail":["global.yaml"],"file":"geo/uk/carLoan/uk_carLoan.yaml","exists":false,"errors":[]}
+# {"trail":["global.yaml"],"file":"geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml","exists":false,"errors":[]}
 #
 version:
-  1                                                                                   # Added by: global.yaml, services.yaml
+  1                                                                                   # Added by: global.yaml, services.yaml, geo/uk/uk_overrides.yaml
 parameters:
   product:
     legal:
@@ -49,18 +49,18 @@ parameters:
       - merchantPortal                                                                # Added by: global.yaml
       - selfServicePortal                                                             # Added by: global.yaml
 hierarchy:
-  Channel Specific Configuration:
-    geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml                      # Added by: global.yaml
-  This Product in This Country:
-    geo/uk/carLoan/uk_carLoan.yaml                                                    # Added by: global.yaml
-  Geo Specific Configuration:
-    geo/uk_overrides.yaml                                                             # Added by: global.yaml
-  Product Specific Configuration:
-    product/carLoan/carLoan.yaml                                                      # Added by: global.yaml
-  All the tasks that are in Camunda:
-    tasks.yaml                                                                        # Added by: global.yaml
   All the services we can use:
     services.yaml                                                                     # Added by: global.yaml
+  All the tasks that are in Camunda:
+    tasks.yaml                                                                        # Added by: global.yaml
+  Product Specific Configuration:
+    product/carLoan/carLoan.yaml                                                      # Added by: global.yaml
+  Geo Specific Configuration:
+    geo/uk/uk_overrides.yaml                                                          # Added by: global.yaml
+  This Product in This Country:
+    geo/uk/carLoan/uk_carLoan.yaml                                                    # Added by: global.yaml
+  Channel Specific Configuration:
+    geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml                      # Added by: global.yaml
 services:
   experian_aml:
     serviceDescription:
@@ -132,20 +132,20 @@ tasks:
     service:
       experian_aml                                                                    # Added by: tasks.yaml
   creditCheck:
-    taskDescription:
-      Credit check for customer                                                       # Added by: tasks.yaml
     service:
-      experian_creditCheck                                                            # Added by: tasks.yaml
-  signatureVerification:
+      equifax_creditCheck                                                             # Added by: tasks.yaml, geo/uk/uk_overrides.yaml
     taskDescription:
-      Signature verification for document signing                                     # Added by: tasks.yaml
-    service:
-      internal_signatureVerification                                                  # Added by: tasks.yaml
+      Credit check for customer. In the UK we use Equifax                             # Added by: tasks.yaml, geo/uk/uk_overrides.yaml
   pricing:
     taskDescription:
       Pricing service for product and service pricing adjustments                     # Added by: tasks.yaml
     service:
       internal_pricingService                                                         # Added by: tasks.yaml
+  signatureVerification:
+    taskDescription:
+      Signature verification for document signing                                     # Added by: tasks.yaml
+    service:
+      internal_signatureVerification                                                  # Added by: tasks.yaml
 where:
   services:
     service/<service>/<reqOrResp>                                                     # Added by: services.yaml

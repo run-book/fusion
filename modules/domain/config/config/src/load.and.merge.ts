@@ -20,7 +20,8 @@ export type LoadedAndMergedAndYamlParts = {
 export async function loadAndMergeParts ( loadFiles: LoadFilesFn, params: NameAnd<string>, parent: string, file: string, debug?: boolean ): Promise<LoadedAndMergedParts> {
   const fileDetails = await loadFiles ( params, parent, file, debug )
   const errors = fileDetails.filter ( f => f.errors.length > 0 )
-  const merged: Merged = fileDetails.reduce ( ( acc, fd ) => mergeObjectInto ( acc, fd ), { value: undefined, files: [] } )
+  const merged: Merged = fileDetails.reduce ( ( acc, fd ) =>
+    mergeObjectInto ( acc, fd ), { value: undefined, files: [] } )
   const { version, parameters, hierarchy, ...rest } = merged.value as any
   let sorted: Merged = { value: { version, parameters, hierarchy, ...rest }, files: merged.files };
   return { fileDetails, errors, sorted };

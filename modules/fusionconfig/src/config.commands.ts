@@ -1,6 +1,6 @@
 import { CommandDetails, ContextConfigAndCommander, SubCommandDetails } from "@itsmworkbench/cli";
 import path from "path";
-import { findPart, NameAnd, toArray } from "@laoban/utils";
+import { findPart, flatMap, NameAnd, toArray } from "@laoban/utils";
 
 import { ThereAndBackContext } from "./context";
 import { defaultCommentOffset, findPartInMerged, loadAndMergeAndYamlParts } from "@fusionconfig/config";
@@ -203,14 +203,20 @@ export function permutateCommand<Commander, Config, CleanConfig> ( tc: ContextCo
           console.log ( '   Post Processor Errors:' )
           postProcessorErrors.forEach ( f => console.log ( '      ', f ) )
         }
-        const fileName = path.join(outputDir, Object.values ( params ).join ( '/' ) + '/' + Object.values ( params ).join ( '-' ) + '.yaml')
-        const dir = path.dirname ( fileName )
-        console.log('   Writing to', fileName)
         const fileOps = tc.context.fileOps
-        const allErrors = [...toArray(errors), ...toArray(postProcessorErrors)]
-        const content = allErrors.length > 0 ? `# Errors: ${allErrors.join ( '\n# ' )}` : yaml
-        await fileOps.createDir(dir )
-        await fileOps.saveFile ( fileName, content )
+        const allErrors = [
+          ...flatMap ( toArray ( errors ), fd => fd.errors.map ( e => fd.file + " " + e ) ),
+          ...toArray ( postProcessorErrors ) ]
+        const rawFileName = path.join ( outputDir, Object.values ( params ).join ( '/' ) + '/' + Object.values ( params ).join ( '-' ) )
+        const fileName = rawFileName + '.yaml'
+        const errorFileName = rawFileName + '.errors.txt'
+        const dir = path.dirname ( fileName )
+        console.log ( '   Writing to', fileName )
+        const content = allErrors.length > 0 ? allErrors.join ( '\n# ' ) : yaml
+        await fileOps.createDir ( dir )
+        await fileOps.removeFile ( fileName )
+        await fileOps.removeFile ( errorFileName )
+        await fileOps.saveFile ( allErrors.length > 0 ? errorFileName : fileName, content )
       } )
 
     }
