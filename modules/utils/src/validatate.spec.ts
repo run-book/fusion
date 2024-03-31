@@ -1,4 +1,4 @@
-import { compose, Validate, validateChild, validateExists } from "./validate";
+import { composeValidators, Validate, validateChild, validateExists } from "./validate";
 
 describe ( "Validate", () => {
   describe ( 'validateExists', () => {
@@ -27,7 +27,7 @@ describe ( "Validate", () => {
     it ( 'should combine multiple validators', () => {
       const alwaysPass = jest.fn ( ( context, t ) => [] );
       const alwaysFail = jest.fn ( ( context, t ) => [ `${context}: Failure` ] );
-      const combined = compose ( alwaysPass, alwaysFail );
+      const combined = composeValidators ( alwaysPass, alwaysFail );
 
       const errors = combined ( 'Test', {} );
       expect ( errors ).toEqual ( [ 'Test: Failure' ] );

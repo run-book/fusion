@@ -1,9 +1,9 @@
-import { NamedLoadResult, NamedUrl, NameSpaceDetailsForGit, nameSpaceDetailsForGit, parseNamedUrlOrThrow, UrlStore } from "@itsmworkbench/urlstore";
-import { mapPathsK, pathListToJson, PathsInJson, removeLastExtension } from "@fusionconfig/utils";
+import { NamedLoadResult, NamedUrl, NameSpaceDetailsForGit, nameSpaceDetailsForGit, parseNamedUrlOrThrow, UrlStore, UrlStoreParser } from "@itsmworkbench/urlstore";
+import { findChildFiles, mapPathsK, pathListToJson, PathsInJson, removeLastExtension } from "@fusionconfig/utils";
 import { ErrorsAnd, hasErrors, mapErrors, mapErrorsK, reportErrors } from "@laoban/utils";
 import { defaultIgnoreFilter, FileOps } from "@laoban/fileops";
 import path from "path";
-import { findChildFiles } from "fusionconfig/dist/src/find.files";
+import { YamlCapability } from "@itsmworkbench/yaml";
 
 
 export type RequestTransformerMeta = {
@@ -45,15 +45,15 @@ export function pathToTransformerUrl ( path: string ): NamedUrl {
 
 export type MetasAndErrors = { metas: TransformerPathAndLoadResult[], errors: string[] }
 
-export async function loadPathToJsonForTransformers ( directory: string, fileOps: FileOps ) {
-  const start = path.join ( directory, 'org', transformNs.pathInGitRepo )
-  const dotExtension = '.' + transformNs.extension
+export async function loadPathToJsonForTransformers ( directory: string, fileOps: FileOps, ns: NameSpaceDetailsForGit ) {
+  const start = path.join ( directory, 'org', ns.pathInGitRepo )
+  const dotExtension = '.' + ns.extension
   const childFiles = await findChildFiles ( fileOps, defaultIgnoreFilter, s => s.endsWith ( dotExtension ) ) ( start )
   const json = pathListToJson ( childFiles, `Expecting only one file with extension ${dotExtension}: ` )
   return json;
 }
-export async function loadAllTransformersFromFileSystem ( fileOps: FileOps, urlStore: UrlStore, directory: string ): Promise<MetasAndErrors> {
-  const json = await loadPathToJsonForTransformers ( directory, fileOps );
+export async function loadAllTransformersFromFileSystem ( fileOps: FileOps, urlStore: UrlStore, directory: string, ns: NameSpaceDetailsForGit ): Promise<MetasAndErrors> {
+  const json = await loadPathToJsonForTransformers ( directory, fileOps, ns );
   if ( hasErrors ( json ) ) return { metas: [], errors: json }
   return await loadAllTransformers ( json, urlStore )
 }
@@ -107,9 +107,10 @@ export function pathToTransformerMeta ( path: string ): ErrorsAnd<TransformerMet
     return { task, service, response: true, url }
 }
 
-export const transformNs: NameSpaceDetailsForGit =
-               nameSpaceDetailsForGit ( 'transformer', {
-                 parser: async ( id: string, s: string ) => s,
-                 writer: ( s: string ) => s,
-                 extension: 'jsonata',
-               } )
+function transParser ( yaml: YamlCapability ): UrlStoreParser {return async ( id, s ) => yaml.parser ( s );}
+export const transformNs = ( yaml: YamlCapability ): NameSpaceDetailsForGit =>
+  nameSpaceDetailsForGit ( 'transformer', {
+    parser: transParser ( yaml ),
+    writer: yaml.writer,
+    extension: 'yaml',
+  } )

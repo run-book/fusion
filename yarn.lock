@@ -3279,7 +3279,7 @@ json5@^2.2.1, json5@^2.2.3:
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
 
-jsonata@^v2.0.4:
+jsonata@2.0.4, jsonata@^v2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/jsonata/-/jsonata-2.0.4.tgz#d8575d4c7695a2086162a2baebce0f0ee4e84fdb"
   integrity sha512-vfavX4/G/yrYxE+UrmT/oUJ3ph7KqUrb0R7b0LVRcntQwxw+Z5kA1pNUIQzX5hF04Oe1eKxyoIPsmXtc2LgJTQ==

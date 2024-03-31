@@ -1,5 +1,5 @@
 import { NamedLoadResult, NamedUrl, UrlLoadNamedFn, writeUrl } from "@itsmworkbench/urlstore";
-import { addIdAndNameToMerged, findPartInMerged, Merged, PostProcessor } from "@fusionconfig/config";
+import { addIdAndNameToMergedFromLoadResult, findPartInMerged, Merged, PostProcessor } from "@fusionconfig/config";
 import { ErrorsAnd, hasErrors, mapErrors, NameAnd } from "@laoban/utils";
 
 export type KafkaNameFn = ( kafkaSchemaName: string ) => Promise<ErrorsAnd<NamedLoadResult<any>>>
@@ -57,6 +57,6 @@ export async function addRequestOrResponseToService ( serviceName: string, servi
   const kafkaSchemaName = kafkaSchemaString.replace ( /<service>/g, serviceName ).replace ( /<reqOrResp>/g, requestOrResponse )
 
   return mapErrors ( await kafkaNameFn ( kafkaSchemaName ), kafka =>
-    addIdAndNameToMerged ( request, 'kafka', kafka, addedBy ) )
+    addIdAndNameToMergedFromLoadResult ( request, 'kafka', kafka, addedBy ) )
 }
 

@@ -1,4 +1,4 @@
-import { addAllFieldsInMergedToMerge, addIdAndNameToMerged, findPartInMerged, Merged, PostProcessor } from "@fusionconfig/config";
+import { addAllFieldsInMergedToMerge, addIdAndNameToMergedFromLoadResult, findPartInMerged, Merged, PostProcessor } from "@fusionconfig/config";
 import { findStringArray } from "@fusionconfig/config";
 import { ErrorsAnd, hasErrors, mapErrors, NameAnd } from "@laoban/utils";
 import { NamedLoadResult } from "@itsmworkbench/urlstore";
@@ -70,5 +70,5 @@ export async function addRequestOrResponseToTask ( taskName: string, task: Merge
   if ( !reqResp ) return [ `No ${reqResp} found for task ${taskName}` ]
 
   return mapErrors ( await nameFn ( taskName, requestOrResponse, taskSchemaNames ), async ( requestLoaded: NamedLoadResult<any> ) =>
-    addIdAndNameToMerged ( reqResp, `schema`, requestLoaded, addedBy ) )
+    addIdAndNameToMergedFromLoadResult ( reqResp, `schema`, requestLoaded, addedBy ) )
 }

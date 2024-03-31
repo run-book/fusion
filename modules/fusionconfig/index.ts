@@ -26,7 +26,7 @@ makeCli<Commander12, ThereAndBackContext, NoConfig, NoConfig> ( context, configF
     process.exit ( 1 )
   }
   cliTc.addSubCommand ( commander, configCommands ( commander ) )
-  cliTc.addSubCommand ( commander, transformerCommands ( commander, transformNs ) )
+  cliTc.addSubCommand ( commander, transformerCommands ( commander, transformNs(context.yaml) ) )
   cliTc.addCommands ( commander, [ apiCommand () ] )
   return await cliTc.execute ( commander.commander, context.args )
 } )

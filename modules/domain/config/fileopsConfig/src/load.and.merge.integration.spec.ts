@@ -22,7 +22,6 @@ describe ( "merging global.yaml", () => {
 # {"trail":[],"file":"global.yaml","exists":true,"errors":[]}
 # {"trail":["global.yaml"],"file":"tasks.yaml","exists":true,"errors":[]}
 # {"trail":["global.yaml"],"file":"services.yaml","exists":true,"errors":[]}
-# {"trail":["global.yaml"],"file":"transformations.yaml","exists":true,"errors":[]}
 #
 # Files not found
 # {"trail":["global.yaml"],"file":"geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml","exists":false,"errors":[]}
@@ -62,8 +61,6 @@ hierarchy:
     tasks.yaml                                                                        # Added by: global.yaml
   All the services we can use:
     services.yaml                                                                     # Added by: global.yaml
-  The transformer locations:
-    transformations.yaml                                                              # Added by: global.yaml
 services:
   experian_aml:
     serviceDescription:
@@ -149,11 +146,6 @@ tasks:
       Pricing service for product and service pricing adjustments                     # Added by: tasks.yaml
     service:
       internal_pricingService                                                         # Added by: tasks.yaml
-  limitManagement:
-    taskDescription:
-      Limit management service for transaction and account limits                     # Added by: tasks.yaml
-    service:
-      internal_limitManagement                                                        # Added by: tasks.yaml
 where:
   services:
     service/<service>/<reqOrResp>                                                     # Added by: services.yaml
@@ -162,11 +154,6 @@ where:
     - task/<task>/<reqOrResp>                                                         # Added by: tasks.yaml
     - task/<task>/<reqOrResp>/uk/carLoan                                              # Added by: tasks.yaml
     - task/<task>/<reqOrResp>/carLoan                                                 # Added by: tasks.yaml
-  transformers:
-    - <service>/<task>/<reqOrResp>/uk/carLoan/merchantPortal                          # Added by: transformations.yaml
-    - <service>/<task>/<reqOrResp>/uk/carLoan                                         # Added by: transformations.yaml
-    - <service>/<task>/<reqOrResp>/carLoan                                            # Added by: transformations.yaml
-    - <service>/<task>/<reqOrResp>                                                    # Added by: transformations.yaml
 
 ` )
 

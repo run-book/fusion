@@ -2,17 +2,18 @@ import { NameSpaceDetailsForGit, OrganisationUrlStoreConfigForGit } from "@itsmw
 import { NameAnd } from "@laoban/utils"
 import { schemaNs } from "@fusionconfig/schema";
 import { transformNs } from "@fusionconfig/transformer";
+import { YamlCapability } from "@itsmworkbench/yaml";
 
-export function allDomainDetails (): NameAnd<NameSpaceDetailsForGit> {
+export function allDomainDetails ( yamlCapability: YamlCapability ): NameAnd<NameSpaceDetailsForGit> {
   return {
     schema: schemaNs,
-    transformer: transformNs
+    transformer: transformNs ( yamlCapability )
   }
 }
-export function defaultOrgConfig (): OrganisationUrlStoreConfigForGit {
+export function defaultOrgConfig ( yamlCapability: YamlCapability ): OrganisationUrlStoreConfigForGit {
   return {
     baseDir: 'organisations',
-    nameSpaceDetails: allDomainDetails ()
+    nameSpaceDetails: allDomainDetails ( yamlCapability )
   }
 }
 

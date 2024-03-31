@@ -1,6 +1,6 @@
 import { findPartInMerged, isMerged, Merged } from "./merge";
 import { ErrorsAnd, hasErrors, mapErrors, NameAnd } from "@laoban/utils";
-import { NamedLoadResult, NamedUrl, UrlLoadNamedFn, writeUrl } from "@itsmworkbench/urlstore";
+import { IdentityUrl, NamedLoadResult, NamedUrl, UrlLoadNamedFn, writeUrl } from "@itsmworkbench/urlstore";
 import { findStringArray } from "./extract.from.merged";
 
 
@@ -55,10 +55,14 @@ export function addNameMergedToMerged ( merged: Merged, name: string, value: Mer
   merged.value[ name ] = value
   return merged
 }
-export function addIdAndNameToMerged ( merged: Merged, name: string, url: NamedLoadResult<any>, addedBy: string ): ErrorsAnd<Merged> {
-  if ( typeof merged.value !== 'object' ) return [ `Was trying to add ${url.id}:${url.url} # ${addedBy} but is not an object` ]
-  const nameMerged = { value: url.url, files: [ addedBy ] }
-  const idMerged = { value: url.id, files: [ addedBy ] }
+export function addIdAndNameToMergedFromLoadResult ( merged: Merged, name: string, lr: NamedLoadResult<any>, addedBy: string ): ErrorsAnd<Merged> {
+  return addIdAndNameToMerged ( merged, name, lr.id, lr.url, addedBy )
+}
+export function addIdAndNameToMerged ( merged: ErrorsAnd<Merged>, name: string, id: string, nameFromUrl: string, addedBy: string ): ErrorsAnd<Merged> {
+  if (hasErrors(merged)) return merged
+  if ( typeof merged.value !== 'object' ) return [ `Was trying to add ${name} = ${id}:${nameFromUrl} # ${addedBy} but is not an object` ]
+  const nameMerged = { value: nameFromUrl, files: [ addedBy ] }
+  const idMerged = { value: id, files: [ addedBy ] }
   const newMerged = { value: { name: nameMerged, id: idMerged, }, files: [ addedBy ] }
   merged.value[ name ] = newMerged
   return merged

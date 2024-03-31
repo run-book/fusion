@@ -1,5 +1,5 @@
 import { NamedLoadResult, NamedUrl, UrlLoadNamedFn, writeUrl } from "@itsmworkbench/urlstore";
-import { addIdAndNameToMerged, findPartInMerged, findStringArray, Merged, PostProcessor } from "@fusionconfig/config";
+import { addIdAndNameToMergedFromLoadResult, findPartInMerged, findStringArray, Merged, PostProcessor } from "@fusionconfig/config";
 import { ErrorsAnd, hasErrors, mapErrors, NameAnd } from "@laoban/utils";
 
 export type TransformerNameFn = ( task: string, service: string, requestOrResponse: string, transformerPatterns: string[] ) => Promise<ErrorsAnd<NamedLoadResult<any>>>
@@ -37,7 +37,7 @@ export async function addTransformerToRequestOrResponse ( transformerNameFn: Tra
   const reqResp = findPartInMerged ( task, requestOrResponse )
   return mapErrors ( await transformerNameFn ( taskName, service, requestOrResponse, transformerPatterns ),
     async ( transformerLoaded: NamedLoadResult<any> ) =>
-      addIdAndNameToMerged ( reqResp, 'transformer', transformerLoaded, addedBy ) )
+      addIdAndNameToMergedFromLoadResult ( reqResp, 'transformer', transformerLoaded, addedBy ) )
 }
 
 export function addTransformersToTasks ( transformerNameFn: TransformerNameFn ): PostProcessor {

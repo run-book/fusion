@@ -2,8 +2,9 @@ import { CommandDetails, ContextConfigAndCommander, SubCommandDetails } from "@i
 
 import { ThereAndBackContext } from "./context";
 import { NameSpaceDetailsForGit } from "@itsmworkbench/urlstore";
-import { loadAllTransformersFromFileSystem } from "@fusionconfig/transformer";
+import { loadAllTransformersFromFileSystem, transformNs } from "@fusionconfig/transformer";
 import { reportErrors } from "@laoban/utils";
+import { allDomainDetails } from "@fusionconfig/alldomains";
 
 
 export function listTransformersCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig>, transformNs: NameSpaceDetailsForGit ): CommandDetails<Commander> {
@@ -17,7 +18,7 @@ export function listTransformersCommand<Commander, Config, CleanConfig> ( tc: Co
     },
     action: async ( _, opts ) => {
       const { directory, debug, full } = opts
-      const { metas, errors } = await loadAllTransformersFromFileSystem ( tc.context.fileOps, tc.context.urlStore, directory as string )
+      const { metas, errors } = await loadAllTransformersFromFileSystem ( tc.context.fileOps, tc.context.urlStore, directory as string, transformNs )
 
       if ( full ) metas.forEach ( m => {
         console.log ( m.path, JSON.stringify ( m, null, 2 ) )
@@ -45,7 +46,7 @@ export function validateTransformersCommand<Commander, Config, CleanConfig> ( tc
     },
     action: async ( _, opts ) => {
       const { directory, debug } = opts
-      const { metas, errors } = await loadAllTransformersFromFileSystem ( tc.context.fileOps, tc.context.urlStore, directory as string )
+      const { metas, errors } = await loadAllTransformersFromFileSystem ( tc.context.fileOps, tc.context.urlStore, directory as string, transformNs )
       if ( errors.length > 0 ) {
         reportErrors ( errors )
         process.exit ( 2 )

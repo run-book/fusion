@@ -1,3 +1,5 @@
-export * from './src/utils'
 export * from './src/paths.in.json'
+export * from './src/find.files'
+export * from './src/from.to.map'
 export * from './src/validate'
+export * from './src/utils'

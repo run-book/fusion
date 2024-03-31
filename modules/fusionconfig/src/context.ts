@@ -29,15 +29,16 @@ export function postProcessors ( fileOps: FileOps, schemaNameFn: SchemaNameFn, u
   return [
     addKafkaSchemasToServices ( defaultKafkaNameFn ( urlStore.loadNamed ) ),
     addTaskDetails ( schemaNameFn ),
-    addTransformersToTasks ( fileOps, urlStore, directory ),
+    addTransformersToTasks ( fileOps, urlStore.loadNamed, directory,false ),
     removeKey ( 'services' )
   ]
 }
 
 export function makeContext ( version: string ): ThereAndBackContext {
-  const urlStore = nodeUrlstore ( shellGitsops (), defaultOrgConfig () )
+  let yamlCapability = jsYaml ();
+  const urlStore = nodeUrlstore ( shellGitsops (), defaultOrgConfig ( yamlCapability ) )
   const schemaNameFn = defaultSchemaNameFn ( urlStore.loadNamed )
-  return thereAndBackContext ( 'fusion', version, fileOpsNode (), jsYaml (), schemaNameFn, defaultCommentFactoryFunction, urlStore )
+  return thereAndBackContext ( 'fusion', version, fileOpsNode (), yamlCapability, schemaNameFn, defaultCommentFactoryFunction, urlStore )
 }
 export const cliTc: CliTc<Commander12, ThereAndBackContext, NoConfig, NoConfig> = commander12Tc<ThereAndBackContext, NoConfig, NoConfig> ()
 export const configFinder = fixedConfig<NoConfig> ( makeContext )

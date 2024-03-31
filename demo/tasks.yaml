@@ -34,6 +34,6 @@ tasks:
   pricing:
     taskDescription: "Pricing service for product and service pricing adjustments"
     service: internal_pricingService
-  limitManagement:
-    taskDescription: "Limit management service for transaction and account limits"
-    service: internal_limitManagement
+#  limitManagement:
+#    taskDescription: "Limit management service for transaction and account limits"
+#    service: internal_limitManagement
