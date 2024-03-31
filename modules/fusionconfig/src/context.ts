@@ -4,7 +4,7 @@ import { FileOps } from "@laoban/fileops";
 import { fileOpsNode } from "@laoban/filesops-node";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { Commander12, commander12Tc } from "@itsmworkbench/commander12";
-import { UrlStore } from "@itsmworkbench/urlstore";
+import { UrlLoadNamedFn, UrlStore } from "@itsmworkbench/urlstore";
 import { NoConfig } from "../index";
 import { CommentFactoryFunction, defaultCommentFactoryFunction, LoadFilesFn, PostProcessor, removeKey, } from "@fusionconfig/config";
 import { addTaskDetails, defaultSchemaNameFn, SchemaNameFn, } from "@fusionconfig/tasks";
@@ -13,7 +13,7 @@ import { findConfigUsingFileops } from "@fusionconfig/fileopsconfig";
 import { nodeUrlstore } from "@itsmworkbench/nodeurlstore";
 import { shellGitsops } from "@itsmworkbench/shellgit";
 import { defaultOrgConfig } from "@fusionconfig/alldomains";
-import { addTransformersToTasks } from "@fusionconfig/transformer";
+import { addTransformersToTasks, cachedUrlLoadFn, findCachedOrRawTransMapAndErrors } from "@fusionconfig/transformer";
 
 export type HasYaml = {
   yaml: YamlCapability
@@ -21,16 +21,17 @@ export type HasYaml = {
 export interface ThereAndBackContext extends CliContext, HasYaml {
   urlStore: UrlStore
   loadFiles: LoadFilesFn
-  postProcessors: ( directory: string ) => PostProcessor[]
+  postProcessors: ( cached: boolean, directory: string ) => PostProcessor[]
   commentFactoryFn: CommentFactoryFunction
 }
 
-export function postProcessors ( fileOps: FileOps, schemaNameFn: SchemaNameFn, urlStore: UrlStore, directory: string ): PostProcessor[] {
+export function postProcessors ( fileOps: FileOps, schemaNameFn: SchemaNameFn, loadNamed: UrlLoadNamedFn, directory: string, cached: boolean | undefined ): PostProcessor[] {
   if ( !directory ) throw new Error ( 'No directory' )
+  const load = cached?cachedUrlLoadFn(loadNamed):loadNamed
   return [
-    addKafkaSchemasToServices ( defaultKafkaNameFn ( urlStore.loadNamed ) ),
+    addKafkaSchemasToServices ( defaultKafkaNameFn ( load ) ),
     addTaskDetails ( schemaNameFn ),
-    addTransformersToTasks ( fileOps, urlStore.loadNamed, directory,false ),
+    addTransformersToTasks ( findCachedOrRawTransMapAndErrors ( fileOps, directory, load ) ( cached ) ),
     removeKey ( 'services' )
   ]
 }
@@ -53,7 +54,7 @@ export function thereAndBackContext ( name: string, version: string,
     ...cliContext ( name, version, fileOps ),
     yaml,
     loadFiles: findConfigUsingFileops ( fileOps, yaml ),
-    postProcessors: directory => postProcessors ( fileOps, schemaNameFn, urlStore, directory ),
+    postProcessors: ( cached, directory ) => postProcessors ( fileOps, schemaNameFn, urlStore.loadNamed, directory, cached ),
     commentFactoryFn,
     urlStore
   }

@@ -4,11 +4,13 @@ import { fusionHandlers } from "./api";
 import { CommentFactoryFunction, defaultCommentOffset, LoadFilesFn } from "@fusionconfig/config";
 import { PostProcessor } from "@fusionconfig/config";
 import { UrlStore } from "@itsmworkbench/urlstore";
+import { UrlLoadNamedFn } from "@itsmworkbench/urlstore/dist/src/url.load.and.store";
+import { cachedUrlLoadFn, findCachedOrRawTransMapAndErrors, FindTransMapAndErrors } from "@fusionconfig/transformer";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
   loadFiles: LoadFilesFn
-  postProcessors: ( directory: string ) => PostProcessor[]
+  postProcessors: ( cached: boolean, directory: string ) => PostProcessor[]
   commentFactoryFn: CommentFactoryFunction
   urlStore: UrlStore
 }
@@ -21,20 +23,23 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
       '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: context.currentDirectory },
       '-p, --port <port>': { description: 'Port to run the server on', default: "1235" },
       '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
+      '--cache': { description: 'Cache the urlstore' },
       '--debug': { description: 'More debug information ' },
       '-i,--id <idroot>': { description: "The root of the id store", default: "ids" }
     },
     action: async ( commander, opts ) => {
-      console.log(JSON.stringify(opts, null, 2))
-      const { port, debug, directory, commentOffset: commentOffsetString, urlStore } = opts
+      console.log ( JSON.stringify ( opts, null, 2 ) )
+      const { port, debug, directory, commentOffset: commentOffsetString, urlStore, cache } = opts
       const commentOffset = Number.parseInt ( commentOffsetString.toString () )
       let debugBoolean = debug === true;
       console.log ( 'directory', directory )
       console.log ( 'port', port )
       console.log ( 'debug', debug )
+      console.log ( 'cached', cache )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
         fusionHandlers ( context.urlStore,
-          context.loadFiles, context.postProcessors ( urlStore.toString () ),
+          context.loadFiles,
+          context.postProcessors ( opts.cache === true, urlStore.toString() ),
           context.commentFactoryFn ( commentOffset ),
           directory.toString (), debugBoolean, ) )
     }

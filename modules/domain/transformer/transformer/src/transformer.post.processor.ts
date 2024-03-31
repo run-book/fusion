@@ -4,7 +4,7 @@ import { ErrorsAnd, hasErrors, mapErrors, NameAnd } from "@laoban/utils";
 import { loadOneTransformerPathAndLoadResult, pathToTransformerMeta, TransformerPathAndLoadResult } from "./transformer";
 import { defaultIgnoreFilter, FileOps } from "@laoban/fileops";
 import { findFirstPath, flatMapPaths, PathsInJson } from "@fusionconfig/utils";
-import { defaultPathToUrl, loadAndMapTrans } from "./domain.transformation.loadfiles";
+import { defaultPathToUrl, loadAndMapTrans, TransMapAndErrors } from "./domain.transformation.loadfiles";
 import { findChildFiles } from "fusionconfig/dist/src/find.files";
 import { validateTrans } from "./domain.transform";
 
@@ -50,14 +50,39 @@ async function processRequestAndResponse ( task: Merged, taskName: string, direc
   if ( errors.length > 0 ) return [ `Error processing 'addTransformersToTasks'`, ...errors ]
   return task
 }
-export function addTransformersToTasks ( fileOps: FileOps, load: UrlLoadNamedFn, directory: string, allowErrors?: boolean ): PostProcessor {
+
+export type FindTransMapAndErrors = () => Promise<TransMapAndErrors>
+
+export function findTransformerNames ( fileOps: FileOps, directory: string, load: UrlLoadNamedFn ): FindTransMapAndErrors {
+  return async () => {
+    const paths = await findChildFiles ( fileOps, defaultIgnoreFilter, s => s.endsWith ( '.yaml' ) ) ( directory )
+    const loadedTransformers = await loadAndMapTrans ( load, paths, validateTrans, defaultPathToUrl ( 'org' ) )
+    return loadedTransformers
+  }
+}
+
+export function cachedFindTransMapAndErrors ( findTransMapAndErrors: FindTransMapAndErrors ): FindTransMapAndErrors {
+  let loaded: TransMapAndErrors | undefined
+  return async () => {
+    if ( !loaded ) {
+      console.log ( 'cachedFindTransMapAndErrors - loading' )
+      loaded = await findTransMapAndErrors ()
+    }
+    return loaded
+  }
+}
+
+export const findCachedOrRawTransMapAndErrors = ( fileOps: FileOps, directory: string, load: UrlLoadNamedFn ) => ( cache: boolean | undefined ): FindTransMapAndErrors => {
+  console.log ( 'findCachedOrRawTransMapAndErrors', cache )
+  let raw = findTransformerNames ( fileOps, directory, load );
+  return cache ? cachedFindTransMapAndErrors ( raw ) : raw;
+};
+export function addTransformersToTasks ( findTransMapAndErrors: FindTransMapAndErrors, allowErrors?: boolean ): PostProcessor {
   return {
     key: 'tasks',
     postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
       if ( debug ) console.log ( 'addTransformersToTasks' )
-
-      const paths = await findChildFiles ( fileOps, defaultIgnoreFilter, s => s.endsWith ( '.yaml' ) ) ( directory )
-      const loadedTransformers = await loadAndMapTrans ( load, paths, validateTrans, defaultPathToUrl ( 'org' ) )
+      const loadedTransformers = await findTransMapAndErrors ()
       if ( debug ) console.log ( 'loadedTransformers', JSON.stringify ( loadedTransformers ) )
       if ( loadedTransformers.errors.length > 0 && !allowErrors ) return loadedTransformers.errors
       if ( typeof tasks.value !== 'object' ) return [ 'tasks is not an object' ]

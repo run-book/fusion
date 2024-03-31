@@ -1,10 +1,11 @@
 import { CommandDetails, ContextConfigAndCommander, SubCommandDetails } from "@itsmworkbench/cli";
 import path from "path";
-import { findPart, NameAnd } from "@laoban/utils";
+import { findPart, NameAnd, toArray } from "@laoban/utils";
 
 import { ThereAndBackContext } from "./context";
 import { defaultCommentOffset, findPartInMerged, loadAndMergeAndYamlParts } from "@fusionconfig/config";
 import { parseParams, permutate } from "@fusionconfig/utils";
+import { cachedUrlLoadFn } from "@fusionconfig/transformer";
 
 
 function fromOpts ( opts: NameAnd<string | boolean> ) {
@@ -14,7 +15,8 @@ function fromOpts ( opts: NameAnd<string | boolean> ) {
   const commentOffset = parseInt ( opts.commentOffset as string )
   const raw = opts.raw === true
   const urlStore = opts.urlStore as string
-  return { params, file: path.basename ( file ), parent, commentOffset, raw, urlStore };
+  const cache = opts.cache === true
+  return { params, file: path.basename ( file ), parent, commentOffset, raw, urlStore, cache };
 }
 export function viewConfigCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, any, Config, CleanConfig> ): CommandDetails<Commander> {
   return {
@@ -75,8 +77,8 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
       '--full': { description: 'Show more data about the files' }
     },
     action: async ( _, opts ) => {
-      const { params, file, parent, commentOffset, raw, urlStore } = fromOpts ( opts );
-      const postProcessors = raw ? [] : tc.context.postProcessors ( urlStore )
+      const { params, file, parent, commentOffset, raw, urlStore, cache } = fromOpts ( opts );
+      const postProcessors = raw ? [] : tc.context.postProcessors ( cache, urlStore )
       let { fileDetails, errors, postProcessorErrors, sorted, yaml } =
             await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
 
@@ -107,13 +109,16 @@ export function checkPermutationsCommand<Commander, Config, CleanConfig> ( tc: C
       '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
       '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
       '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: tc.context.currentDirectory },
+      '--cache': { description: 'Cache the urlstore' },
       '--raw': { description: `Don't run the post processors` },
       '--debug': { description: 'Show debug information' },
       '--full': { description: 'Show more data about the files' }
     },
     action: async ( _, opts ) => {
-      const { file, parent, commentOffset, raw, urlStore } = fromOpts ( opts );
-      const postProcessors = raw ? [] : tc.context.postProcessors ( urlStore )
+      const { file, parent, commentOffset, raw, urlStore, cache } = fromOpts ( opts );
+      console.log ( 'cache', opts.cache === true )
+
+      const postProcessors = raw ? [] : tc.context.postProcessors ( cache, urlStore )
 
       const initialFile = await tc.context.fileOps.loadFileOrUrl ( path.join ( parent, file ) )
       const initialFileAsYaml = tc.context.yaml.parser ( initialFile )
@@ -152,6 +157,68 @@ export function checkPermutationsCommand<Commander, Config, CleanConfig> ( tc: C
   }
 }
 
+export function permutateCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): CommandDetails<Commander> {
+  return {
+    cmd: 'permutate [outputDir]',
+    description: 'Produces a file for all the possible permutations',
+    options: {
+      '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
+      '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
+      '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: tc.context.currentDirectory },
+      '--cache': { description: 'Cache the urlstore' },
+      '--raw': { description: `Don't run the post processors` },
+      '--debug': { description: 'Show debug information' },
+      '--full': { description: 'Show more data about the files' }
+    },
+    action: async ( _, opts, outputDir ) => {
+      if ( !outputDir ) outputDir = 'target'
+      const { file, parent, commentOffset, raw, urlStore, cache } = fromOpts ( opts );
+      console.log ( 'cache', opts.cache === true )
+
+      const postProcessors = raw ? [] : tc.context.postProcessors ( cache, urlStore )
+
+      const initialFile = await tc.context.fileOps.loadFileOrUrl ( path.join ( parent, file ) )
+      const initialFileAsYaml = tc.context.yaml.parser ( initialFile )
+      const parameters = initialFileAsYaml.parameters
+      if ( parameters === undefined ) {
+        console.log ( 'No parameters found in ', opts.file )
+        process.exit ( 1 )
+      }
+
+      const parameterNames = Object.keys ( parameters )
+      console.log ( "Checking permutations" )
+      for ( let parameterName of parameterNames ) {
+        const values = parameters[ parameterName ]
+        console.log ( '   ', parameterName + ':', values )
+      }
+      permutate ( parameters, async ( params ) => {
+        console.log ( 'Permutation:', params )
+        let { fileDetails, errors, postProcessorErrors, sorted, yaml } =
+              await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
+        if ( errors.length > 0 ) {
+          console.log ( '   Errors:' )
+          fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( '      ', f.file, f.errors ) )
+        }
+        if ( postProcessorErrors?.length > 0 ) {
+          console.log ( '   Post Processor Errors:' )
+          postProcessorErrors.forEach ( f => console.log ( '      ', f ) )
+        }
+        const fileName = path.join(outputDir, Object.values ( params ).join ( '/' ) + '/' + Object.values ( params ).join ( '-' ) + '.yaml')
+        const dir = path.dirname ( fileName )
+        console.log('   Writing to', fileName)
+        const fileOps = tc.context.fileOps
+        const allErrors = [...toArray(errors), ...toArray(postProcessorErrors)]
+        const content = allErrors.length > 0 ? `# Errors: ${allErrors.join ( '\n# ' )}` : yaml
+        await fileOps.createDir(dir )
+        await fileOps.saveFile ( fileName, content )
+      } )
+
+    }
+
+
+  }
+}
+
 export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): CommandDetails<Commander> {
   return {
     cmd: 'property <property>',
@@ -167,8 +234,9 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
       '--keys': { description: 'If an object shows the keys' },
     },
     action: async ( _, opts, property ) => {
-      const { params, file, parent, commentOffset, raw, urlStore } = fromOpts ( opts );
-      const postProcessors = raw ? [] : tc.context.postProcessors ( urlStore )
+      const { params, file, parent, commentOffset, raw, urlStore, cache } = fromOpts ( opts );
+      const postProcessors = raw ? [] : tc.context.postProcessors ( cache, urlStore )
+
       let { fileDetails, errors, yaml, sorted } =
             await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
       if ( errors.length > 0 ) {
@@ -204,6 +272,7 @@ export function configCommands<Commander, Config, CleanConfig> ( tc: ContextConf
     description: 'Config commands',
     commands: [
       checkPermutationsCommand<Commander, Config, CleanConfig> ( tc ),
+      permutateCommand<Commander, Config, CleanConfig> ( tc ),
       viewConfigCommand<Commander, Config, CleanConfig> ( tc ),
       listFilesCommand<Commander, Config, CleanConfig> ( tc ),
       mergeFilesCommand<Commander, Config, CleanConfig> ( tc ),
