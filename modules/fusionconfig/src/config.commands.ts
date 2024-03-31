@@ -4,7 +4,7 @@ import { findPart, NameAnd } from "@laoban/utils";
 
 import { ThereAndBackContext } from "./context";
 import { defaultCommentOffset, findPartInMerged, loadAndMergeAndYamlParts } from "@fusionconfig/config";
-import { parseParams } from "@fusionconfig/utils";
+import { parseParams, permutate } from "@fusionconfig/utils";
 
 
 function fromOpts ( opts: NameAnd<string | boolean> ) {
@@ -105,7 +105,6 @@ export function checkPermutationsCommand<Commander, Config, CleanConfig> ( tc: C
     description: 'Checks all the permutations',
     options: {
       '-f, --file <file>': { description: 'The root config file', default: 'global.yaml' },
-      '-p, --params <params>': { description: 'The parameters to use. Comma seperated attribute=value' },
       '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
       '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: tc.context.currentDirectory },
       '--raw': { description: `Don't run the post processors` },
@@ -113,28 +112,43 @@ export function checkPermutationsCommand<Commander, Config, CleanConfig> ( tc: C
       '--full': { description: 'Show more data about the files' }
     },
     action: async ( _, opts ) => {
-      const { params, file, parent, commentOffset, raw, urlStore } = fromOpts ( opts );
-      const initialFile = await tc.context.fileOps.loadFileOrUrl ( file )
-      console.log ( 'initialFile', initialFile )
+      const { file, parent, commentOffset, raw, urlStore } = fromOpts ( opts );
+      const postProcessors = raw ? [] : tc.context.postProcessors ( urlStore )
+
+      const initialFile = await tc.context.fileOps.loadFileOrUrl ( path.join ( parent, file ) )
       const initialFileAsYaml = tc.context.yaml.parser ( initialFile )
       const parameters = initialFileAsYaml.parameters
-      console.log ( 'parameters', parameters )
-
-      process.exit ( 0 )
-      const postProcessors = raw ? [] : tc.context.postProcessors ( urlStore )
-      let { fileDetails, errors, sorted, yaml } =
-            await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
-      if ( errors.length > 0 ) {
-        console.log ( 'Errors:' )
-        fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
+      if ( parameters === undefined ) {
+        console.log ( 'No parameters found in ', opts.file )
         process.exit ( 1 )
       }
-      if ( opts.full === true )
-        console.log ( JSON.stringify ( sorted.value, null, 2 ) )
-      else {
-        console.log ( yaml )
+
+      const parameterNames = Object.keys ( parameters )
+      console.log ( "Checking permutations" )
+      for ( let parameterName of parameterNames ) {
+        const values = parameters[ parameterName ]
+        console.log ( '   ', parameterName + ':', values )
       }
+      permutate ( parameters, async ( params ) => {
+        console.log ( 'Permutation:', params )
+        let { fileDetails, errors, postProcessorErrors, sorted, yaml } =
+              await loadAndMergeAndYamlParts ( tc.context.loadFiles, postProcessors, tc.context.commentFactoryFn ( commentOffset ), params, parent, file, opts.debug === true );
+
+        if ( errors.length > 0 ) {
+          console.log ( '   Errors:' )
+          fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( '      ', f.file, f.errors ) )
+        }
+        if ( postProcessorErrors?.length > 0 ) {
+          console.log ( '   Post Processor Errors:' )
+          postProcessorErrors.forEach ( f => console.log ( '      ', f ) )
+
+        }
+
+      } )
+
     }
+
+
   }
 }
 

@@ -1,4 +1,4 @@
-import { extractPlaceholders, parseParams } from "./utils";
+import { extractPlaceholders, parseParams, permutate } from "./utils";
 
 describe ( 'extractPlaceholders', () => {
   it ( 'extracts single placeholder correctly', () => {
@@ -81,3 +81,39 @@ describe ( 'parseParams', () => {
 
   // Add more tests here for any other edge cases you can think of.
 } );
+
+
+describe('permutate function', () => {
+  it('should process all parameter permutations', async () => {
+    const params = {
+      product: {
+        legal: ['instantLoan', 'mortgage']
+      },
+      geo: {
+        legal: ['uk', 'us']
+      }
+    };
+
+    const processedParams: any[] = [];
+
+    // Mock processOne function that accumulates parameters into an array
+    const mockProcessOne = async (params: { [name: string]: string }) => {
+      processedParams.push(params);
+    };
+
+    await permutate(params, mockProcessOne);
+
+    // Expected permutations
+    const expectedPermutations = [
+      { product: 'instantLoan', geo: 'uk' },
+      { product: 'instantLoan', geo: 'us' },
+      { product: 'mortgage', geo: 'uk' },
+      { product: 'mortgage', geo: 'us' }
+    ];
+
+    // Check if all expected permutations were processed
+    expect(processedParams).toEqual(expect.arrayContaining(expectedPermutations));
+    // Additionally, check if the number of processed permutations matches the expected number
+    expect(processedParams.length).toBe(expectedPermutations.length);
+  });
+});
