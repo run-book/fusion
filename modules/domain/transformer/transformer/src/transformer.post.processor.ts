@@ -1,11 +1,10 @@
 import { UrlLoadNamedFn, UrlStore } from "@itsmworkbench/urlstore";
-import { addIdAndNameToMerged, addIdAndNameToMergedFromLoadResult, findPartInMerged, findStringArray, Merged, PostProcessor } from "@fusionconfig/config";
+import { addIdAndNameToMerged, addIdAndNameToMergedFromLoadResult, findPartInMerged, Merged, PostProcessor } from "@fusionconfig/config";
 import { ErrorsAnd, hasErrors, mapErrors, NameAnd } from "@laoban/utils";
 import { loadOneTransformerPathAndLoadResult, pathToTransformerMeta, TransformerPathAndLoadResult } from "./transformer";
 import { defaultIgnoreFilter, FileOps } from "@laoban/fileops";
-import { findFirstPath, flatMapPaths, PathsInJson } from "@fusionconfig/utils";
+import { findChildFiles, findFirstPath, PathsInJson } from "@fusionconfig/utils";
 import { defaultPathToUrl, loadAndMapTrans, TransMapAndErrors } from "./domain.transformation.loadfiles";
-import { findChildFiles } from "fusionconfig/dist/src/find.files";
 import { validateTrans } from "./domain.transform";
 
 export async function addTransformerToRequestOrResponse (
@@ -73,7 +72,7 @@ export function cachedFindTransMapAndErrors ( findTransMapAndErrors: FindTransMa
 }
 
 export const findCachedOrRawTransMapAndErrors = ( fileOps: FileOps, directory: string, load: UrlLoadNamedFn ) => ( cache: boolean | undefined ): FindTransMapAndErrors => {
-  console.log ( 'findCachedOrRawTransMapAndErrors', cache )
+  // console.log ( 'findCachedOrRawTransMapAndErrors', cache )
   let raw = findTransformerNames ( fileOps, directory, load );
   return cache ? cachedFindTransMapAndErrors ( raw ) : raw;
 };

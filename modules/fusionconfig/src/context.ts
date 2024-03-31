@@ -27,12 +27,15 @@ export interface ThereAndBackContext extends CliContext, HasYaml {
 
 export function postProcessors ( fileOps: FileOps, schemaNameFn: SchemaNameFn, loadNamed: UrlLoadNamedFn, directory: string, cached: boolean | undefined ): PostProcessor[] {
   if ( !directory ) throw new Error ( 'No directory' )
-  const load = cached?cachedUrlLoadFn(loadNamed):loadNamed
+  const load = cached ? cachedUrlLoadFn ( loadNamed ) : loadNamed
   return [
     addKafkaSchemasToServices ( defaultKafkaNameFn ( load ) ),
     addTaskDetails ( schemaNameFn ),
     addTransformersToTasks ( findCachedOrRawTransMapAndErrors ( fileOps, directory, load ) ( cached ) ),
-    // removeKey ( 'services' )
+    removeKey ( 'services' ),
+    removeKey ( 'parameters' ),
+    removeKey ( 'hierarchy' ),
+    removeKey ( 'where' ),
   ]
 }
 

@@ -5,7 +5,7 @@
   "packageJson": {
     "dependencies":    {
       "@laoban/utils":           "1.4.49",
-      "@itsmworkbench/urlstore": "0.0.13"
+      "@itsmworkbench/urlstore": "0.0.16"
     },
     "devDependencies": {
     }
