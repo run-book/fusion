@@ -1,0 +1,28 @@
+{
+  "template":    "react",
+  "name":        "@fusionconfig/react",
+  "description": "Like heira but for whole files",
+  "packageJson": {
+    "dependencies":    {
+      "jsonata":                     "^v2.0.4",
+      "@laoban/utils":               "1.4.49",
+      "@itsmworkbench/jsyaml":     "0.0.16",
+
+      "@monaco-editor/react": "^4.6.0"
+    },
+    "devDependencies": {},
+    "bin":             {
+      "fusion": "dist/index.js"
+    }
+  },
+  "links":       [
+
+    "@fusionconfig/jsonata",
+    "@fusionconfig/utils"
+  ],
+  "guards":      {
+    "compile": true,
+    "publish": true,
+    "test":    false
+  }
+}

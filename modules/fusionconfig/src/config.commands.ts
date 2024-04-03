@@ -210,13 +210,17 @@ export function permutateCommand<Commander, Config, CleanConfig> ( tc: ContextCo
         const rawFileName = path.join ( outputDir, Object.values ( params ).join ( '/' ) + '/' + Object.values ( params ).join ( '-' ) )
         const fileName = rawFileName + '.yaml'
         const errorFileName = rawFileName + '.errors.txt'
+        const jsonFileName = rawFileName + '.json'
         const dir = path.dirname ( fileName )
         console.log ( '   Writing to', fileName )
         const content = allErrors.length > 0 ? allErrors.join ( '\n# ' ) : yaml
         await fileOps.createDir ( dir )
         await fileOps.removeFile ( fileName )
         await fileOps.removeFile ( errorFileName )
+        await fileOps.removeFile ( jsonFileName )
         await fileOps.saveFile ( allErrors.length > 0 ? errorFileName : fileName, content )
+        if ( allErrors.length === 0 && yaml !== undefined )
+          await fileOps.saveFile ( jsonFileName, JSON.stringify ( tc.context.yaml.parser ( yaml ), null, 2 ) )
       } )
 
     }

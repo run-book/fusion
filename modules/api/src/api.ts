@@ -6,10 +6,13 @@ import { chainOfResponsibility } from "@runbook/utils";
 import { getFusion, matchFusion, matchRawFusion } from "./api.for.fusion";
 import { CommentFunction, LoadFilesFn } from "@fusionconfig/config";
 import { PostProcessor } from "@fusionconfig/config";
+import { callService, matchService } from "./api.for.call.service";
+import { FileOps } from "@laoban/fileops";
 
 
 export const fusionHandlers = (
   urlStore: UrlStore,
+  fileOps: FileOps,
   loadFile: LoadFilesFn,
   postProcessors: PostProcessor[],
   commentFn: CommentFunction,
@@ -21,6 +24,7 @@ export const fusionHandlers = (
     getUrls ( urlStore ),
     getFusion ( matchRawFusion, loadFile, [], commentFn, parent, debug ),
     getFusion ( matchFusion, loadFile, postProcessors, commentFn, parent, debug ),
+    callService ( matchService, fileOps,urlStore, debug ),
     ...handlers,
     notFoundIs404,
   )

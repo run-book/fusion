@@ -1,14 +1,13 @@
 import { CommandFn, HasCurrentDirectory } from "@itsmworkbench/cli";
 import { startKoa } from "@itsmworkbench/koa";
 import { fusionHandlers } from "./api";
-import { CommentFactoryFunction, defaultCommentOffset, LoadFilesFn } from "@fusionconfig/config";
-import { PostProcessor } from "@fusionconfig/config";
+import { CommentFactoryFunction, defaultCommentOffset, LoadFilesFn, PostProcessor } from "@fusionconfig/config";
 import { UrlStore } from "@itsmworkbench/urlstore";
-import { UrlLoadNamedFn } from "@itsmworkbench/urlstore/dist/src/url.load.and.store";
-import { cachedUrlLoadFn, findCachedOrRawTransMapAndErrors, FindTransMapAndErrors } from "@fusionconfig/transformer";
+import { FileOps } from "@laoban/fileops";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
+  fileOps: FileOps,
   loadFiles: LoadFilesFn
   postProcessors: ( cached: boolean, directory: string ) => PostProcessor[]
   commentFactoryFn: CommentFactoryFunction
@@ -38,8 +37,9 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
       console.log ( 'cached', cache )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
         fusionHandlers ( context.urlStore,
+          context.fileOps,
           context.loadFiles,
-          context.postProcessors ( opts.cache === true, urlStore.toString() ),
+          context.postProcessors ( opts.cache === true, urlStore.toString () ),
           context.commentFactoryFn ( commentOffset ),
           directory.toString (), debugBoolean, ) )
     }

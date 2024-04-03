@@ -25,15 +25,20 @@ tasks:
   aml:
     taskDescription: "AML check for customer"
     service: experian_aml
+    variables: [ 'userdata' ]
   creditCheck:
     taskDescription: "Credit check for customer"
     service: experian_creditCheck
+    variables: [ 'userdata' ]
   signatureVerification:
     taskDescription: "Signature verification for document signing"
     service: internal_signatureVerification
+    variables: [ 'userdata' ]
   pricing:
     taskDescription: "Pricing service for product and service pricing adjustments"
     service: internal_pricingService
+    variables: [ 'userdata' ]
 #  limitManagement:
 #    taskDescription: "Limit management service for transaction and account limits"
 #    service: internal_limitManagement
+#    variables: ['userdata']
