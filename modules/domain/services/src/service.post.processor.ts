@@ -18,7 +18,7 @@ export function defaultKafkaNameFn ( loadNamed: UrlLoadNamedFn ): KafkaNameFn {
 //where:
 //  services: "service/<service>/<reqOrResp>"
 //we could default this of course, but I like to force it to be explicit
-export function addKafkaSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostProcessor {
+export function   addKafkaSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostProcessor {
   return {
     key: 'services',
     postProcess:

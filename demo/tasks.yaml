@@ -14,18 +14,23 @@
 
 # Unlike kafka we have a chain of responsibility to find the 'right' task description. We start most specific. We use a different templating than the config story for task
 # This is because in different countries/products we might choose to have a different service to implement the task.
+# Consider tweaking this... the ${} and the <> is a little ugly. I am not sure if we want the two levels...
 where:
   tasks:
-    - "task/<task>/<reqOrResp>/${geo}/${product}/${channel}"
+    - "task/<task>/${geo}/${product}/${channel}/<reqOrResp>"
+    - "task/<task>/${product}/${geo}/<reqOrResp>"
+    - "task/<task>/${product}/<reqOrResp>"
     - "task/<task>/<reqOrResp>"
-    - "task/<task>/<reqOrResp>/${geo}/${product}"
-    - "task/<task>/<reqOrResp>/${product}"
 
 tasks:
   aml:
     taskDescription: "AML check for customer"
     service: experian_aml
     variables: [ 'userdata' ]
+    # will change to
+#    variables:
+#        input: [ 'userdata' ] - might by 'userdata' or ['userdata1', 'userdata2']. If first don't prefix with userdata in schema
+#        output:  'amlData'
   creditCheck:
     taskDescription: "Credit check for customer"
     service: experian_creditCheck
