@@ -5,10 +5,10 @@
   "packageJson": {
     "dependencies":    {
       "jsonata":                     "^v2.0.4",
-      "@itsmworkbench/cli":          "0.0.16",
-      "@itsmworkbench/commander12":  "0.0.16",
-      "@itsmworkbench/jsyaml":       "0.0.16",
-      "@itsmworkbench/nodeurlstore": "0.0.16",
+      "@itsmworkbench/cli":          "0.0.18",
+      "@itsmworkbench/commander12":  "0.0.18",
+      "@itsmworkbench/jsyaml":       "0.0.18",
+      "@itsmworkbench/nodeurlstore": "0.0.18",
       "@laoban/filesops-node":       "1.4.49",
       "@laoban/variables":           "1.4.49",
       "@laoban/utils":               "1.4.49"

@@ -29,7 +29,7 @@ describe ( "loadFilesIntegrationTest", () => {
       { "errors": [], "exists": true, "file": "global.yaml", "trail": [] },
       { "errors": [], "exists": true, "file": "services.yaml", "trail": [ "global.yaml" ] },
       { "errors": [], "exists": true, "file": "tasks.yaml", "trail": [ "global.yaml" ] },
-      { "errors": [], "exists": false, "file": "product/carLoan/carLoan.yaml", "trail": [ "global.yaml" ] },
+      { "errors": [], "exists": true, "file": "carLoan.yaml", "trail": [ "global.yaml" ] },
       { "errors": [], "exists": true, "file": "geo/uk/uk_overrides.yaml", "trail": [ "global.yaml" ] },
       { "errors": [], "exists": false, "file": "geo/uk/carLoan/uk_carLoan.yaml", "trail": [ "global.yaml" ] },
       { "errors": [], "exists": false, "file": "geo/uk/carLoan/merchantPortal/uk_carLoan_merchantPortal.yaml", "trail": [ "global.yaml" ] }

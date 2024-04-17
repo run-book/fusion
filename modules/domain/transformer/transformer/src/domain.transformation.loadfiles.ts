@@ -1,8 +1,7 @@
 import { putIntoFromToMap, removeLastExtension } from "@fusionconfig/utils";
 import { collect, ErrorsAnd, flatMap, flatMapErrors, hasErrors, NameAnd } from "@laoban/utils";
 import { Trans, TransAndMeta } from "./domain.transform";
-import { NamedLoadResult, NamedUrl, parseNamedUrlOrErrors } from "@itsmworkbench/urlstore";
-import { UrlLoadNamedFn } from "@itsmworkbench/urlstore/dist/src/url.load.and.store";
+import { NamedLoadResult, NamedUrl, parseNamedUrlOrErrors, UrlLoadNamedFn } from "@itsmworkbench/urlstore";
 
 
 interface NamedLoadResultAndPathAndUrl<T> {
@@ -16,14 +15,16 @@ export interface TransMapAndErrors {
   errors: string[]
 }
 
-export const defaultPathToUrl = ( org: string ) => ( path: string ) => parseNamedUrlOrErrors ( `itsm/${removeLastExtension ( path )}` );
+export type PathToErrorsAndNamedUrl = ( path: string ) => ErrorsAnd<NamedUrl>
+export const defaultPathToUrl = ( org: string ): PathToErrorsAndNamedUrl =>
+  ( path: string ) => parseNamedUrlOrErrors ( `itsm/${removeLastExtension ( path )}` );
 export async function loadAndMapTrans ( load: UrlLoadNamedFn,
                                         paths: string[],
                                         validate: ( context: string, trans: Trans ) => string[],
                                         pathToUrl: ( path: string ) => ErrorsAnd<NamedUrl> ): Promise<TransMapAndErrors> {
   const loadResult: ErrorsAnd<NamedLoadResultAndPathAndUrl<Trans>>[] = await Promise.all ( paths.map ( async path => {
     const url = pathToUrl ( path )
-    if ( hasErrors ( url ) ) return url.map( e => `Loading transformer ${path} - ${e}`)
+    if ( hasErrors ( url ) ) return url.map ( e => `Loading transformer ${path} - ${e}` )
     return flatMapErrors ( await load<Trans> ( url ), result => {
       const errors = validate ( `loading transformer at ${url.url}`, result.result )
       if ( errors.length > 0 ) return errors

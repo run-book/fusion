@@ -4,11 +4,12 @@
   "description": "Like heira but for whole files",
   "packageJson": {
     "dependencies":    {
-      "jsonata":                     "^v2.0.4",
-      "@laoban/utils":               "1.4.49",
-      "@itsmworkbench/jsyaml":     "0.0.16",
-
-      "@monaco-editor/react": "^4.6.0"
+      "jsonata":                   "^v2.0.4",
+      "@mui/x-tree-view":          "^7.1.1",
+      "@laoban/utils":             "1.4.49",
+      "@itsmworkbench/jsyaml":     "0.0.18",
+      "@itsmworkbench/eventstore": "0.0.18",
+      "@monaco-editor/react":      "^4.6.0"
     },
     "devDependencies": {},
     "bin":             {
@@ -16,7 +17,7 @@
     }
   },
   "links":       [
-
+    "@fusionconfig/config",
     "@fusionconfig/jsonata",
     "@fusionconfig/utils"
   ],

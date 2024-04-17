@@ -36,7 +36,7 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
       console.log ( 'debug', debug )
       console.log ( 'cached', cache )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
-        fusionHandlers ( context.urlStore,
+        fusionHandlers ( directory.toString (), context.urlStore,
           context.fileOps,
           context.loadFiles,
           context.postProcessors ( opts.cache === true, urlStore.toString () ),

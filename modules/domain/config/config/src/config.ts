@@ -18,8 +18,6 @@ export interface ConfigFile {
   //     path: "get/${geo}/${product}/${channel}/{geo}_${product}_${channel}.yaml"
   hierarchy: NameAnd<string>
 
-  //The actual values.
-  values: NameAnd<any>
 }
 
 
