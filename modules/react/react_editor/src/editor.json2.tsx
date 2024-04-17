@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Editor, useMonaco } from "@monaco-editor/react";
-
-import { hasErrors } from "@laoban/utils";
 import { LensProps } from "@focuson/state";
-import { Button } from "@mui/material";
 
 export interface JsonEditorInStateProps2<S> extends LensProps<S, string, any> {
   // Suggest?: ( setJson: ( json: string ) => void ) => React.ReactNode

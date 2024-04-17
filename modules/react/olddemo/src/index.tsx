@@ -1,18 +1,17 @@
 import React from 'react';
-import { Button, Toolbar } from "@mui/material";
 import { FusionWorkbenchLayout } from "./layout/app.layout";
 import { SizingContext } from "./layout/sizing.context";
 
 import { addEventStoreListener, EventStore, eventStore, setEventStoreValue } from "@itsmworkbench/eventstore";
 import { FusionState } from "./state/fusion.state";
 import { LensProps, lensState } from '@focuson/state';
-import { FolderTree } from "./components/folder.tree";
+
 import { mockInputFolders, mockOutputFolders } from "./state/mock.dir.structure";
 import { createRoot } from 'react-dom/client';
-import { JsonEditor2 } from "./components/editor.json2";
-import { TransformButton } from "./buttons/transform.button";
-import { SuggestButton } from "./buttons/suggest.button";
 import { inputSchema, outputSchema, tx_suggestion } from "./state/suggestions";
+import { FolderTree } from "./filelist/folder.tree";
+import { JsonEditor2 } from "@fusionconfig/react_editor";
+import { SuggestButton, TransformButton } from "@fusionconfig/react_components";
 
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );

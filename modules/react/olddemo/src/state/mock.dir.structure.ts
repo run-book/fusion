@@ -1,4 +1,4 @@
-import { FileOrFolder } from "../components/folder.tree";
+import { FileOrFolder } from "../filelist/filelist.domain";
 
 export const mockInputFolders: FileOrFolder[] = [ {
   id: 'input',
