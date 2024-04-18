@@ -4,7 +4,8 @@ import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import React from "react";
 import { Box } from "@mui/material";
 import { FusionWorkbenchState } from "../state/fusion.state";
-import { FocusOnSetValueButton, FocusOnToggleButton } from "@fusionconfig/react_components";
+import { FocusOnToggleButton } from "@fusionconfig/react_components";
+import { RouteDebug } from "@fusionconfig/react_routing";
 
 
 export function FusionNav<S> ( { state }: LensProps<S, FusionWorkbenchState, any> ) {
@@ -28,7 +29,7 @@ export function FusionNav<S> ( { state }: LensProps<S, FusionWorkbenchState, any
 
     <FocusOnToggleButton aria-label='Toggle Developer Mode' startIcon={<DeveloperModeIcon/>} state={state.focusOn ( 'debug' ).focusOn ( 'devMode' )} sx={buttonSx}>Developer Mode</FocusOnToggleButton>
     {devMode && <>
-        <div>Dev Mode</div>
+        <RouteDebug/>
       {/*<FocusOnSetValueButton aria-label='Debug Variables'*/}
       {/*                       valueToSet={{ workspaceTab: 'debugVariables' }}*/}
       {/*                       state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )} sx={buttonSx}>Debug Variables</FocusOnSetValueButton>*/}

@@ -19,11 +19,11 @@
   "dependencies": {
     "@laoban/utils": "1.4.49",
     "@laoban/fileops": "1.4.49",
-    "@itsmworkbench/urlstore": "0.0.20",
+    "@itsmworkbench/urlstore": "0.0.21",
     "debug": "^4.3.4"
   },
   "devDependencies": {
-    "@itsmworkbench/jsyaml": "0.0.20",
+    "@itsmworkbench/jsyaml": "0.0.21",
     "typescript": "^5.2.2",
     "@testing-library/jest-dom": "^6.1.4",
     "@types/jest": "^29.0.0",

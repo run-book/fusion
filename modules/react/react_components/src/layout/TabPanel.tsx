@@ -26,7 +26,7 @@ export function SimpleTabPanel<S, M, C> ( { title, children }: SimpleTabPanelPro
     {children}
   </Box>
 }
-export interface TabsContainerProps<S, M, C> extends LensProps2<S, M, string|undefined, C> {
+export interface TabsContainerProps<S, M, C> extends LensProps2<S, M, string, C> {
   label: string
   height?: string
   children: React.ReactElement<TabPanelDetails>[] | React.ReactElement<TabPanelDetails>;

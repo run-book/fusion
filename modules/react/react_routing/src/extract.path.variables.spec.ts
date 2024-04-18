@@ -1,5 +1,5 @@
 // Assuming extractVariableNames is imported from where it's defined
-import {extractPathVariables, extractVariableNames,composeReturnObjectFromMatch} from './extract.path.variable'
+import {extractPathVariables, extractVariableNames,composeReturnObjectFromMatch, extractPathAndQuery} from './extract.path.variable'
 
 describe('extractVariableNames', () => {
   test('returns an empty array when no variables are present', () => {
@@ -100,4 +100,46 @@ describe ( 'extractPathVariables', () => {
     const result = extractPathVariables ( template, path );
     expect ( result ).toEqual ( expected );
   } );
+
 } );
+describe('extractPathAndQuery', () => {
+  test('should extract path and query correctly when both are present', () => {
+    const result = extractPathAndQuery('/some/path?param1=value1&param2=value2');
+    expect(result).toEqual({
+      path: '/some/path',
+      query: 'param1=value1&param2=value2'
+    });
+  });
+
+  test('should return only path when no query string is present', () => {
+    const result = extractPathAndQuery('/just/a/path');
+    expect(result).toEqual({
+      path: '/just/a/path',
+      query: ''
+    });
+  });
+
+  test('should handle empty query strings correctly', () => {
+    const result = extractPathAndQuery('/path/with/empty/query?');
+    expect(result).toEqual({
+      path: '/path/with/empty/query',
+      query: ''
+    });
+  });
+
+  test('should return empty path and query if given an empty string', () => {
+    const result = extractPathAndQuery('');
+    expect(result).toEqual({
+      path: '',
+      query: ''
+    });
+  });
+
+  test('should handle paths with multiple question marks correctly', () => {
+    const result = extractPathAndQuery('/path/with/multiple??query=weird&case=two');
+    expect(result).toEqual({
+      path: '/path/with/multiple',
+      query: '?query=weird&case=two'
+    });
+  });
+});

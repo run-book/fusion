@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@laoban/utils": "1.4.45",
-    "@fusionconfig/react_core": "0.0.7",
     "@fusionconfig/utils": "0.0.7",
     "debug": "^4.3.4",
     "@emotion/react": "^11.11.3",
