@@ -1,6 +1,7 @@
 import React from "react";
 import { MenuItem, Select } from "@mui/material";
 import { LensProps, LensProps2 } from "@focuson/state";
+import { splitAndCapitalize} from "@itsmworkbench/utils";
 import { NameAnd } from "@laoban/utils";
 
 export type SelectWhenIdIsNameProps<S> = LensProps<S, string, any> & {
@@ -17,7 +18,7 @@ export function SelectWhenIdIsName<S> ( { state, purpose, options }: SelectWhenI
     fullWidth
   > <MenuItem disabled value=""> <em>Please select a {purpose}</em> </MenuItem>
     {options.map ( ( option ) => (
-      <MenuItem key={option} value={option}>{option}</MenuItem>
+      <MenuItem key={option} value={option}>{splitAndCapitalize(option)}</MenuItem>
     ) )}
   </Select>
 }
@@ -36,7 +37,7 @@ export function SingleSelect<S> ( { name, state }: SingleSelectProps<S> ) {
     fullWidth
   > <MenuItem disabled value=""> <em>Please select a {name}</em> </MenuItem>
     {options.map ( ( option ) => (
-      <MenuItem key={option} value={option}>{option}</MenuItem>
+      <MenuItem key={option} value={option}>{splitAndCapitalize(option)}</MenuItem>
     ) )}
   </Select>
 }

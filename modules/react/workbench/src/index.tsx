@@ -6,7 +6,7 @@ import { LensProps, lensState } from '@focuson/state';
 
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
-import { configL, configLegalTasksL, foldersO, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, routeL, tagsL, taskL } from "./state/fusion.state";
+import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, routeL, tagsL, taskL } from "./state/fusion.state";
 import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
@@ -18,8 +18,8 @@ import { YamlCapability } from "@itsmworkbench/yaml";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { allDomainDetails } from "@fusionconfig/alldomains";
 import { DebugFolders } from "./playground/debug.folders";
-import { ConfigFile } from "@fusionconfig/config";
 import { objectToQueryString } from "@fusionconfig/utils";
+import { FusionDetails } from "./react/details";
 
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );
@@ -61,14 +61,9 @@ const legalParams = depData ( 'legalParams', legalParamsL, {
 
 const params = depData ( 'params', paramsL, legalParams, {
   tag: ( o: NameAnd<string> ) => JSON.stringify ( o ),
-  load: async ( legalParams: NameAnd<string[]> ): Promise<NameAnd<string>> => {
-    const parameters = getQueryParams ( window.location.search )
-    return Object.keys ( parameters ).length === 0 ?
-      mapObject ( legalParams, ( v, name ) => v[ 0 ] ) :
-      parameters;
-
-  },
   clean: ( legalParams ) => {
+    const fromUrl = getQueryParams ( window.location.search )
+    if ( Object.keys ( fromUrl ).length > 0 ) return fromUrl
     if ( legalParams === undefined ) return undefined as any
     return mapObject ( legalParams, ( v, name ) => v[ 0 ] );
   },
@@ -88,8 +83,8 @@ const rawConfig = depData ( 'rawConfig', rawConfigL, params, {
 
 const config = depData ( 'config', configL, rawConfig, {
   clean: 'leave',
-  tag: ( o: ConfigFile ) => o === undefined ? undefined : 'config',
-  load: async ( raw: string ): Promise<ConfigFile> => yaml.parser ( raw )
+  tag: ( o: FusionConfigFile ) => o === undefined ? undefined : 'config',
+  load: async ( raw: string ): Promise<FusionConfigFile> => yaml.parser ( raw )
 } )
 
 
@@ -100,20 +95,24 @@ const legalTasks = depData ( 'configLegalData', configLegalTasksL, rawConfig, co
 
 const task = depData ( 'task', taskL, {
   tag: ( o: string ) => o,
-  clean: 'leave'
+  clean: () => {
+    const path = window.location.pathname
+    if ( path.startsWith ( '/task/' ) ) return path.substring ( 6 )
+    return undefined as any as string
+  }
 } )
 const route = depData ( 'route', routeL, task, params, {
   tag: ( o: string ) => o,
   clean: ( task: string, params: NameAnd<string> ) => {
     const rawSearchString = makeSearchString ( params )
-    const search = rawSearchString ? `?${rawSearchString}` : ''
-    const taskString = task ? `/${task}` : '/'
+    const search = params === undefined ? window.location.search : `?${rawSearchString}`
+    const taskString = task ? `/task/${task}` : '/'
     return taskString + search
   },
 } )
 
 
-const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config, legalTasks,task, route ]
+const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config, legalTasks, task, route ]
 
 const setJson = setJsonForDepData ( depEngine, () => container.state, setEventStoreValue ( container ) ) ( deps, {
   setTag: ( s, name, tag ) => { // could do it with optional, but don't need to
@@ -139,12 +138,12 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
   const devMode = state.optJson ()?.debug?.devMode;
   return (
     <RouteProvider state={state.copyWithLens ( routeL )}>
-      <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '500px' }}>
+      <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '800px' }}>
         {/*<RouteDebug/>*/}
         <WorkbenchLayout
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
-          Details={<pre>{state.focusOn ( 'rawConfig' ).optJson () || 'loading'}</pre>}>
+          Details={<FusionDetails state={state}/>}>
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
                                extra={{ route: <RouteDebug/> }}
@@ -157,7 +156,7 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
 let parameters: NameAnd<string> | undefined = getQueryParams ( window.location.search )
 if ( Object.keys ( parameters ).length === 0 ) parameters = undefined
 setJson ( {
-  selectionState: { route: window.location.pathname + window.location.search },
+  selectionState: {},
   parameters,
   tags: {}, depDataLog: [],
   debug: { depData: true },

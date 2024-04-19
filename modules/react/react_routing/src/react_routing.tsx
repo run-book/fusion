@@ -14,7 +14,7 @@ export const RouteContext = React.createContext<LensState<any, string, any> | un
 export function RouteProvider<S> ( { children, state }: RouteProviderProps<S> ) {
   const route = state.optJson () || '/'
   console.log ( 'RouteProvider', 'route', route, 'window', window.location.pathname )
-  if ( route !== window.location.pathname ) {
+  if ( route !== window.location.pathname+ window.location.search ) {
     window.history.pushState ( {}, '', route )
     console.log ( 'RouteProvider - made change', 'window', window.location.pathname )
   }
