@@ -7,7 +7,7 @@ import { LensProps, lensState } from '@focuson/state';
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
 import { rawConfigL, foldersO, FusionWorkbenchState, legalParamsL, paramsL, routeL, tagsL, configL } from "./state/fusion.state";
-import { Route, RouteDebug, RouteProvider } from "@fusionconfig/react_routing";
+import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
 import { hasErrors, mapObject, mapObjectValues, NameAnd, toArray } from "@laoban/utils";
@@ -62,8 +62,10 @@ const legalParams = depData ( 'legalParams', legalParamsL, {
 const params = depData ( 'params', paramsL, legalParams, {
   tag: ( o: NameAnd<string> ) => JSON.stringify ( o ),
   load: async ( legalParams: NameAnd<string[]> ): Promise<NameAnd<string>> => {
-    if ( legalParams === undefined ) return undefined as any
-    return mapObject ( legalParams, ( v, name ) => v[ 0 ] );
+    const parameters = getQueryParams ( window.location.search )
+    return Object.keys ( parameters ).length === 0 ?
+      mapObject ( legalParams, ( v, name ) => v[ 0 ] ) :
+      parameters;
 
   },
   clean: ( legalParams ) => {
@@ -74,7 +76,7 @@ const params = depData ( 'params', paramsL, legalParams, {
 
 const rawConfig = depData ( 'rawConfig', rawConfigL, params, {
   clean: 'leave',
-  tag: ( o: string ) =>o?.substring(0, 100),
+  tag: ( o: string ) => o?.substring ( 0, 100 ),
   load: async ( ps: NameAnd<string> ): Promise<string> => {
     const params = objectToQueryString ( ps )
     const paramString = params ? `?${params}` : ''
@@ -90,7 +92,16 @@ const config = depData ( 'config', configL, rawConfig, {
   load: async ( raw: string ): Promise<ConfigFile> => yaml.parser ( raw )
 } )
 
-const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config ]
+const route = depData ( 'route', routeL, params, {
+  clean: ( params: NameAnd<string> ) => {
+    const rawSearchString = makeSearchString ( params )
+    const search = rawSearchString ? `?${rawSearchString}` : ''
+    return `/${search}`;
+  },
+  tag: ( o: string ) => o
+} )
+
+const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config, route ]
 
 const setJson = setJsonForDepData ( depEngine, () => container.state, setEventStoreValue ( container ) ) ( deps, {
   setTag: ( s, name, tag ) => { // could do it with optional, but don't need to
@@ -131,8 +142,11 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
     </RouteProvider>)
 }
 
+let parameters: NameAnd<string> | undefined = getQueryParams ( window.location.search )
+if ( Object.keys ( parameters ).length === 0 ) parameters = undefined
 setJson ( {
   selectionState: { route: window.location.pathname + window.location.search },
+  parameters,
   tags: {}, depDataLog: [],
   debug: { depData: true },
 
