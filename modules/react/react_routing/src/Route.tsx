@@ -1,6 +1,7 @@
 import React from "react";
 import { useRoute, useRouteVariables } from "./react_routing";
 import { extractPathAndQuery } from "./extract.path.variable";
+import { NameAnd } from "@laoban/utils";
 
 export function RouteDebug () {
   const path = useRoute ()[ 0 ]
@@ -19,11 +20,11 @@ export function Route<T> ( { path, children }: RouteProps<T> ): React.ReactEleme
   return <>{children}</>
 }
 
-export type RouteVarsProps<T> = {
+export type RouteVarsProps = {
   path: string
-  children: ( t: T ) => React.ReactNode
+  children: ( params: NameAnd<string> ) => React.ReactNode
 }
-export function RouteVars<T> ( { path, children }: RouteVarsProps<T> ): React.ReactElement {
+export function RouteVars ( { path, children }: RouteVarsProps ): React.ReactElement {
   const vars = useRouteVariables ( path )
   if ( vars === null ) return <></>
   return <>{children ( vars )}</>

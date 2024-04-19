@@ -7,7 +7,7 @@ import { LensProps, lensState } from '@focuson/state';
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
 import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, routeL, tagsL, taskL } from "./state/fusion.state";
-import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider } from "@fusionconfig/react_routing";
+import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider, RouteVars } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
 import { hasErrors, mapObject, NameAnd, toArray } from "@laoban/utils";
@@ -20,6 +20,9 @@ import { allDomainDetails } from "@fusionconfig/alldomains";
 import { DebugFolders } from "./playground/debug.folders";
 import { objectToQueryString } from "@fusionconfig/utils";
 import { FusionDetails } from "./react/details";
+import { Task } from "@mui/icons-material";
+import { TaskSummaryPage } from "./react/task.summary.page";
+import { TaskDetailsPage } from "./react/task.details.page";
 
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );
@@ -138,13 +141,16 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
   const devMode = state.optJson ()?.debug?.devMode;
   return (
     <RouteProvider state={state.copyWithLens ( routeL )}>
-      <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '800px' }}>
+      <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '600px' }}>
         {/*<RouteDebug/>*/}
         <WorkbenchLayout
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
           Details={<FusionDetails state={state}/>}>
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
+          <RouteVars path='/task/{task}'>{
+            ( { task } ) => <TaskDetailsPage task={task} state={state.focusOn ( 'config' ).focusOn ( 'tasks' )}/>
+          }</RouteVars>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
                                extra={{ route: <RouteDebug/> }}
                                titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'configLegalData', 'tags', 'depDataLog', 'debug' ]}/>}

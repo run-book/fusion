@@ -34,6 +34,7 @@ export interface TaskRequestOrResponse {
 export interface Task {
   service: string
   variables: string | string[]
+  taskDescription: string
   serviceDescription: string
   request: TaskRequestOrResponse
   response: TaskRequestOrResponse
