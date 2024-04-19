@@ -6,11 +6,11 @@ import { LensProps, lensState } from '@focuson/state';
 
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
-import { rawConfigL, foldersO, FusionWorkbenchState, legalParamsL, paramsL, routeL, tagsL, configL } from "./state/fusion.state";
+import { configL, configLegalTasksL, foldersO, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, routeL, tagsL, taskL } from "./state/fusion.state";
 import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
-import { hasErrors, mapObject, mapObjectValues, NameAnd, toArray } from "@laoban/utils";
+import { hasErrors, mapObject, NameAnd, toArray } from "@laoban/utils";
 import { FCLogRecord, futureCacheConsoleLog, futureCacheLog } from "@itsmworkbench/utils";
 import { UrlStoreApiClientConfig, urlStoreFromApi } from "@itsmworkbench/browserurlstore";
 import { NameSpaceDetails, UrlFolder } from "@itsmworkbench/urlstore";
@@ -92,16 +92,28 @@ const config = depData ( 'config', configL, rawConfig, {
   load: async ( raw: string ): Promise<ConfigFile> => yaml.parser ( raw )
 } )
 
-const route = depData ( 'route', routeL, params, {
-  clean: ( params: NameAnd<string> ) => {
-    const rawSearchString = makeSearchString ( params )
-    const search = rawSearchString ? `?${rawSearchString}` : ''
-    return `/${search}`;
-  },
-  tag: ( o: string ) => o
+
+const legalTasks = depData ( 'configLegalData', configLegalTasksL, rawConfig, config, {
+  tag: ( o: string[] ) => o,
+  clean: ( rawConfig, config: any ) => config?.tasks === undefined ? undefined as any as string[] : Object.keys ( config?.tasks ),
 } )
 
-const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config, route ]
+const task = depData ( 'task', taskL, {
+  tag: ( o: string ) => o,
+  clean: 'leave'
+} )
+const route = depData ( 'route', routeL, task, params, {
+  tag: ( o: string ) => o,
+  clean: ( task: string, params: NameAnd<string> ) => {
+    const rawSearchString = makeSearchString ( params )
+    const search = rawSearchString ? `?${rawSearchString}` : ''
+    const taskString = task ? `/${task}` : '/'
+    return taskString + search
+  },
+} )
+
+
+const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config, legalTasks,task, route ]
 
 const setJson = setJsonForDepData ( depEngine, () => container.state, setEventStoreValue ( container ) ) ( deps, {
   setTag: ( s, name, tag ) => { // could do it with optional, but don't need to
@@ -127,16 +139,16 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
   const devMode = state.optJson ()?.debug?.devMode;
   return (
     <RouteProvider state={state.copyWithLens ( routeL )}>
-      <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '240px' }}>
+      <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '500px' }}>
         {/*<RouteDebug/>*/}
         <WorkbenchLayout
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
-          Details={<div>Details</div>}>
+          Details={<pre>{state.focusOn ( 'rawConfig' ).optJson () || 'loading'}</pre>}>
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
                                extra={{ route: <RouteDebug/> }}
-                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'tags', 'depDataLog', 'debug' ]}/>}
+                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'configLegalData', 'tags', 'depDataLog', 'debug' ]}/>}
         </WorkbenchLayout>
       </SizingContext.Provider>
     </RouteProvider>)

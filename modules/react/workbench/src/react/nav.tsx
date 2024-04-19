@@ -6,10 +6,11 @@ import EventIcon from '@mui/icons-material/Event';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import React from "react";
 import { Box } from "@mui/material";
-import { FusionWorkbenchState, legalParamsL, paramsL, routeL } from "../state/fusion.state";
-import { FocusOnSetValueButton, FocusOnToggleButton, Loading, MultipleSelects } from "@fusionconfig/react_components";
+import { configLegalTasksL, FusionWorkbenchState, legalParamsL, paramsL, routeL, taskL } from "../state/fusion.state";
+import { FocusOnSetValueButton, FocusOnToggleButton, Loading, MultipleSelects, SingleSelect } from "@fusionconfig/react_components";
 import { RouteDebug } from "@fusionconfig/react_routing";
 import { NameAnd } from "@laoban/utils";
+import { HideNavButton } from "@fusionconfig/react_components/src/buttons/hide.nav.button";
 
 
 export function FusionNav<S> ( { state }: LensProps<S, FusionWorkbenchState, any> ) {
@@ -32,7 +33,10 @@ export function FusionNav<S> ( { state }: LensProps<S, FusionWorkbenchState, any
     }}
   >
 
-    <Loading state={paramsState.state2 ()}>{_ => <MultipleSelects state={paramsState}/>}</Loading>
+    <HideNavButton title='Parameters'><Loading state={paramsState.state2 ()}>{_ =>
+      <MultipleSelects state={paramsState}/>}</Loading></HideNavButton>
+    <HideNavButton title='Tasks'><Loading state={paramsState.state2 ()}>{_ =>
+      <SingleSelect name='tasks' state={state.doubleUp().chain1(configLegalTasksL).chain2(taskL)}/>}</Loading></HideNavButton>
     <FocusOnToggleButton aria-label='Toggle Developer Mode' startIcon={<DeveloperModeIcon/>} state={state.focusOn ( 'debug' ).focusOn ( 'devMode' )} sx={buttonSx}>Developer Mode</FocusOnToggleButton>
     {devMode && <>
         <FocusOnSetValueButton aria-label='Debug Folders'

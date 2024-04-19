@@ -22,15 +22,15 @@ export function SelectWhenIdIsName<S> ( { state, purpose, options }: SelectWhenI
   </Select>
 }
 
-export type SingleSelectProps<S> = LensProps<S, string, any> & {
+export type SingleSelectProps<S> = LensProps2<S, string[], string, any> & {
   name: string
-  options: string[]
 }
-export function SingleSelect<S> ( { name, state, options }: SingleSelectProps<S> ) {
-  const selected = state.optJson ()
+export function SingleSelect<S> ( { name, state }: SingleSelectProps<S> ) {
+  const options = state.optJson1 () || []
+  const selected = state.optJson2 ()
   return <Select
     value={selected || ''}
-    onChange={e => state.setJson ( e.target?.value, 'Selectit' )}
+    onChange={e => state.state2 ().setJson ( e.target?.value, 'Selectit' )}
     aria-label={`Select`}
     displayEmpty
     fullWidth
@@ -43,9 +43,6 @@ export function SingleSelect<S> ( { name, state, options }: SingleSelectProps<S>
 
 export type MultipleSelectProps<S> = LensProps2<S, NameAnd<string[]>, NameAnd<string>, any>
 export function MultipleSelects<S> ( { state }: MultipleSelectProps<S> ) {
-  const legalValues = state.optJson1 () || {}
-  const selected: NameAnd<string> = state.optJson2 () || {}
-  const keys = Object.keys ( legalValues || {} )
-  const selectedState = state.state2 ()
-  return <>{keys.map ( key => <SingleSelect state={selectedState.focusOn ( key )} name={key} options={legalValues[ key ]}/> )}</>
+  const keys = Object.keys ( state.optJson1 () || {} )
+  return <>{keys.map ( key => <SingleSelect state={state.focus1On ( key ).focus2On ( key )} name={key}/> )}</>
 }

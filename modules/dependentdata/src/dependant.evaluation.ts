@@ -19,7 +19,7 @@ function makeDiAction<S, T> ( deps: DependentItem<S, any>[],
                               vAndT: NameAnd<ValueAndTagAndLastTag>,
                               di: DependentItem<S, T>, s: S, wantLoad: boolean,
                               currentTags: ValueAndTagAndLastTag[], reasonPrefix ): DiAction<S, T>[] {
-  const params = deps.map ( d => vAndT[ d.name ].value );
+  const params = deps.map ( d => vAndT[ d.name ]?.value );
   const value = cleanValue ( di, s, params )
   const tag = di.tagFn ( value )
   const clean = { value, tag }
@@ -34,8 +34,8 @@ export const evaluateDependentItem = <S> ( getTag: TagStoreGetter<S>, status: Up
   const deps = dependents ( di.dependsOn )
   const currentTags = deps.map ( d => vAndT[ d.name ] )
   const someUpstreamIsUndefined = currentTags.some ( vt => vt?.value === undefined )
-  const lastTags = currentTags.map ( vAndT => vAndT.lastTag )
-  const upstreamChanged = lastTags.some ( ( ch, i ) => diTagChanged ( ch, currentTags[ i ].tag ) )
+  const lastTags = currentTags.map ( vAndT => vAndT?.lastTag )
+  const upstreamChanged = lastTags.some ( ( ch, i ) => diTagChanged ( ch, currentTags[ i ]?.tag ) )
 
   const thisValue = di.optional.getOption ( s )
   const thisTag = di.tagFn ( thisValue )
