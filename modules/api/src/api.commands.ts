@@ -4,6 +4,7 @@ import { fusionHandlers } from "./api";
 import { CommentFactoryFunction, defaultCommentOffset, LoadFilesFn, PostProcessor } from "@fusionconfig/config";
 import { UrlStore } from "@itsmworkbench/urlstore";
 import { FileOps } from "@laoban/fileops";
+import { YamlCapability } from "@itsmworkbench/yaml";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
@@ -12,6 +13,7 @@ export type  ApiCommandContext = HasCurrentDirectory & {
   postProcessors: ( cached: boolean, directory: string ) => PostProcessor[]
   commentFactoryFn: CommentFactoryFunction
   urlStore: UrlStore
+  yaml: YamlCapability
 }
 export function apiCommand<Commander, Context extends ApiCommandContext, Config> (): CommandFn<Commander, Context, Config> {
   return ( context, config ) => ({
@@ -40,6 +42,7 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
           context.fileOps,
           context.loadFiles,
           context.postProcessors ( opts.cache === true, urlStore.toString () ),
+          context.yaml,
           context.commentFactoryFn ( commentOffset ),
           directory.toString (), debugBoolean, ) )
     }

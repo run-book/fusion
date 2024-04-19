@@ -216,7 +216,7 @@ const CustomTreeItem = ( getIcon: GetIconFromFileOrFolderDetails ) => React.forw
   let icon;
   if ( expandable ) {
     icon = FolderRounded;
-  } else if ( item.fileType ) {
+  } else {
     icon = getIcon ( item );
   }
 const CastProvider = TreeItem2Provider as any;
@@ -249,17 +249,19 @@ const CastProvider = TreeItem2Provider as any;
 export type FileExplorerProps = RichTreeViewPropsBase & {
   items: FileOrFolderDetails[];
   getIcon?: GetIconFromFileOrFolderDetails
+  expandIds?: string[]
 }
-export default function FileExplorer ( { items, getIcon, ...props }: FileExplorerProps ) {
+export  function FileExplorer ( { items, getIcon, expandIds,...props }: FileExplorerProps ) {
   const actualGetIcon = getIcon || defaultGetIconFromFileOrFolderDetails;
   return (
     <RichTreeView
+      defaultExpandedItems={expandIds}
       // aria-label="file explorer"
       // sx={{ height: 'fit-content', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
       // defaultExpandedItems={[ '1' ]}
       {...props}
       items={items}
-      slots={{ item: CustomTreeItem ( getIcon || defaultGetIconFromFileOrFolderDetails ) }}
+      slots={{ item: CustomTreeItem ( actualGetIcon )}}
     />
   );
 }

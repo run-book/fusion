@@ -6,7 +6,7 @@ export function RouteDebug () {
   const path = useRoute ()[ 0 ]
   const pathQuery = extractPathAndQuery ( path )
   const vars = useRouteVariables ( pathQuery.path )
-  return <pre>RouteDebug {JSON.stringify ( { route: path, pathQuery, vars}, null, 2 )}</pre>
+  return <pre>RouteDebug {JSON.stringify ( { route: path, ...pathQuery, vars}, null, 2 )}</pre>
 }
 
 export type RouteProps<T> = {

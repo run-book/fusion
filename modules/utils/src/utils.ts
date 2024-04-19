@@ -1,4 +1,4 @@
-import { NameAnd } from "@laoban/utils";
+import { NameAnd, safeObject } from "@laoban/utils";
 
 const placeHolderPattern = /\$\{([^}]+)\}/g;
 
@@ -18,6 +18,7 @@ export function parseParams ( params: string | boolean ) {
   return {}
 }
 
+
 export function removeLastExtension ( path: string ): string {
   // Split the path by dots to separate extensions
   const parts = path.split ( '.' );
@@ -35,35 +36,43 @@ export function removeLastExtension ( path: string ): string {
 }
 export type ParameterNameAndValues = NameAnd<NameAnd<string[]>>;
 
-export async function permutate(
+export async function permutate (
   params: ParameterNameAndValues,
-  processOne: (params: NameAnd<string>) => Promise<void>
+  processOne: ( params: NameAnd<string> ) => Promise<void>
 ): Promise<void> {
   // Convert the parameter structure into an array of entries
-  const paramEntries = Object.entries(params);
+  const paramEntries = Object.entries ( params );
 
   // Generate and process all permutations of the parameter values
-  await generateAndProcessPermutations(paramEntries, 0, {}, processOne);
+  await generateAndProcessPermutations ( paramEntries, 0, {}, processOne );
 }
 
 // Recursive function to generate permutations and process them with processOne
-export async function generateAndProcessPermutations(
-  entries: [string, NameAnd<string[]>][],
+export async function generateAndProcessPermutations (
+  entries: [ string, NameAnd<string[]> ][],
   index: number,
   currentPermutation: NameAnd<string>,
-  processOne: (params: NameAnd<string>) => Promise<void>
+  processOne: ( params: NameAnd<string> ) => Promise<void>
 ): Promise<void> {
-  if (index === entries.length) {
+  if ( index === entries.length ) {
     // Process the current permutation asynchronously
-    await processOne({...currentPermutation});
+    await processOne ( { ...currentPermutation } );
     return;
   }
 
-  const [paramName, paramValues] = entries[index];
+  const [ paramName, paramValues ] = entries[ index ];
   const legalValues = paramValues.legal;
 
-  for (const value of legalValues) {
-    currentPermutation[paramName] = value;
-    await generateAndProcessPermutations(entries, index + 1, currentPermutation, processOne);
+  for ( const value of legalValues ) {
+    currentPermutation[ paramName ] = value;
+    await generateAndProcessPermutations ( entries, index + 1, currentPermutation, processOne );
   }
+}
+
+export function objectToQueryString ( params: NameAnd<any> ): string {
+  const queryString = Object.keys ( safeObject ( params ) ).map ( key => {
+    const value = params[ key ];
+    return `${encodeURIComponent ( key )}=${encodeURIComponent ( value )}`;
+  } ).join ( '&' );
+  return queryString;
 }

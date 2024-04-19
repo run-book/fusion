@@ -4,8 +4,8 @@
   "description": "Fusion Workbench. Gui for working with transformations and schemas",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":                "1.4.49",
-      "@itsmworkbench/dependentdata": "0.0.21"
+      "@laoban/utils":                  "1.4.49",
+      "@itsmworkbench/browserurlstore": "0.0.25"
     },
     "devDependencies": {},
     "bin":             {
@@ -13,6 +13,7 @@
     }
   },
   "links":       [
+    "@itsmworkbench/dependentdata",
     "@fusionconfig/config",
     "@fusionconfig/jsonata",
     "@fusionconfig/react_components",

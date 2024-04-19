@@ -6,26 +6,91 @@ import { LensProps, lensState } from '@focuson/state';
 
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
-import { FusionWorkbenchState, routeL, tagsL } from "./state/fusion.state";
+import { rawConfigL, foldersO, FusionWorkbenchState, legalParamsL, paramsL, routeL, tagsL, configL } from "./state/fusion.state";
 import { Route, RouteDebug, RouteProvider } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
-import { toArray } from "@laoban/utils";
-import { FCLogRecord, futureCacheLog, futureCacheConsoleLog } from "@itsmworkbench/utils";
+import { hasErrors, mapObject, mapObjectValues, NameAnd, toArray } from "@laoban/utils";
+import { FCLogRecord, futureCacheConsoleLog, futureCacheLog } from "@itsmworkbench/utils";
+import { UrlStoreApiClientConfig, urlStoreFromApi } from "@itsmworkbench/browserurlstore";
+import { NameSpaceDetails, UrlFolder } from "@itsmworkbench/urlstore";
+import { YamlCapability } from "@itsmworkbench/yaml";
+import { jsYaml } from "@itsmworkbench/jsyaml";
+import { allDomainDetails } from "@fusionconfig/alldomains";
+import { DebugFolders } from "./playground/debug.folders";
+import { ConfigFile } from "@fusionconfig/config";
+import { objectToQueryString } from "@fusionconfig/utils";
 
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );
 const root = createRoot ( rootElement );
-
+const yaml: YamlCapability = jsYaml ()
+let rootUrl = "http://localhost:1235/";
 const container: EventStore<FusionWorkbenchState> = eventStore<FusionWorkbenchState> ()
+const nameSpaceDetails: NameAnd<NameSpaceDetails> = allDomainDetails ( yaml )
+
+const urlStoreconfig: UrlStoreApiClientConfig = { apiUrlPrefix: rootUrl + "url", details: nameSpaceDetails }
+const urlStore = urlStoreFromApi ( urlStoreconfig )
 
 const logForDeps: FCLogRecord<any, any>[] = []
 const tagStore = optionalTagStore ( tagsL );
 const depEngine = dependentEngine<FusionWorkbenchState> (
   { listeners: [ futureCacheLog ( logForDeps ), futureCacheConsoleLog ( 'fc -' ) ], cache: {} },
-  tagStore.currentValue )
+  tagStore )
 
-const deps: DependentItem<FusionWorkbenchState, any>[] = []
+const dirList = depData ( 'dirlist', foldersO, {
+  clean: 'leave',
+  tag: ( o: UrlFolder ) => o?.name,
+  load: async (): Promise<UrlFolder> => {
+    const folders = await urlStore.folders ( "org", "schema" )
+    if ( hasErrors ( folders ) ) throw new Error ( 'Failed to load ticketList\n' + folders.join ( '\n' ) )
+    return folders
+  }
+} )
+
+const legalParams = depData ( 'legalParams', legalParamsL, {
+  clean: 'leave',
+  tag: ( o: NameAnd<string[]> ) => JSON.stringify ( o ),
+  load: async (): Promise<NameAnd<string[]>> => {
+    const response = await fetch ( `${rootUrl}/axes/global.yaml` );
+    if ( response.status >= 400 ) throw new Error ( `Failed to load parameters\n${response.statusText}` )
+    const json: any = await response.json ()
+    return json
+  }
+} )
+
+const params = depData ( 'params', paramsL, legalParams, {
+  tag: ( o: NameAnd<string> ) => JSON.stringify ( o ),
+  load: async ( legalParams: NameAnd<string[]> ): Promise<NameAnd<string>> => {
+    if ( legalParams === undefined ) return undefined as any
+    return mapObject ( legalParams, ( v, name ) => v[ 0 ] );
+
+  },
+  clean: ( legalParams ) => {
+    if ( legalParams === undefined ) return undefined as any
+    return mapObject ( legalParams, ( v, name ) => v[ 0 ] );
+  },
+} )
+
+const rawConfig = depData ( 'rawConfig', rawConfigL, params, {
+  clean: 'leave',
+  tag: ( o: string ) =>o?.substring(0, 100),
+  load: async ( ps: NameAnd<string> ): Promise<string> => {
+    const params = objectToQueryString ( ps )
+    const paramString = params ? `?${params}` : ''
+    const response = await fetch ( `${rootUrl}/fusion/global.yaml${paramString}`, {} );
+    if ( response.status >= 400 ) throw new Error ( `Failed to load parameters\n${response.statusText}` )
+    return await response.text ()
+  }
+} )
+
+const config = depData ( 'config', configL, rawConfig, {
+  clean: 'leave',
+  tag: ( o: ConfigFile ) => o === undefined ? undefined : 'config',
+  load: async ( raw: string ): Promise<ConfigFile> => yaml.parser ( raw )
+} )
+
+const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config ]
 
 const setJson = setJsonForDepData ( depEngine, () => container.state, setEventStoreValue ( container ) ) ( deps, {
   setTag: ( s, name, tag ) => { // could do it with optional, but don't need to
@@ -38,10 +103,11 @@ const setJson = setJsonForDepData ( depEngine, () => container.state, setEventSt
     return s
   },
   debug: () => container.state?.debug?.depData,
-  delay: 100
+  delay: 500,
+
 } )
 // const setJson = setEventStoreValue ( container );
-addEventStoreListener ( container, (( _, s, setJson ) => {
+addEventStoreListener ( container, (( _, s ) => {
   const state = lensState ( s, setJson, 'state', {} )
   return root.render ( <App state={state}/> );
 }) )
@@ -56,13 +122,18 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
           Details={<div>Details</div>}>
-          {/*<Route path='/as'>Route <RouteDebug/></Route>*/}
+          <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
                                extra={{ route: <RouteDebug/> }}
-                               titles={[ 'selectionState', 'depDataLog', 'debug' ]}/>}
+                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'tags', 'depDataLog', 'debug' ]}/>}
         </WorkbenchLayout>
       </SizingContext.Provider>
     </RouteProvider>)
 }
 
-setJson ( { selectionState: { route: window.location.pathname + window.location.search }, tags: {}, depDataLog: [] } )
+setJson ( {
+  selectionState: { route: window.location.pathname + window.location.search },
+  tags: {}, depDataLog: [],
+  debug: { depData: true },
+
+} )

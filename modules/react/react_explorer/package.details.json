@@ -8,8 +8,8 @@
       "@mui/x-tree-view":          "^7.1.1",
       "@react-spring/web":         "^9.7.3",
       "@laoban/utils":             "1.4.49",
-      "@itsmworkbench/jsyaml":     "0.0.21",
-      "@itsmworkbench/eventstore": "0.0.21",
+      "@itsmworkbench/jsyaml":     "0.0.25",
+      "@itsmworkbench/eventstore": "0.0.25",
       "@monaco-editor/react":      "^4.6.0"
     },
     "devDependencies": {},

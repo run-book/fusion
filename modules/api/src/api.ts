@@ -9,6 +9,8 @@ import { PostProcessor } from "@fusionconfig/config";
 import { callService, matchService } from "./api.for.call.service";
 import { FileOps } from "@laoban/fileops";
 import { getAxes, matchAxes } from "./api.for.axes";
+import { getFolders } from "@itsmworkbench/apiurlstore/dist/src/api.for.url.store";
+import { YamlCapability } from "@itsmworkbench/yaml";
 
 
 export const fusionHandlers = (
@@ -17,17 +19,19 @@ export const fusionHandlers = (
   fileOps: FileOps,
   loadFile: LoadFilesFn,
   postProcessors: PostProcessor[],
+  yaml: YamlCapability,
   commentFn: CommentFunction,
   parent: string,
   debug: boolean | undefined,
   ...handlers: KoaPartialFunction[] ): ( from: ContextAndStats ) => Promise<void> =>
   chainOfResponsibility ( defaultShowsError, //called if no matches
+    getAxes ( fileOps, yaml, configFileName ),
+    getFolders ( urlStore.folders ),
     listUrls ( urlStore.list ),
     getUrls ( urlStore ),
     getFusion ( matchRawFusion, loadFile, [], commentFn, parent, debug ),
     getFusion ( matchFusion, loadFile, postProcessors, commentFn, parent, debug ),
-    getAxes(fileOps, configFileName),
-    callService ( matchService, fileOps,urlStore, debug ),
+    callService ( matchService, fileOps, urlStore, debug ),
     ...handlers,
     notFoundIs404,
   )

@@ -6,5 +6,5 @@ export type LoadingProps<S, T> = LensProps<S, T, any> & {
 }
 export function Loading<S, T> ( { state, children }: LoadingProps<S, T> ) {
   const json = state.optJson ()
-  return json === undefined ? <div>Loading...</div> : <>children(state)</>;
+  return json === undefined ? <div>Loading...</div> : <>{children(state)}</>;
 }
