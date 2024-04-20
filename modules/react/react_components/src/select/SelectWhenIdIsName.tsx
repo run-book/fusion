@@ -1,8 +1,8 @@
 import React from "react";
 import { MenuItem, Select } from "@mui/material";
 import { LensProps, LensProps2 } from "@focuson/state";
-import { splitAndCapitalize} from "@itsmworkbench/utils";
-import { NameAnd } from "@laoban/utils";
+import { splitAndCapitalize } from "@itsmworkbench/utils";
+import { NameAnd, safeArray } from "@laoban/utils";
 
 export type SelectWhenIdIsNameProps<S> = LensProps<S, string, any> & {
   purpose: string
@@ -18,28 +18,35 @@ export function SelectWhenIdIsName<S> ( { state, purpose, options }: SelectWhenI
     fullWidth
   > <MenuItem disabled value=""> <em>Please select a {purpose}</em> </MenuItem>
     {options.map ( ( option ) => (
-      <MenuItem key={option} value={option}>{splitAndCapitalize(option)}</MenuItem>
+      <MenuItem key={option} value={option}>{splitAndCapitalize ( option )}</MenuItem>
     ) )}
   </Select>
 }
+export type SingleSelectWithOptionsProps<S, T> = LensProps<S, T, any> & {
+  name: string
+  options: T[]
+}
 
+export function SingleSelectWithOptions<S, T> ( { name, state, options }: SingleSelectWithOptionsProps<S, T> ) {
+  const selected = state.optJson ()
+  return <Select
+    value={selected?.toString () || ''}
+    onChange={e => state.setJson ( e.target?.value as T, 'Selectit' )}
+    aria-label={`Select`}
+    displayEmpty
+    fullWidth
+  > <MenuItem disabled value=""> <em>Please select a {name}</em> </MenuItem>
+    {safeArray(options).map ( ( option ) => (
+      <MenuItem key={option.toString ()} value={option.toString ()}>{splitAndCapitalize ( option.toString () )}</MenuItem>
+    ) )}
+  </Select>
+}
 export type SingleSelectProps<S> = LensProps2<S, string[], string, any> & {
   name: string
 }
 export function SingleSelect<S> ( { name, state }: SingleSelectProps<S> ) {
   const options = state.optJson1 () || []
-  const selected = state.optJson2 ()
-  return <Select
-    value={selected || ''}
-    onChange={e => state.state2 ().setJson ( e.target?.value, 'Selectit' )}
-    aria-label={`Select`}
-    displayEmpty
-    fullWidth
-  > <MenuItem disabled value=""> <em>Please select a {name}</em> </MenuItem>
-    {options.map ( ( option ) => (
-      <MenuItem key={option} value={option}>{splitAndCapitalize(option)}</MenuItem>
-    ) )}
-  </Select>
+  return <SingleSelectWithOptions state={state.state2 ()} name={name} options={options}/>
 }
 
 export type MultipleSelectProps<S> = LensProps2<S, NameAnd<string[]>, NameAnd<string>, any>

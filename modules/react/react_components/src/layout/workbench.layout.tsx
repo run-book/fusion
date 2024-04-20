@@ -34,7 +34,7 @@ export function WorkbenchLayout ( { title, children, Nav, Details }: WorkbenchLa
         <CssBaseline/>
         <WorkbenchMainBar title={title} leftDrawerClick={() => setLeftDrawerOpen ( !leftDrawerOpen )} rightDrawerClick={() => setRightDrawerOpen ( !rightDrawerOpen )}/>
         <LeftDrawer width={leftDrawerWidth} Nav={Nav} open={leftDrawerOpen}/>
-        <Box sx={{ width: '100%' }}><Toolbar/>{children}</Box>
+        <Box sx={{ width}}><Toolbar/>{children}</Box>
         <RightSlider width={rightDrawerWidth} anchor='right' open={rightDrawerOpen} children={Details}/>
       </Box>
 

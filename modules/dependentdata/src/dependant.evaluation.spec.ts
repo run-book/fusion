@@ -1,14 +1,15 @@
 import { DiValuesAndTags, evaluateDependentItem } from "./dependant.evaluation";
 import { globalTagStoreCurrentValue } from "./tag.store";
-import { comparableDi, DepDataFortest, paramDi, paramsListDefDi, someParams, someParamsDef, taskListDi } from "./dependent.data.fixture";
+import { DepDataFortest, paramsListDefDi, someParams, someParamsDef, taskListDi } from "./dependent.data.fixture";
 import { DiAction, isFetchDiAction } from "./di.actions";
 
 function comparableDiAction<S, T> ( d: DiAction<S, T> ) {
   const load = (d as any).load
+  let clean = (d as any).clean;
   return {
     ...d, di: d.di.name,
     load: typeof load === 'function' ? 'function' : JSON.stringify ( load ),
-    clean: typeof d.clean === 'function' ? 'function' : d.clean
+    clean: typeof clean === 'function' ? 'function' : clean
   }
 }
 function comparableDiActions<S, T> ( ds: DiAction<S, T>[] ) {

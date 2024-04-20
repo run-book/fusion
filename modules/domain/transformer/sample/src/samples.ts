@@ -29,6 +29,9 @@ export function schemaNamedUrlAndNameToInputUrl ( namedUrl: NamedUrl, name: stri
   const url = writeUrl ( result )
   return { ...result, url }
 }
+export type RequestOrResponse = 'request' | 'response'
+
+export type InputOutputSampleNS = 'input_sample' | 'output_sample'
 export const inputSampleNs: NameSpaceDetailsForGit =
                nameSpaceDetailsForGit ( 'input_sample', {
                  pathInGitRepo: 'schema', //not an error. we store the samples next to the schema

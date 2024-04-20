@@ -18,8 +18,8 @@
   },
   "dependencies": {
     "@laoban/utils": "1.4.49",
-    "@itsmworkbench/yaml": "0.0.25",
-    "@itsmworkbench/urlstore": "0.0.25",
+    "@itsmworkbench/yaml": "0.0.27",
+    "@itsmworkbench/urlstore": "0.0.27",
     "debug": "^4.3.4"
   },
   "devDependencies": {

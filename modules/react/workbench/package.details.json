@@ -5,7 +5,7 @@
   "packageJson": {
     "dependencies":    {
       "@laoban/utils":                  "1.4.49",
-      "@itsmworkbench/browserurlstore": "0.0.25"
+      "@itsmworkbench/browserurlstore": "0.0.27"
     },
     "devDependencies": {},
     "bin":             {
@@ -20,7 +20,8 @@
     "@fusionconfig/react_explorer",
     "@fusionconfig/react_editor",
     "@fusionconfig/react_routing",
-    "@fusionconfig/utils"
+    "@fusionconfig/utils",
+    "@fusionconfig/i18n"
   ],
   "guards":      {
     "compile": true,

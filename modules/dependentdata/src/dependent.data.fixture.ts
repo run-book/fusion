@@ -68,6 +68,7 @@ export function comparableDi<S, T> ( d: DependentItem<S, T> ) {
 
 export function fetchParamsDefAction ( clean: ValueAndTag, data: NameAnd<string[]> ): FetchDiAction<DepDataFortest, NameAnd<string[]>> {
   return {
+    type: 'fetch',
     di: paramsListDefDi,
     tags: [],//no upstreams
     tag: '1/1/1',
@@ -78,6 +79,7 @@ export function fetchParamsDefAction ( clean: ValueAndTag, data: NameAnd<string[
 }
 export function fetchParamsAction ( clean: ValueAndTag ): CleanDiAction<DepDataFortest, NameAnd<string>> {
   return {
+    type: 'clean',
     di: paramDi,
     clean,
     reason: 'from test'
@@ -85,6 +87,7 @@ export function fetchParamsAction ( clean: ValueAndTag ): CleanDiAction<DepDataF
 }
 export function fetchTaskListAction ( clean: ValueAndTag, data: string[] ): FetchDiAction<DepDataFortest, string[]> {
   return {
+    type: 'fetch',
     di: taskListDi,
     tags: [ { tag: 'uk/cc/web', value: someParams } ],
     tag: [ 't1', 't2' ],

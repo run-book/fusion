@@ -6,23 +6,22 @@ import { LensProps, lensState } from '@focuson/state';
 
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
-import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, routeL, tagsL, taskL } from "./state/fusion.state";
+import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, reqRespOptions, ReqRespTx, requestResponseL, routeL, tagsL, taskL, tasksL, testL, Tests } from "./state/fusion.state";
 import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider, RouteVars } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
-import { hasErrors, mapObject, NameAnd, toArray } from "@laoban/utils";
+import { hasErrors, mapObject, NameAnd, toArray, value } from "@laoban/utils";
 import { FCLogRecord, futureCacheConsoleLog, futureCacheLog } from "@itsmworkbench/utils";
 import { UrlStoreApiClientConfig, urlStoreFromApi } from "@itsmworkbench/browserurlstore";
-import { NameSpaceDetails, UrlFolder } from "@itsmworkbench/urlstore";
+import { ListNamesResult, NameSpaceDetails, UrlFolder, UrlQuery } from "@itsmworkbench/urlstore";
 import { YamlCapability } from "@itsmworkbench/yaml";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { allDomainDetails } from "@fusionconfig/alldomains";
 import { DebugFolders } from "./playground/debug.folders";
 import { objectToQueryString } from "@fusionconfig/utils";
 import { FusionDetails } from "./react/details";
-import { Task } from "@mui/icons-material";
-import { TaskSummaryPage } from "./react/task.summary.page";
 import { TaskDetailsPage } from "./react/task.details.page";
+import { schemaToTestQuery } from "./react/task.summary.page";
 
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );
@@ -104,6 +103,32 @@ const task = depData ( 'task', taskL, {
     return undefined as any as string
   }
 } )
+const requestResponse = depData ( 'requestResponse', requestResponseL, {
+  tag: ( o: ReqRespTx ) => o,
+  clean: 'leave'
+} )
+
+async function loadOne ( query: UrlQuery ) {
+  const res = urlStore.list ( query )
+  if ( hasErrors ( res ) ) throw new Error ( res.join ( '\n' ) )
+  return res
+}
+const tests = depData ( 'tests', testL, config, task, {
+  tag: ( o: Tests ) => o ? 'tests' : undefined,
+  clean: 'leave',
+  load: async ( config, task ): Promise<Tests> => {
+    const theTask = config.tasks[ task ]
+    if ( theTask === undefined ) throw new Error ( `Task ${task} not found in config` )
+
+    const inputRequestTests = await loadOne ( schemaToTestQuery ( theTask.request.kafka.name, "input_sample" ) )
+    const outputRequestTests = await loadOne ( schemaToTestQuery ( theTask.request.kafka.name, "output_sample") )
+    const inputResponseTests = await loadOne ( schemaToTestQuery ( theTask.response.kafka.name, "input_sample" ) )
+    const outputResponseTests = await loadOne ( schemaToTestQuery ( theTask.response.kafka.name, "output_sample") )
+     return { inputRequestTests, outputRequestTests, inputResponseTests, outputResponseTests }
+  }
+} )
+
+
 const route = depData ( 'route', routeL, task, params, {
   tag: ( o: string ) => o,
   clean: ( task: string, params: NameAnd<string> ) => {
@@ -115,7 +140,7 @@ const route = depData ( 'route', routeL, task, params, {
 } )
 
 
-const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config, legalTasks, task, route ]
+const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config, legalTasks, task, requestResponse, tests, route ]
 
 const setJson = setJsonForDepData ( depEngine, () => container.state, setEventStoreValue ( container ) ) ( deps, {
   setTag: ( s, name, tag ) => { // could do it with optional, but don't need to
@@ -139,6 +164,7 @@ addEventStoreListener ( container, (( _, s ) => {
 
 function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, any> ) {
   const devMode = state.optJson ()?.debug?.devMode;
+  const tasksState=state.tripleUp().withLens1(testL).withLens2(tasksL).withLens3(requestResponseL)
   return (
     <RouteProvider state={state.copyWithLens ( routeL )}>
       <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '600px' }}>
@@ -149,11 +175,11 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
           Details={<FusionDetails state={state}/>}>
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           <RouteVars path='/task/{task}'>{
-            ( { task } ) => <TaskDetailsPage task={task} state={state.focusOn ( 'config' ).focusOn ( 'tasks' )}/>
+            ( { task } ) => <TaskDetailsPage task={task} state={tasksState}/>
           }</RouteVars>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
                                extra={{ route: <RouteDebug/> }}
-                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'configLegalData', 'tags', 'depDataLog', 'debug' ]}/>}
+                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'tests','configLegalData', 'tags', 'depDataLog', 'debug' ]}/>}
         </WorkbenchLayout>
       </SizingContext.Provider>
     </RouteProvider>)
@@ -162,7 +188,7 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
 let parameters: NameAnd<string> | undefined = getQueryParams ( window.location.search )
 if ( Object.keys ( parameters ).length === 0 ) parameters = undefined
 setJson ( {
-  selectionState: {},
+  selectionState: { requestResponse: reqRespOptions[ 0 ] },
   parameters,
   tags: {}, depDataLog: [],
   debug: { depData: true },

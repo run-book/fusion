@@ -1,10 +1,25 @@
 import { LensProps } from "@focuson/state";
 import { Task } from "../state/fusion.state";
-import { NameAnd, toArray } from "@laoban/utils";
-import { Grid, Paper, Toolbar, Typography } from "@mui/material";
+import { hasErrors, NameAnd, toArray } from "@laoban/utils";
+import { Paper, Typography } from "@mui/material";
+import { parseNamedUrlOrErrors, UrlQuery } from "@itsmworkbench/urlstore";
 import React from "react";
-import { splitAndCapitalize } from "@itsmworkbench/utils";
-import { ResponseTwoColumnCards } from "@fusionconfig/react_components/src/layout/responsive.two.column.cards";
+import { ResponseTwoColumnCards } from "@fusionconfig/react_components";
+import { InputOutputSampleNS, RequestOrResponse } from "@fusionconfig/sample";
+
+export function schemaToTestQuery ( schema: string, namespace: InputOutputSampleNS) {
+  const schemaUrl = parseNamedUrlOrErrors ( schema )
+  if ( hasErrors ( schemaUrl ) ) throw new Error(schemaUrl.join ( '\n' ))
+  const query: UrlQuery = {
+    org: schemaUrl.organisation,
+    namespace,
+    pageQuery: { page: 1, pageSize: 100 },
+    order: 'name',
+    path: schemaUrl.name
+  }
+  return query;
+
+}
 
 export type TaskSummaryPageProps<S> = LensProps<S, NameAnd<Task>, any> & { task: string | undefined, singleColumn?: boolean }
 
@@ -18,7 +33,7 @@ export function TaskSummary ( { task, data }: TaskSummaryProps ) {
 
 }
 
-type TaskProps = { data: Task }
+export type TaskProps = { data: Task }
 export function ServiceSummary ( { data }: TaskProps ) {
   return <>
     <Typography variant="h6">{data.service}</Typography>
@@ -47,9 +62,9 @@ export function TaskSummaryPage<S> ( { state, task, singleColumn }: TaskSummaryP
   const data: Task = (state.optJson () || {})[ task || '' ]
   if ( data === undefined ) return <Paper style={{ padding: 20 }}/>
   return <><ResponseTwoColumnCards singleColumn={singleColumn} cards={[
-    { title: 'Task', component: <TaskSummary task={task} data={data}/> },
-    { title: 'Service', component: <ServiceSummary data={data}/> },
-    { title: 'Request', component: <RequestSummary data={data}/> },
-    { title: 'Response', component: <ResponseSummary data={data}/> }
+    { title: 'Task', comp: <TaskSummary task={task} data={data}/> },
+    { title: 'Service', comp: <ServiceSummary data={data}/> },
+    { title: 'Request', comp: <RequestSummary data={data}/> },
+    { title: 'Response', comp: <ResponseSummary data={data}/> }
   ]}/></>
 }
