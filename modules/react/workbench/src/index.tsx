@@ -10,10 +10,10 @@ import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbench
 import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider, RouteVars } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
-import { hasErrors, mapObject, NameAnd, toArray, value } from "@laoban/utils";
+import { hasErrors, mapObject, NameAnd, toArray } from "@laoban/utils";
 import { FCLogRecord, futureCacheConsoleLog, futureCacheLog } from "@itsmworkbench/utils";
 import { UrlStoreApiClientConfig, urlStoreFromApi } from "@itsmworkbench/browserurlstore";
-import { ListNamesResult, NameSpaceDetails, UrlFolder, UrlQuery } from "@itsmworkbench/urlstore";
+import { NameSpaceDetails, UrlFolder, UrlQuery } from "@itsmworkbench/urlstore";
 import { YamlCapability } from "@itsmworkbench/yaml";
 import { jsYaml } from "@itsmworkbench/jsyaml";
 import { allDomainDetails } from "@fusionconfig/alldomains";
@@ -22,7 +22,6 @@ import { objectToQueryString } from "@fusionconfig/utils";
 import { FusionDetails } from "./react/details";
 import { TaskDetailsPage } from "./react/task.details.page";
 import { schemaToTestQuery } from "./react/task.summary.page";
-import { TestsDetailsPage } from "./react/tests.details.page";
 
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );
@@ -122,20 +121,21 @@ const tests = depData ( 'tests', testL, config, task, {
     if ( theTask === undefined ) throw new Error ( `Task ${task} not found in config` )
 
     const inputRequestTests = await loadOne ( schemaToTestQuery ( theTask.request.kafka.name, "input_sample" ) )
-    const outputRequestTests = await loadOne ( schemaToTestQuery ( theTask.request.kafka.name, "output_sample") )
+    const outputRequestTests = await loadOne ( schemaToTestQuery ( theTask.request.kafka.name, "output_sample" ) )
     const inputResponseTests = await loadOne ( schemaToTestQuery ( theTask.response.kafka.name, "input_sample" ) )
-    const outputResponseTests = await loadOne ( schemaToTestQuery ( theTask.response.kafka.name, "output_sample") )
-     return { inputRequestTests, outputRequestTests, inputResponseTests, outputResponseTests }
+    const outputResponseTests = await loadOne ( schemaToTestQuery ( theTask.response.kafka.name, "output_sample" ) )
+    return { inputRequestTests, outputRequestTests, inputResponseTests, outputResponseTests }
   }
 } )
 
 
-const route = depData ( 'route', routeL, task, params, {
+const route = depData ( 'route', routeL, task, params, requestResponse, {
   tag: ( o: string ) => o,
-  clean: ( task: string, params: NameAnd<string> ) => {
+  clean: ( task: string, params: NameAnd<string>, reqRes ) => {
     const rawSearchString = makeSearchString ( params )
     const search = params === undefined ? window.location.search : `?${rawSearchString}`
-    const taskString = task ? `/task/${task}` : '/'
+    const repResString = reqRes === undefined ? 'Summary' : `${reqRes}`
+    const taskString = task ? `/task/${task}/${repResString}` : '/'
     return taskString + search
   },
 } )
@@ -165,17 +165,16 @@ addEventStoreListener ( container, (( _, s ) => {
 
 function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, any> ) {
   const devMode = state.optJson ()?.debug?.devMode;
-  const tasksState=state.tripleUp().withLens1(testL).withLens2(tasksL).withLens3(requestResponseL)
+  const tasksState = state.tripleUp ().withLens1 ( testL ).withLens2 ( tasksL ).withLens3 ( requestResponseL )
   return (
     <RouteProvider state={state.copyWithLens ( routeL )}>
       <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '600px' }}>
-        {/*<RouteDebug/>*/}
         <WorkbenchLayout
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
           Details={<FusionDetails state={state}/>}>
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
-          <RouteVars path='/task/{task}'>{
+          <RouteVars path='/task/{task}/{action}'>{
             ( { task } ) => <>
               <TaskDetailsPage task={task} state={tasksState}/>
 
@@ -183,7 +182,7 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
           }</RouteVars>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
                                extra={{ route: <RouteDebug/> }}
-                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'tests','configLegalData', 'tags', 'depDataLog', 'debug' ]}/>}
+                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'tests', 'configLegalData', 'tags', 'depDataLog', 'debug' ]}/>}
         </WorkbenchLayout>
       </SizingContext.Provider>
     </RouteProvider>)

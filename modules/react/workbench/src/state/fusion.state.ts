@@ -6,7 +6,6 @@ import { DiTag } from "@itsmworkbench/dependentdata";
 import { ConfigFile } from "@fusionconfig/config";
 
 export type ReqRespTx = 'Summary' |
-  'Summary' |
   'TaskRequestInput' | 'RequestTranform' | 'ServiceRequestInput' |
   'ServiceResponseOutput' | 'ResponseTransform' | 'TaskResponseOutput'
 
@@ -22,7 +21,6 @@ export const serviceRequestInput: ReqRespTx = 'ServiceRequestInput'
 export const serviceResponseOutput: ReqRespTx = 'ServiceResponseOutput'
 export const responseTransform: ReqRespTx = 'ResponseTransform'
 export const taskResponseOutput: ReqRespTx = 'TaskResponseOutput'
-
 
 
 export type SelectionState = {
@@ -41,9 +39,9 @@ export type ConfigData = {
 
 export type Tests = {
   inputRequestTests: ErrorsAnd<ListNamesResult>
-  outputRequestTests:  ErrorsAnd<ListNamesResult>
-  inputResponseTests:  ErrorsAnd<ListNamesResult>
-  outputResponseTests:  ErrorsAnd<ListNamesResult>
+  outputRequestTests: ErrorsAnd<ListNamesResult>
+  inputResponseTests: ErrorsAnd<ListNamesResult>
+  outputResponseTests: ErrorsAnd<ListNamesResult>
 
 }
 
