@@ -13,12 +13,7 @@ interface CardBodyProps {
 }
 
 export const CardBody: React.FC<CardBodyProps> = ( { title, comp } ) => (
-  <>
-    <Typography variant="h5" component="div" gutterBottom>
-      {title}
-    </Typography>
-    {comp}
-  </>
+  <>{title?.length>0 &&<Typography variant="h5" component="div" gutterBottom>{title}</Typography>}{comp}</>
 );
 
 

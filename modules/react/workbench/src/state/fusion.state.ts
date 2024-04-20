@@ -15,6 +15,7 @@ export const reqRespOptions: ReqRespTx[] = [
   'TaskRequestInput', 'RequestTranform', 'ServiceRequestInput',
   'ServiceResponseOutput', 'ResponseTransform', 'TaskResponseOutput',
 ]
+export const summary: ReqRespTx = 'Summary'
 export const taskRequestInput: ReqRespTx = 'TaskRequestInput'
 export const requestTranform: ReqRespTx = 'RequestTranform'
 export const serviceRequestInput: ReqRespTx = 'ServiceRequestInput'

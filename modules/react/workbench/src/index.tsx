@@ -22,6 +22,7 @@ import { objectToQueryString } from "@fusionconfig/utils";
 import { FusionDetails } from "./react/details";
 import { TaskDetailsPage } from "./react/task.details.page";
 import { schemaToTestQuery } from "./react/task.summary.page";
+import { TestsDetailsPage } from "./react/tests.details.page";
 
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );
@@ -175,7 +176,10 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
           Details={<FusionDetails state={state}/>}>
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           <RouteVars path='/task/{task}'>{
-            ( { task } ) => <TaskDetailsPage task={task} state={tasksState}/>
+            ( { task } ) => <>
+              <TaskDetailsPage task={task} state={tasksState}/>
+
+            </>
           }</RouteVars>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
                                extra={{ route: <RouteDebug/> }}
