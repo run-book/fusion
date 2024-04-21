@@ -5,6 +5,10 @@ import { CommentFactoryFunction, defaultCommentOffset, LoadFilesFn, PostProcesso
 import { UrlStore } from "@itsmworkbench/urlstore";
 import { FileOps } from "@laoban/fileops";
 import { YamlCapability } from "@itsmworkbench/yaml";
+import { cleanTest, RunTests, runTestsUsingEngine, TestEngine } from "@fusionconfig/tests";
+import { ajvTest } from "@fusionconfig/ajv/src/ajv";
+import { jsonataTransformer } from "@fusionconfig/jsonata";
+import { jsonDiffPatchFn } from "@fusionconfig/jsondiffpatch";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
@@ -30,21 +34,34 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
     },
     action: async ( commander, opts ) => {
       console.log ( JSON.stringify ( opts, null, 2 ) )
-      const { port, debug, directory, commentOffset: commentOffsetString,
-              urlStore, cache } = opts
+      const {
+              port, debug, directory, commentOffset: commentOffsetString,
+              urlStore: dir, cache
+            } = opts
       const commentOffset = Number.parseInt ( commentOffsetString.toString () )
       let debugBoolean = debug === true;
       console.log ( 'directory', directory )
       console.log ( 'port', port )
       console.log ( 'debug', debug )
       console.log ( 'cached', cache )
+
+      let urlStore = context.urlStore ( dir.toString () );
+      const testEngine: TestEngine = {
+        clean: cleanTest ( urlStore.list ),
+        loadNamed: urlStore.loadNamed,
+        testSchema: ajvTest,
+        compileTransfomer: jsonataTransformer,
+        testTransformer: jsonDiffPatchFn
+      }
+      const rt: RunTests = runTestsUsingEngine ( testEngine )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
-        fusionHandlers ( directory.toString (), context.urlStore ( urlStore.toString () ),
+        fusionHandlers ( directory.toString (), urlStore,
           context.fileOps,
           context.loadFiles,
-          context.postProcessors ( opts.cache === true, urlStore.toString () ),
+          context.postProcessors ( opts.cache === true, dir.toString () ),
           context.yaml,
           context.commentFactoryFn ( commentOffset ),
+          rt,
           directory.toString (), debugBoolean, ) )
     }
   })

@@ -4,11 +4,11 @@ import EventIcon from '@mui/icons-material/Event';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import React from "react";
 import { Box } from "@mui/material";
-import { configLegalTasksL, FusionWorkbenchState,  requestResponseL, routeL, taskL } from "../state/fusion.state";
+import { configLegalTasksL, FusionWorkbenchState, requestResponseL, routeL, taskL } from "../state/fusion.state";
 import { FocusOnSetValueButton, FocusOnToggleButton, Loading, MultipleSelects, SingleSelect, SingleSelectWithOptions } from "@fusionconfig/react_components";
 import { NameAnd } from "@laoban/utils";
 import { HideNavButton } from "@fusionconfig/react_components/src/buttons/hide.nav.button";
-import { reqRespOptions } from "@fusionconfig/tests";
+import { reqRespOptions } from "../state/test.selection";
 
 
 export function FusionNav<S> ( { state }: LensProps<S, FusionWorkbenchState, any> ) {

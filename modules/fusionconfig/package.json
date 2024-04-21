@@ -20,7 +20,6 @@
     ]
   },
   "dependencies": {
-    "jsonata": "^v2.0.4",
     "@itsmworkbench/cli": "0.0.29",
     "@itsmworkbench/commander12": "0.0.29",
     "@itsmworkbench/jsyaml": "0.0.29",
@@ -29,11 +28,14 @@
     "@laoban/variables": "1.4.49",
     "@laoban/utils": "1.4.49",
     "@fusionconfig/alldomains": "0.0.8",
+    "@fusionconfig/ajv": "0.0.8",
     "@fusionconfig/api": "0.0.8",
+    "@fusionconfig/apitests": "0.0.8",
     "@fusionconfig/config": "0.0.8",
     "@fusionconfig/clitests": "0.0.8",
-    "@fusionconfig/jsonata": "0.0.8",
     "@fusionconfig/fileopsconfig": "0.0.8",
+    "@fusionconfig/jsonata": "0.0.8",
+    "@fusionconfig/jsondiffpatch": "0.0.8",
     "@fusionconfig/utils": "0.0.8",
     "debug": "^4.3.4"
   },

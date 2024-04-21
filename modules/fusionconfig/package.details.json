@@ -4,7 +4,6 @@
   "description": "Like heira but for whole files",
   "packageJson": {
     "dependencies":    {
-      "jsonata":                     "^v2.0.4",
       "@itsmworkbench/cli":          "0.0.29",
       "@itsmworkbench/commander12":  "0.0.29",
       "@itsmworkbench/jsyaml":       "0.0.29",
@@ -23,11 +22,14 @@
   },
   "links":       [
     "@fusionconfig/alldomains",
+    "@fusionconfig/ajv",
     "@fusionconfig/api",
+    "@fusionconfig/apitests",
     "@fusionconfig/config",
     "@fusionconfig/clitests",
-    "@fusionconfig/jsonata",
     "@fusionconfig/fileopsconfig",
+    "@fusionconfig/jsonata",
+    "@fusionconfig/jsondiffpatch",
     "@fusionconfig/utils"
   ],
   "guards":      {

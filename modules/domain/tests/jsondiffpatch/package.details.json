@@ -5,7 +5,7 @@
   "packageJson": {
     "dependencies":    {
       "@laoban/utils": "1.4.49",
-      "jsondiffpatch": "^0.6.0"
+      "jsondiffpatch": "^0.4.1"
     },
     "devDependencies": {
     }

@@ -1,15 +1,16 @@
 import { ErrorsAnd, hasErrors, mapErrors, mapErrorsK, mapK } from "@laoban/utils";
 import { TestEngine, TransformerFn } from "./test.engine.domain";
-import { OneTestResult, RanTestResult, RunTests, RunTestsDefn,  SchemaTestResult, TestInExpectedActualOut, TestInOut, TestResults, TestsResult, TransformerTestResult } from "./test.domain";
-import { NamedUrl } from "@itsmworkbench/urlstore";
+import { OneTestResult, RanTestResult, RunTestsDefn, SchemaTestResult, TestInExpectedActualOut, TestInOut, TestResults, TestsResult, TransformerTestResult } from "./test.domain";
+import { NamedUrl, UrlLoadNamedFn } from "@itsmworkbench/urlstore";
 import { schemaNameToTestName } from "./schema.to.test.mapping";
+import { NamedLoadResult } from "@itsmworkbench/urlstore/dist/src/url.load.and.store";
 
 export type TransformerDescAndTx = { transformerDesc: string, tx: TransformerFn }
 
 export async function makeTransformer ( engine: TestEngine, transformer: NamedUrl ): Promise<ErrorsAnd<TransformerDescAndTx>> {
   return mapErrorsK ( await engine.loadNamed<string> ( transformer ),
     async transformerDesc =>
-      mapErrors ( await engine.compileTransfomer ( transformerDesc.result ),
+      mapErrors ( await engine.compileTransfomer ( (transformerDesc.result as any).jsonata ),
         tx => ({ transformerDesc: transformerDesc.result, tx }) ) )
 }
 
@@ -25,30 +26,36 @@ export async function loadSchemasAndTransformer ( engine: TestEngine, schemaName
 }
 
 
-export async function loadTestValues ( engine: TestEngine, schema: TestInOut<NamedUrl>, tx: TransformerFn, inpTestName: NamedUrl, outTestName: NamedUrl ): Promise<ErrorsAnd<TestInExpectedActualOut<any>>> {
-  return mapErrorsK ( await engine.loadNamed ( inpTestName ),
-    async inp => mapErrorsK ( await engine.loadNamed ( outTestName ),
+export const loadTestValue = async <T> ( ln: UrlLoadNamedFn, n: NamedUrl | undefined ): Promise<ErrorsAnd<NamedLoadResult<T>>> =>
+  n === undefined ? undefined : ln ( n );
+
+export async function loadTestValues ( engine: TestEngine, tx: TransformerFn, inpTestName: NamedUrl | undefined, outTestName: NamedUrl | undefined ): Promise<ErrorsAnd<TestInExpectedActualOut<any>>> {
+  return mapErrorsK ( await loadTestValue ( engine.loadNamed, inpTestName ),
+    async inp => mapErrorsK ( await loadTestValue ( engine.loadNamed, outTestName ),
       async out => {
-        let namedLoadResult: TestInExpectedActualOut<any> = { input: inp.result, expectedOutput: out.result, actualOutput: await tx ( inp.result ) };
+        const actualOutput = inp === undefined ? undefined : await tx ( inp.result )
+        let namedLoadResult: TestInExpectedActualOut<any> = { input: inp?.result, expectedOutput: out?.result, actualOutput };
         return namedLoadResult;
       } ) )
 
 }
 export async function valuesToTestResults ( engine: TestEngine, schemas: TestInOut<any>, values: TestInExpectedActualOut<any> ): Promise<TestResults> {
   const schemaResults: TestInExpectedActualOut<SchemaTestResult> = {
-    input: engine.testSchema ( schemas.input, values.input ),
-    actualOutput: engine.testSchema ( schemas.output, values.actualOutput ),
-    expectedOutput: engine.testSchema ( schemas.output, values.expectedOutput )
+    input: values.input === undefined ? undefined : engine.testSchema ( schemas.input, values.input ),
+    actualOutput: values.actualOutput === undefined ? undefined : engine.testSchema ( schemas.output, values.actualOutput ),
+    expectedOutput: values.expectedOutput === undefined ? undefined : engine.testSchema ( schemas.output, values.expectedOutput )
   }
-  const transformerResults: TransformerTestResult = await engine.testTransformer ( values.expectedOutput, values.actualOutput )
+  const transformerResults: TransformerTestResult = (values.expectedOutput !== undefined && values.actualOutput !== undefined) ?
+    await engine.testTransformer ( values.expectedOutput, values.actualOutput ) :
+    undefined
   return { schema: schemaResults, transformer: transformerResults }
 }
 
-async function runOneTest ( engine: TestEngine, schemasAndTx: SchemasAndTransformer, test: string ): Promise<OneTestResult> {
-  const inpTestName = schemaNameToTestName ( 'input_sample' ) ( schemasAndTx.schemaNames.input, test )
-  const outTestName = schemaNameToTestName ( 'output_sample' ) ( schemasAndTx.schemaNames.output, test )
+async function runOneTest ( engine: TestEngine, schemasAndTx: SchemasAndTransformer, test: MergedTest ): Promise<OneTestResult> {
+  const inpTestName: NamedUrl | undefined = schemaNameToTestName ( 'input_sample' ) ( schemasAndTx.schemaNames.input, test.input )
+  const outTestName: NamedUrl | undefined = schemaNameToTestName ( 'output_sample' ) ( schemasAndTx.schemaNames.output, test.output )
 
-  let result = await mapErrorsK ( await loadTestValues ( engine, schemasAndTx.schemaNames, schemasAndTx.tx, inpTestName, outTestName ),
+  let result = await mapErrorsK ( await loadTestValues ( engine, schemasAndTx.tx, inpTestName, outTestName ),
     async values => mapErrors ( await valuesToTestResults ( engine, schemasAndTx.schemas, values ),
       results => {
         let ran: RanTestResult = {
@@ -62,19 +69,28 @@ async function runOneTest ( engine: TestEngine, schemasAndTx: SchemasAndTransfor
   if ( hasErrors ( result ) ) return { errors: result }
   return result
 }
+export type MergedTest = {
+  input?: string
+  output?: string
+}
+export const mergeTests = ( test: TestInOut<string[]> ): MergedTest[] => {
+  const all = [ ...new Set ( [ ...test.input, ...test.output ] ) ].sort ()
+  return all.map ( t => ({ input: test.input.includes ( t ) ? t : undefined, output: test.output.includes ( t ) ? t : undefined }) )
+}
 
-export const runTestsUsingEngine = ( engine: TestEngine ): RunTests =>
-  async ( defn: RunTestsDefn ): Promise<ErrorsAnd<TestsResult>> => {
-    const { schema, transformer, tests } = defn
-    return mapErrorsK ( await loadSchemasAndTransformer ( engine, schema, transformer ),
-      async ( schemasAndTransformer ) => {
-        const testResults: OneTestResult[] = await mapK ( tests, async test => runOneTest ( engine, schemasAndTransformer, test ) )
-        let testResult: TestsResult = {
-          transformer: { name: defn.transformer, transformerDesc: schemasAndTransformer.transformerDesc },
-          inputSchema: { name: schema.input, schema: schemasAndTransformer.schemas.input },
-          outputSchema: { name: schema.output, schema: schemasAndTransformer.schemas.output },
-          tests: testResults
-        };
-        return testResult
-      } )
-  }
+export const runTestsUsingEngine = ( engine: TestEngine ) =>
+  async ( defn: RunTestsDefn ): Promise<ErrorsAnd<TestsResult>> =>
+    mapErrorsK ( await engine.clean ( defn ), async ( { schema, transformer, tests } ) => {
+      return mapErrorsK ( await loadSchemasAndTransformer ( engine, schema, transformer ),
+        async ( schemasAndTransformer ) => {
+          const mergedTests = mergeTests ( tests )
+          const testResults: OneTestResult[] = await mapK ( mergedTests, async test => runOneTest ( engine, schemasAndTransformer, test ) )
+          let testResult: TestsResult = {
+            transformer: { name: transformer, transformerDesc: schemasAndTransformer.transformerDesc },
+            inputSchema: { name: schema.input, schema: schemasAndTransformer.schemas.input },
+            outputSchema: { name: schema.output, schema: schemasAndTransformer.schemas.output },
+            tests: testResults
+          };
+          return testResult
+        } )
+    } )

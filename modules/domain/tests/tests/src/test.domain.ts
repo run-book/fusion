@@ -1,12 +1,19 @@
 import { NamedUrl } from "@itsmworkbench/urlstore";
 import { ErrorsAnd } from "@laoban/utils";
 
-export type RunTests = (defn: RunTestsDefn) => Promise<ErrorsAnd<TestsResult>>
+export type RunTests = ( defn: RunTestsDefn ) => Promise<ErrorsAnd<TestsResult>>
+
+export type CleanFn = ( defn: RunTestsDefn ) => Promise<ErrorsAnd<CleanRunTestsDefn>>
 
 export type RunTestsDefn = {
+  schema: TestInOut<string>
+  transformer: string
+}
+
+export type CleanRunTestsDefn = {
   schema: TestInOut<NamedUrl>
   transformer: NamedUrl
-  tests: string[]
+  tests: TestInOut<string[]>
 }
 
 export type TestsResult = {
@@ -24,17 +31,17 @@ export type NameAndValueAndSchemaResult = { name: NamedUrl, value: any, result: 
 export type ValueAndTransformerResult = { value: any, result: TransformerTestResult }
 
 export type RanTestResult = {
-  input: NameAndValueAndSchemaResult
-  expectedOutput: NameAndValueAndSchemaResult
-  actualOutput: ValueAndTransformerResult
+  input?: NameAndValueAndSchemaResult
+  expectedOutput?: NameAndValueAndSchemaResult
+  actualOutput?: ValueAndTransformerResult
 }
-export function isRanTestResult (x: any): x is RanTestResult {
+export function isRanTestResult ( x: any ): x is RanTestResult {
   return x && x.input && x.expectedOutput && x.actualOutput
 }
 export type CannotRunTestResult = {
   errors: string[]
 }
-export function isCannotRunTestResult (x: any): x is CannotRunTestResult {
+export function isCannotRunTestResult ( x: any ): x is CannotRunTestResult {
   return x && x.errors
 }
 export type OneTestResult = RanTestResult | CannotRunTestResult
@@ -52,15 +59,14 @@ export type TestInOut<T> = {
   output: T
 }
 export type TestInExpectedActualOut<T> = {
-  input: T
-  expectedOutput: T
-  actualOutput: T
+  input?: T
+  expectedOutput?: T
+  actualOutput?: T
 }
-
 
 
 export type TestResults = {
   schema: TestInExpectedActualOut<SchemaTestResult>
-  transformer: TransformerTestResult
+  transformer?: TransformerTestResult
 }
 

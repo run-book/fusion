@@ -4,7 +4,7 @@ import { KoaPartialFunction } from "@itsmworkbench/koa";
 
 
 export const matchTests = /\/tests$/;
-export const oneTest = ( runTests: RunTests, debug?: boolean ): KoaPartialFunction => {
+export const runTests = ( runTests: RunTests, debug?: boolean ): KoaPartialFunction => {
   return ({
     isDefinedAt: ( ctx ) => {
       const match = matchTests.exec ( ctx.context.request.path );
@@ -13,6 +13,7 @@ export const oneTest = ( runTests: RunTests, debug?: boolean ): KoaPartialFuncti
     },
     apply: async ( ctx ) => {
       const body: RunTestsDefn = JSON.parse ( ctx.context.request.rawBody );
+      console.log('runTests', body)
       const result = await runTests ( body );
       ctx.context.body = JSON.stringify ( result, null, 2 );
       if ( hasErrors ( result ) )

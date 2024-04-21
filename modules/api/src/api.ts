@@ -11,6 +11,8 @@ import { FileOps } from "@laoban/fileops";
 import { getAxes, matchAxes } from "./api.for.axes";
 import { getFolders } from "@itsmworkbench/apiurlstore/dist/src/api.for.url.store";
 import { YamlCapability } from "@itsmworkbench/yaml";
+import { runTests } from "@fusionconfig/apitests/src/tests.api";
+import { RunTests } from "@fusionconfig/tests";
 
 
 export const fusionHandlers = (
@@ -21,6 +23,7 @@ export const fusionHandlers = (
   postProcessors: PostProcessor[],
   yaml: YamlCapability,
   commentFn: CommentFunction,
+  rt: RunTests,
   parent: string,
   debug: boolean | undefined,
   ...handlers: KoaPartialFunction[] ): ( from: ContextAndStats ) => Promise<void> =>
@@ -32,6 +35,7 @@ export const fusionHandlers = (
     getFusion ( matchRawFusion, loadFile, [], commentFn, parent, debug ),
     getFusion ( matchFusion, loadFile, postProcessors, commentFn, parent, debug ),
     callService ( matchService, fileOps, urlStore, debug ),
+    runTests ( rt, debug ),
     ...handlers,
     notFoundIs404,
   )

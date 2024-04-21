@@ -3,16 +3,19 @@ import React from "react";
 import { ErrorsAnd, hasErrors } from "@laoban/utils";
 import { ListNamesResult } from "@itsmworkbench/urlstore";
 import { DataTable } from "@fusionconfig/react_components";
+import { Task } from "../state/fusion.state";
 
 
 export type TestTableProps<S> = LensProps<S, string, any> & {
   inputs: ErrorsAnd<ListNamesResult>
   outputs: ErrorsAnd<ListNamesResult>
 }
-export function TestTable<S> ( { state, inputs, outputs }: TestTableProps<S> ) {
+export function TestTable<S> ( { state,  inputs, outputs }: TestTableProps<S> ) {
   if ( !inputs ) return <div>No tests</div>
   if ( hasErrors ( inputs ) ) return <pre>Errors in inputs{'\n'}{inputs.join ( '\n' )}</pre>
   if ( hasErrors ( outputs ) ) return <pre>Errors in outputs{'\n'}{outputs.join ( '\n' )}</pre>
+
+
 
   return <DataTable cols={[ 'name', 'i/p schema', 'transform', 'o/p schema' ]} noData={<div>No tests</div>} rows={
     inputs.names.map ( name => {

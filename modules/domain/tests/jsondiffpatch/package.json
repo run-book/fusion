@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@laoban/utils": "1.4.49",
-    "jsondiffpatch": "^0.6.0",
+    "jsondiffpatch": "^0.4.1",
     "@fusionconfig/config": "0.0.8",
     "@fusionconfig/tests": "0.0.8",
     "debug": "^4.3.4"

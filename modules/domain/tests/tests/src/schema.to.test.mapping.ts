@@ -12,6 +12,7 @@ export const schemaToTestQuery = ( schema: NamedUrl, namespace: InputOutputSampl
   return query;
 };
 
-export const schemaNameToTestName = ( namespace: InputOutputSampleNS ) => ( schemaName: NamedUrl, test: string ): NamedUrl => {
-  return  { scheme: 'itsm', organisation: schemaName.organisation,  namespace, name: schemaName.name + '/' + test }
+export const schemaNameToTestName = ( namespace: InputOutputSampleNS ) => ( schemaName: NamedUrl, test: string | undefined ): NamedUrl | undefined => {
+  if ( test === undefined ) return undefined;
+  return { scheme: 'itsm', organisation: schemaName.organisation, namespace, name: schemaName.name + '/' + test }
 };
