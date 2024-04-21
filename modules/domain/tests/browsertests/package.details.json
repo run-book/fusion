@@ -1,0 +1,22 @@
+{
+  "template":    "typescript",
+  "name":        "@fusionconfig/browsertests",
+  "description": "accessing the tests from the browser",
+  "packageJson": {
+    "dependencies":    {
+      "@laoban/utils":           "1.4.49",
+      "@itsmworkbench/urlstore": "0.0.27"
+    },
+    "devDependencies": {
+    }
+  },
+  "links":       [
+    "@fusionconfig/config",
+    "@fusionconfig/tests"
+  ],
+  "guards":      {
+    "compile": true,
+    "publish": true,
+    "test":    false
+  }
+}

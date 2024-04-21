@@ -1,0 +1,22 @@
+{
+  "template":    "typescript",
+  "name":        "@fusionconfig/jsondiffpatch",
+  "description": "using json diff patch to compare json objects",
+  "packageJson": {
+    "dependencies":    {
+      "@laoban/utils": "1.4.49",
+      "jsondiffpatch": "^0.6.0"
+    },
+    "devDependencies": {
+    }
+  },
+  "links":       [
+    "@fusionconfig/config",
+    "@fusionconfig/tests"
+  ],
+  "guards":      {
+    "compile": true,
+    "publish": true,
+    "test":    false
+  }
+}

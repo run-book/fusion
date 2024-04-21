@@ -4,29 +4,14 @@ import { FCLogRecord } from "@itsmworkbench/utils";
 import { ListNamesResult, UrlFolder } from "@itsmworkbench/urlstore"
 import { DiTag } from "@itsmworkbench/dependentdata";
 import { ConfigFile } from "@fusionconfig/config";
-
-export type ReqRespTx = 'Summary' |
-  'TaskRequestInput' | 'RequestTranform' | 'ServiceRequestInput' |
-  'ServiceResponseOutput' | 'ResponseTransform' | 'TaskResponseOutput'
-
-export const reqRespOptions: ReqRespTx[] = [
-  'Summary',
-  'TaskRequestInput', 'RequestTranform', 'ServiceRequestInput',
-  'ServiceResponseOutput', 'ResponseTransform', 'TaskResponseOutput',
-]
-export const summary: ReqRespTx = 'Summary'
-export const taskRequestInput: ReqRespTx = 'TaskRequestInput'
-export const requestTranform: ReqRespTx = 'RequestTranform'
-export const serviceRequestInput: ReqRespTx = 'ServiceRequestInput'
-export const serviceResponseOutput: ReqRespTx = 'ServiceResponseOutput'
-export const responseTransform: ReqRespTx = 'ResponseTransform'
-export const taskResponseOutput: ReqRespTx = 'TaskResponseOutput'
+import { ReqRespAction } from "./test.selection";
 
 
 export type SelectionState = {
   route?: string
   task?: string
-  requestResponse?: ReqRespTx
+  requestResponse?: ReqRespAction
+  testName?: string
 }
 export type DebugState = {
   devMode?: boolean
@@ -88,6 +73,7 @@ export type FusionWorkbenchState = {
 export const idL = Lenses.identity<FusionWorkbenchState> ()
 let selectionL = idL.focusQuery ( 'selectionState' );
 export const taskL = selectionL.focusQuery ( 'task' )
+export const testNameL = selectionL.focusQuery ( 'testName' )
 export const testL = idL.focusQuery ( 'tests' )
 export const requestResponseL = selectionL.focusQuery ( 'requestResponse' )
 export const routeL: Optional<FusionWorkbenchState, string> = selectionL.focusQuery ( 'route' )

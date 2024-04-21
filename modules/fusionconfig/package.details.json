@@ -17,15 +17,15 @@
     "bin":             {
       "fusion": "dist/index.js"
     },
-    "scripts": {
+    "scripts":         {
       "api": "cd ../.. && ts-node modules/fusionconfig/index.ts api -d demo -u organisations --debug --cache"
     }
-
   },
   "links":       [
     "@fusionconfig/alldomains",
     "@fusionconfig/api",
     "@fusionconfig/config",
+    "@fusionconfig/clitests",
     "@fusionconfig/jsonata",
     "@fusionconfig/fileopsconfig",
     "@fusionconfig/utils"

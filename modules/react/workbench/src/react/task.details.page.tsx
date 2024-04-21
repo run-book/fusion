@@ -1,13 +1,14 @@
-import { ReqRespTx, requestTranform, responseTransform, serviceRequestInput, serviceResponseOutput, summary, Task, taskRequestInput, taskResponseOutput, Tests } from "../state/fusion.state";
-import { Grid, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
-import { CardWithTitleAndBody } from "@fusionconfig/react_components/src/layout/responsive.two.column.cards";
+
+import { Grid, Paper, Stack, Typography } from "@mui/material";
+import { CardWithTitleAndBody, FocusOnSetValueButton } from "@fusionconfig/react_components";
 import { TaskProps } from "./task.summary.page";
 import { NameAnd, toArray } from "@laoban/utils";
 import { MultiParagraphText } from "@fusionconfig/i18n";
-import { FocusOnSetValueButton } from "@fusionconfig/react_components";
-import { LensProps, LensProps3 } from "@focuson/state";
+import { LensProps, LensProps2 } from "@focuson/state";
 import { TestsDetailsPage } from "./tests.details.page";
+import { ReqRespAction, requestTranform, responseTransform, serviceRequestInput, serviceResponseOutput, summary, taskRequestInput, taskResponseOutput } from "../state/test.selection";
+import { Task, Tests } from "../state/fusion.state";
 
 export type TaskDetailsLayoutProps = {
   task: React.ReactElement
@@ -59,7 +60,7 @@ export function ServiceDetails ( { data }: TaskProps ) {
     <Typography variant="subtitle1">{data.serviceDescription}</Typography>
   </>
 }
-export type ReqOrRespSummaryProps<S> = LensProps<S, ReqRespTx, any>
+export type ReqOrRespSummaryProps<S> = LensProps<S, ReqRespAction, any>
 let fontSize = '0.5rem';
 export function RequestSummary<S> ( { state }: ReqOrRespSummaryProps<S> ) {
   return <Stack direction='row' spacing={0.5} sx={{ alignItems: 'center', justifyContent: 'space-around', padding: 1, }}> {/* Adjust spacing and padding as needed */}
@@ -89,15 +90,17 @@ export function RequestResponse<S> ( { state }: ReqOrRespSummaryProps<S> ) {
   </Stack>
 
 }
-export type TaskDetailsPageProps<S> = LensProps3<S, Tests, NameAnd<Task>, ReqRespTx, any> & { task: string | undefined }
-export function TaskDetailsPage<S> ( { state, task }: TaskDetailsPageProps<S> ) {
-  const data: Task = (state.optJson2 () || {})[ task || '' ]
-  if ( data === undefined ) return <Paper style={{ padding: 20 }}/>
+export type TaskDetailsPageProps<S> = LensProps2<S, ReqRespAction, string, any> & { task: string | undefined, tasks?: NameAnd<Task>, tests?: Tests }
+export function TaskDetailsPage<S> ( { state, task, tasks, tests }: TaskDetailsPageProps<S> ) {
+  if ( tasks === undefined ) return <div>No tasks</div>
+  if ( task === undefined ) return <div>No task name</div>
+  const data: Task = (tasks)[ task || '' ]
+  if ( data === undefined ) return <div>No task</div>
   return <Paper style={{ padding: 20 }}>
     <TaskDetailsLayout task={<TaskDetails task={data} taskName={task}/>}
-                       requestResponse={<RequestResponse state={state.state3 ()}/>}
+                       requestResponse={<RequestResponse state={state.state1 ()}/>}
                        service={<ServiceDetails data={data}/>}
-                       tests={<TestsDetailsPage state={state.state13 ()}/>}
+                       tests={<TestsDetailsPage tasks={tasks} tests={tests} state={state}/>}
     />
 
   </Paper>

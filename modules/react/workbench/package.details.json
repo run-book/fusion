@@ -21,6 +21,8 @@
     "@fusionconfig/react_editor",
     "@fusionconfig/react_routing",
     "@fusionconfig/utils",
+    "@fusionconfig/tests",
+    "@fusionconfig/browsertests",
     "@fusionconfig/i18n"
   ],
   "guards":      {

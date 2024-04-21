@@ -21,6 +21,7 @@
     "@laoban/utils": "1.4.49",
     "@itsmworkbench/apiurlstore": "0.0.27",
     "@itsmworkbench/nodeurlstore": "0.0.27",
+    "@itsmworkbench/cli": "0.0.27",
     "@itsmworkbench/shellgit": "0.0.27",
     "@itsmworkbench/jsyaml": "0.0.27",
     "@itsmworkbench/koa": "0.0.27",

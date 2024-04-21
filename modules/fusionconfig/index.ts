@@ -8,6 +8,7 @@ import { apiCommand } from "@fusionconfig/api";
 import { transformerCommands } from "./src/transformer.commands";
 import { transformNs } from "@fusionconfig/transformer";
 import { schemaCommands } from "./src/schema.commands";
+import { testCommands } from "@fusionconfig/clitests";
 
 export function findVersion () {
   let packageJsonFileName = "../package.json";
@@ -27,8 +28,9 @@ makeCli<Commander12, ThereAndBackContext, NoConfig, NoConfig> ( context, configF
     process.exit ( 1 )
   }
   cliTc.addSubCommand ( commander, configCommands ( commander ) )
-  cliTc.addSubCommand ( commander, transformerCommands ( commander, transformNs(context.yaml) ) )
-  cliTc.addSubCommand ( commander, schemaCommands ( commander, transformNs(context.yaml) ) )
+  cliTc.addSubCommand ( commander, transformerCommands ( commander, transformNs ( context.yaml ) ) )
+  cliTc.addSubCommand ( commander, schemaCommands ( commander, transformNs ( context.yaml ) ) )
+  cliTc.addSubCommand ( commander, testCommands ( commander ) )
   cliTc.addCommands ( commander, [ apiCommand () ] )
   return await cliTc.execute ( commander.commander, context.args )
 } )

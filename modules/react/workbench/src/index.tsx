@@ -1,12 +1,9 @@
 import React from 'react';
-
-
 import { addEventStoreListener, EventStore, eventStore, setEventStoreValue } from "@itsmworkbench/eventstore";
 import { LensProps, lensState } from '@focuson/state';
-
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
-import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, reqRespOptions, ReqRespTx, requestResponseL, routeL, tagsL, taskL, tasksL, testL, Tests } from "./state/fusion.state";
+import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, requestResponseL, routeL, tagsL, taskL, testL, testNameL, Tests } from "./state/fusion.state";
 import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider, RouteVars } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
@@ -21,7 +18,10 @@ import { DebugFolders } from "./playground/debug.folders";
 import { objectToQueryString } from "@fusionconfig/utils";
 import { FusionDetails } from "./react/details";
 import { TaskDetailsPage } from "./react/task.details.page";
-import { schemaToTestQuery } from "./react/task.summary.page";
+import { ReqRespAction, reqRespOptions } from "./state/test.selection";
+import { schemaToTestQuery } from "@fusionconfig/tests";
+import { parseNamedUrlOrThrow } from "@itsmworkbench/urlstore/dist/src/identity.and.name.url";
+
 
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );
@@ -104,7 +104,7 @@ const task = depData ( 'task', taskL, {
   }
 } )
 const requestResponse = depData ( 'requestResponse', requestResponseL, {
-  tag: ( o: ReqRespTx ) => o,
+  tag: ( o: ReqRespAction ) => o,
   clean: 'leave'
 } )
 
@@ -120,10 +120,10 @@ const tests = depData ( 'tests', testL, config, task, {
     const theTask = config.tasks[ task ]
     if ( theTask === undefined ) throw new Error ( `Task ${task} not found in config` )
 
-    const inputRequestTests = await loadOne ( schemaToTestQuery ( theTask.request.kafka.name, "input_sample" ) )
-    const outputRequestTests = await loadOne ( schemaToTestQuery ( theTask.request.kafka.name, "output_sample" ) )
-    const inputResponseTests = await loadOne ( schemaToTestQuery ( theTask.response.kafka.name, "input_sample" ) )
-    const outputResponseTests = await loadOne ( schemaToTestQuery ( theTask.response.kafka.name, "output_sample" ) )
+    const inputRequestTests = await loadOne ( schemaToTestQuery ( parseNamedUrlOrThrow (theTask.request.kafka.name), "input_sample" ) )
+    const outputRequestTests = await loadOne ( schemaToTestQuery (parseNamedUrlOrThrow ( theTask.request.kafka.name), "output_sample" ) )
+    const inputResponseTests = await loadOne ( schemaToTestQuery (parseNamedUrlOrThrow ( theTask.response.kafka.name), "input_sample" ) )
+    const outputResponseTests = await loadOne ( schemaToTestQuery ( parseNamedUrlOrThrow (theTask.response.kafka.name), "output_sample" ) )
     return { inputRequestTests, outputRequestTests, inputResponseTests, outputResponseTests }
   }
 } )
@@ -165,7 +165,9 @@ addEventStoreListener ( container, (( _, s ) => {
 
 function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, any> ) {
   const devMode = state.optJson ()?.debug?.devMode;
-  const tasksState = state.tripleUp ().withLens1 ( testL ).withLens2 ( tasksL ).withLens3 ( requestResponseL )
+  const tasks = state.optJson ()?.config?.tasks
+  const tests = state.optJson ()?.tests
+  const tasksState = state.doubleUp ().withLens1 ( requestResponseL ).withLens2 ( testNameL )
   return (
     <RouteProvider state={state.copyWithLens ( routeL )}>
       <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '600px' }}>
@@ -176,8 +178,7 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           <RouteVars path='/task/{task}/{action}'>{
             ( { task } ) => <>
-              <TaskDetailsPage task={task} state={tasksState}/>
-
+              <TaskDetailsPage task={task} tasks={tasks} tests={tests} state={tasksState}/>
             </>
           }</RouteVars>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
@@ -195,5 +196,4 @@ setJson ( {
   parameters,
   tags: {}, depDataLog: [],
   debug: { depData: true },
-
 } )

@@ -16,30 +16,36 @@ export function SelectWhenIdIsName<S> ( { state, purpose, options }: SelectWhenI
     aria-label={`Select${purpose ? ' ' + purpose : ''}`}
     displayEmpty
     fullWidth
-  > <MenuItem disabled value=""> <em>Please select a {purpose}</em> </MenuItem>
+  ><MenuItem disabled value=""> <em>Please select a {purpose}</em> </MenuItem>
     {options.map ( ( option ) => (
       <MenuItem key={option} value={option}>{splitAndCapitalize ( option )}</MenuItem>
-    ) )}
-  </Select>
+    ) )}</Select>
 }
 export type SingleSelectWithOptionsProps<S, T> = LensProps<S, T, any> & {
   name: string
   options: T[]
 }
 
-export function SingleSelectWithOptions<S, T> ( { name, state, options }: SingleSelectWithOptionsProps<S, T> ) {
+export function SingleSelectWithOptions<S, T extends any> ( { name, state, options }: SingleSelectWithOptionsProps<S, T> ) {
   const selected = state.optJson ()
-  return <Select
-    value={selected?.toString () || ''}
-    onChange={e => state.setJson ( e.target?.value as T, 'Selectit' )}
-    aria-label={`Select`}
-    displayEmpty
-    fullWidth
-  > <MenuItem disabled value=""> <em>Please select a {name}</em> </MenuItem>
-    {safeArray(options).map ( ( option ) => (
-      <MenuItem key={option.toString ()} value={option.toString ()}>{splitAndCapitalize ( option.toString () )}</MenuItem>
-    ) )}
-  </Select>
+  try {
+    return <Select
+      value={selected?.toString () || ''}
+      onChange={e => state.setJson ( e.target?.value as T, 'Selectit' )}
+      aria-label={`Select`}
+      displayEmpty
+      fullWidth
+    ><MenuItem disabled value=""> <em>Please select a {name}</em> </MenuItem>
+      {safeArray ( options ).map ( ( option ) => {
+        const opt = `${option}`
+        return (
+          <MenuItem key={opt} value={opt}>{splitAndCapitalize ( opt )}</MenuItem>
+        );
+      } )}
+    </Select>
+  }catch(e: any){
+    return <div>Error: {e}</div>
+  }
 }
 export type SingleSelectProps<S> = LensProps2<S, string[], string, any> & {
   name: string
