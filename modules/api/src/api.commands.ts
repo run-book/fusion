@@ -30,7 +30,8 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
     },
     action: async ( commander, opts ) => {
       console.log ( JSON.stringify ( opts, null, 2 ) )
-      const { port, debug, directory, commentOffset: commentOffsetString, urlStore, cache } = opts
+      const { port, debug, directory, commentOffset: commentOffsetString,
+              urlStore, cache } = opts
       const commentOffset = Number.parseInt ( commentOffsetString.toString () )
       let debugBoolean = debug === true;
       console.log ( 'directory', directory )
@@ -38,7 +39,7 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
       console.log ( 'debug', debug )
       console.log ( 'cached', cache )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
-        fusionHandlers ( directory.toString (), context.urlStore ( directory.toString () ),
+        fusionHandlers ( directory.toString (), context.urlStore ( urlStore.toString () ),
           context.fileOps,
           context.loadFiles,
           context.postProcessors ( opts.cache === true, urlStore.toString () ),
