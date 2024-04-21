@@ -1,13 +1,13 @@
 import React from 'react';
 import { addEventStoreListener, EventStore, eventStore, setEventStoreValue } from "@itsmworkbench/eventstore";
-import { LensProps, lensState } from '@focuson/state';
+import { LensProps, LensState, lensState } from '@focuson/state';
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
-import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, requestResponseL, routeL, tagsL, taskL, testL, testNameL, Tests } from "./state/fusion.state";
+import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, requestResponseL, routeL, tagsL, taskL, taskToRunDefn, testL, testNameL } from "./state/fusion.state";
 import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider, RouteVars } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
-import { hasErrors, mapObject, NameAnd, toArray } from "@laoban/utils";
+import { ErrorsAnd, hasErrors, mapObject, NameAnd, toArray } from "@laoban/utils";
 import { FCLogRecord, futureCacheConsoleLog, futureCacheLog } from "@itsmworkbench/utils";
 import { UrlStoreApiClientConfig, urlStoreFromApi } from "@itsmworkbench/browserurlstore";
 import { NameSpaceDetails, UrlFolder, UrlQuery } from "@itsmworkbench/urlstore";
@@ -19,8 +19,9 @@ import { objectToQueryString } from "@fusionconfig/utils";
 import { FusionDetails } from "./react/details";
 import { TaskDetailsPage } from "./react/task.details.page";
 import { ReqRespAction, reqRespOptions } from "./state/test.selection";
-import { schemaToTestQuery } from "@fusionconfig/tests";
-import { parseNamedUrlOrThrow } from "@itsmworkbench/urlstore/dist/src/identity.and.name.url";
+import { TestsResult } from "@fusionconfig/tests";
+import { browserTestsRun } from "@fusionconfig/browsertests/src/browser.tests";
+import { HomePage } from "./react/home.page";
 
 
 const rootElement = document.getElementById ( 'root' );
@@ -114,17 +115,14 @@ async function loadOne ( query: UrlQuery ) {
   return res
 }
 const tests = depData ( 'tests', testL, config, task, {
-  tag: ( o: Tests ) => o ? 'tests' : undefined,
+  tag: ( o: ErrorsAnd<TestsResult> ) => o ? 'tests' : undefined,
   clean: 'leave',
-  load: async ( config, task ): Promise<Tests> => {
+  load: async ( config, task ): Promise<ErrorsAnd<TestsResult>> => {
     const theTask = config.tasks[ task ]
     if ( theTask === undefined ) throw new Error ( `Task ${task} not found in config` )
-
-    const inputRequestTests = await loadOne ( schemaToTestQuery ( parseNamedUrlOrThrow (theTask.request.kafka.name), "input_sample" ) )
-    const outputRequestTests = await loadOne ( schemaToTestQuery (parseNamedUrlOrThrow ( theTask.request.kafka.name), "output_sample" ) )
-    const inputResponseTests = await loadOne ( schemaToTestQuery (parseNamedUrlOrThrow ( theTask.response.kafka.name), "input_sample" ) )
-    const outputResponseTests = await loadOne ( schemaToTestQuery ( parseNamedUrlOrThrow (theTask.response.kafka.name), "output_sample" ) )
-    return { inputRequestTests, outputRequestTests, inputResponseTests, outputResponseTests }
+    const runDefn = taskToRunDefn ( theTask )
+    const res: ErrorsAnd<TestsResult> = await browserTestsRun ( rootUrl ) ( runDefn )
+    return res;
   }
 } )
 
@@ -163,22 +161,27 @@ addEventStoreListener ( container, (( _, s ) => {
   return root.render ( <App state={state}/> );
 }) )
 
+function homeClick<S> ( state: LensState<S, string, any> ) {
+  return () => state.setJson ( undefined as any as string, '' )
+}
 function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, any> ) {
   const devMode = state.optJson ()?.debug?.devMode;
   const tasks = state.optJson ()?.config?.tasks
-  const tests = state.optJson ()?.tests
+  const testResult = state.optJson ()?.tests
   const tasksState = state.doubleUp ().withLens1 ( requestResponseL ).withLens2 ( testNameL )
   return (
     <RouteProvider state={state.copyWithLens ( routeL )}>
       <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '600px' }}>
         <WorkbenchLayout
+          clickHome={homeClick ( state.chainLens ( taskL ) )}
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
           Details={<FusionDetails state={state}/>}>
+          <Route path='/'><HomePage state={state}/></Route>
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           <RouteVars path='/task/{task}/{action}'>{
             ( { task } ) => <>
-              <TaskDetailsPage task={task} tasks={tasks} tests={tests} state={tasksState}/>
+              <TaskDetailsPage task={task} tasks={tasks} testResult={testResult} state={tasksState}/>
             </>
           }</RouteVars>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}

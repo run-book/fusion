@@ -21,9 +21,10 @@ export interface WorkbenchLayoutProps {
   Nav: ReactNode;
   Details: ReactNode;
   children: ReactNode;
+  clickHome: () => void
 }
 
-export function WorkbenchLayout ( { title, children, Nav, Details }: WorkbenchLayoutProps ) {
+export function WorkbenchLayout ( { title, children, Nav, Details , clickHome}: WorkbenchLayoutProps ) {
   const [ leftDrawerOpen, setLeftDrawerOpen ] = React.useState ( false );
   const [ rightDrawerOpen, setRightDrawerOpen ] = React.useState ( false );
   const sizing = useSizing ()
@@ -32,7 +33,7 @@ export function WorkbenchLayout ( { title, children, Nav, Details }: WorkbenchLa
     <>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline/>
-        <WorkbenchMainBar title={title} leftDrawerClick={() => setLeftDrawerOpen ( !leftDrawerOpen )} rightDrawerClick={() => setRightDrawerOpen ( !rightDrawerOpen )}/>
+        <WorkbenchMainBar clickHome={clickHome} title={title} leftDrawerClick={() => setLeftDrawerOpen ( !leftDrawerOpen )} rightDrawerClick={() => setRightDrawerOpen ( !rightDrawerOpen )}/>
         <LeftDrawer width={leftDrawerWidth} Nav={Nav} open={leftDrawerOpen}/>
         <Box sx={{ width}}><Toolbar/>{children}</Box>
         <RightSlider width={rightDrawerWidth} anchor='right' open={rightDrawerOpen} children={Details}/>

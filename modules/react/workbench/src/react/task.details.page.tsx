@@ -3,12 +3,14 @@ import React from "react";
 import { Grid, Paper, Stack, Typography } from "@mui/material";
 import { CardWithTitleAndBody, FocusOnSetValueButton } from "@fusionconfig/react_components";
 import { TaskProps } from "./task.summary.page";
-import { NameAnd, toArray } from "@laoban/utils";
+import { ErrorsAnd, NameAnd, toArray } from "@laoban/utils";
 import { MultiParagraphText } from "@fusionconfig/i18n";
 import { LensProps, LensProps2 } from "@focuson/state";
 import { TestsDetailsPage } from "./tests.details.page";
 import { ReqRespAction, requestTranform, responseTransform, serviceRequestInput, serviceResponseOutput, summary, taskRequestInput, taskResponseOutput } from "../state/test.selection";
-import { Task, Tests } from "../state/fusion.state";
+import { Task } from "../state/fusion.state";
+import { TestsResult } from "@fusionconfig/tests";
+import { splitAndCapitalize } from "@itsmworkbench/utils";
 
 export type TaskDetailsLayoutProps = {
   task: React.ReactElement
@@ -21,8 +23,7 @@ export const TaskDetailsLayout: React.FC<TaskDetailsLayoutProps> = ( { task, req
   return (
     <Grid container spacing={2}>
       {/* Task on the left */}
-      <Grid item xs={12} sm={4}>
-        <CardWithTitleAndBody title='Task' comp={task}/>
+      <Grid item xs={12} sm={4}>{task}
       </Grid>
 
       {/* Request and Response in the middle, centered vertically */}
@@ -31,9 +32,7 @@ export const TaskDetailsLayout: React.FC<TaskDetailsLayoutProps> = ( { task, req
       </Grid>
 
       {/* Service on the right */}
-      <Grid item xs={12} sm={4}>
-        <CardWithTitleAndBody title='Service' comp={service}/>
-      </Grid>
+      <Grid item xs={12} sm={4}>{service} </Grid>
       <Grid item xs={12} sm={12}>
         <CardWithTitleAndBody title='Tests' comp={tests}/>
       </Grid>
@@ -43,22 +42,23 @@ export const TaskDetailsLayout: React.FC<TaskDetailsLayoutProps> = ( { task, req
 
 export type TaskDetailsProps = { taskName: string | undefined, task: Task }
 export function TaskDetails ( { taskName, task }: TaskDetailsProps ) {
-  return <Typography variant="body1" paragraph>
-    <MultiParagraphText i18nKey={[ "fusion.task.description" ]}/>
-    <hr/>
-    <Typography>Name: {taskName} </Typography>
-    <Typography>{task.taskDescription} </Typography>
-    <Typography>Variables: {toArray ( task.variables ).join ( ', ' )}</Typography>
-  </Typography>
+  return <CardWithTitleAndBody title={`Task: ${splitAndCapitalize ( taskName )}`} comp={
+    <Typography variant="body1" paragraph>
+      <MultiParagraphText i18nKey={[ "fusion.task.description" ]}/>
+      <hr/>
+      <Typography>Name: {taskName} </Typography>
+      <Typography>{task.taskDescription} </Typography>
+      <Typography>Variables: {toArray ( task.variables ).join ( ', ' )}</Typography>
+    </Typography>}/>
 }
 
 export function ServiceDetails ( { data }: TaskProps ) {
-  return <>
+  return <CardWithTitleAndBody title={`Service: ${splitAndCapitalize(data.service)}`} comp={<>
     <MultiParagraphText i18nKey={[ "fusion.service.description" ]}/>
     <hr/>
     <Typography variant="h6">{data.service}</Typography>
-    <Typography variant="subtitle1">{data.serviceDescription}</Typography>
-  </>
+    <Typography variant="subtitle1">{data.serviceDescription}</Typography></>}/>
+
 }
 export type ReqOrRespSummaryProps<S> = LensProps<S, ReqRespAction, any>
 let fontSize = '0.5rem';
@@ -90,8 +90,8 @@ export function RequestResponse<S> ( { state }: ReqOrRespSummaryProps<S> ) {
   </Stack>
 
 }
-export type TaskDetailsPageProps<S> = LensProps2<S, ReqRespAction, string, any> & { task: string | undefined, tasks?: NameAnd<Task>, tests?: Tests }
-export function TaskDetailsPage<S> ( { state, task, tasks, tests }: TaskDetailsPageProps<S> ) {
+export type TaskDetailsPageProps<S> = LensProps2<S, ReqRespAction, string, any> & { task: string | undefined, tasks?: NameAnd<Task>, testResult?: ErrorsAnd<TestsResult> }
+export function TaskDetailsPage<S> ( { state, task, tasks, testResult }: TaskDetailsPageProps<S> ) {
   if ( tasks === undefined ) return <div>No tasks</div>
   if ( task === undefined ) return <div>No task name</div>
   const data: Task = (tasks)[ task || '' ]
@@ -100,7 +100,7 @@ export function TaskDetailsPage<S> ( { state, task, tasks, tests }: TaskDetailsP
     <TaskDetailsLayout task={<TaskDetails task={data} taskName={task}/>}
                        requestResponse={<RequestResponse state={state.state1 ()}/>}
                        service={<ServiceDetails data={data}/>}
-                       tests={<TestsDetailsPage tasks={tasks} tests={tests} state={state}/>}
+                       tests={<TestsDetailsPage tasks={tasks} testResult={testResult} state={state}/>}
     />
 
   </Paper>

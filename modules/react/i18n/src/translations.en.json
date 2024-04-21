@@ -1,4 +1,10 @@
 {
+  "fusion.home.description": [
+    "The Fusion Workbench is a tool to view the configuration of camunda workflows using Fusion Config",
+    "Above you can see all the tasks that are configured, along with the service that implements the task",
+    "Click the task for more information"
+  ],
+
   "fusion.task.description":    [
     "A task is a 'external task' in camunda",
     "In that task you configure an 'id'. This is the id of the task in the camunda workflow"

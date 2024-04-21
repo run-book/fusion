@@ -1,27 +1,29 @@
 import { LensProps } from "@focuson/state";
 import React from "react";
-import { ErrorsAnd, hasErrors } from "@laoban/utils";
-import { ListNamesResult } from "@itsmworkbench/urlstore";
+import { hasErrors, lastSegment } from "@laoban/utils";
 import { DataTable } from "@fusionconfig/react_components";
-import { Task } from "../state/fusion.state";
+import { isCannotRunTestResult, OneTestResult, SchemaTestResult } from "@fusionconfig/tests";
 
 
-export type TestTableProps<S> = LensProps<S, string, any> & {
-  inputs: ErrorsAnd<ListNamesResult>
-  outputs: ErrorsAnd<ListNamesResult>
+export type TestTableProps<S> = {
+  tests: OneTestResult[]
 }
-export function TestTable<S> ( { state,  inputs, outputs }: TestTableProps<S> ) {
-  if ( !inputs ) return <div>No tests</div>
-  if ( hasErrors ( inputs ) ) return <pre>Errors in inputs{'\n'}{inputs.join ( '\n' )}</pre>
-  if ( hasErrors ( outputs ) ) return <pre>Errors in outputs{'\n'}{outputs.join ( '\n' )}</pre>
+export function TestTable<S> ( { tests }: TestTableProps<S> ) {
+  if ( !tests ) return <div>No tests</div>
+  const cols = [ 'name', 'i/p schema', 'transform', 'o/p schema' ]
+  const rows = tests.map ( ( test: OneTestResult, i ) => {
+    if ( isCannotRunTestResult ( test ) ) return [ test.errors.join ( ', ' ) ]
+    const inpName = test.input?.name?.name;
+    const outName = test.expectedOutput?.name?.name;
+    function findStringFor ( result: SchemaTestResult | undefined ) {
+      if ( !result ) return 'missing'
+      if ( result.length > 0 ) return `failed ${result.length}`
+      return 'passed'
+    }
+    return [ lastSegment(inpName || outName||'error'), findStringFor ( test.input?.result ), 'tx', findStringFor ( test.expectedOutput?.result ) ]
+  } )
 
-
-
-  return <DataTable cols={[ 'name', 'i/p schema', 'transform', 'o/p schema' ]} noData={<div>No tests</div>} rows={
-    inputs.names.map ( name => {
-      const outputExists = outputs.names?.includes ( name )
-      return [ name, 'true', 'tx', outputExists ? 'true' : 'missing' ]
-    } )}/>
+  return <DataTable cols={cols} noData={<div>No tests</div>} rows={rows}/>
 
 }
 

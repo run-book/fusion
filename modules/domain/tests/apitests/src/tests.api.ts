@@ -16,6 +16,7 @@ export const runTests = ( runTests: RunTests, debug?: boolean ): KoaPartialFunct
       console.log('runTests', body)
       const result = await runTests ( body );
       ctx.context.body = JSON.stringify ( result, null, 2 );
+      ctx.context.set ( 'Content-Type', 'application/json' );
       if ( hasErrors ( result ) )
         ctx.context.status = 400;
       else

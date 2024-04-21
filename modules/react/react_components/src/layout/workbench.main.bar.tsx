@@ -5,10 +5,11 @@ import React from "react";
 
 export interface WorkbenchMainBarProps {
   title: string
+  clickHome: () => void
   leftDrawerClick: () => void
   rightDrawerClick: () => void
 }
-export function WorkbenchMainBar<S> ( { title, leftDrawerClick, rightDrawerClick }: WorkbenchMainBarProps ) {
+export function WorkbenchMainBar<S> ( { title, clickHome,leftDrawerClick, rightDrawerClick }: WorkbenchMainBarProps ) {
 
   return <AppBar position="fixed" sx={{ zIndex: ( theme ) => theme.zIndex.drawer + 1 }}>
     <Toolbar>
@@ -21,7 +22,7 @@ export function WorkbenchMainBar<S> ( { title, leftDrawerClick, rightDrawerClick
       >
         <MenuIcon/>
       </IconButton>
-      <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+      <Typography onClick={clickHome} variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
         {title}
       </Typography>
       <IconButton
