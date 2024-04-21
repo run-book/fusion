@@ -14,10 +14,7 @@ export function allDomainDetails ( yamlCapability: YamlCapability ): NameAnd<Nam
 
   }
 }
-export function defaultOrgConfig ( yamlCapability: YamlCapability ): OrganisationUrlStoreConfigForGit {
-  return {
-    baseDir: 'organisations',
-    nameSpaceDetails: allDomainDetails ( yamlCapability )
-  }
+export function defaultOrgConfig ( baseDir: string, yamlCapability: YamlCapability ): OrganisationUrlStoreConfigForGit {
+  return { baseDir, nameSpaceDetails: allDomainDetails ( yamlCapability ) }
 }
 

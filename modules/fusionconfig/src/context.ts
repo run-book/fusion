@@ -19,7 +19,7 @@ export type HasYaml = {
   yaml: YamlCapability
 }
 export interface ThereAndBackContext extends CliContext, HasYaml {
-  urlStore: UrlStore
+  urlStore: ( dir: string ) => UrlStore
   loadFiles: LoadFilesFn
   postProcessors: ( cached: boolean, directory: string ) => PostProcessor[]
   commentFactoryFn: CommentFactoryFunction
@@ -41,23 +41,24 @@ export function postProcessors ( fileOps: FileOps, schemaNameFn: SchemaNameFn, l
 
 export function makeContext ( version: string ): ThereAndBackContext {
   let yamlCapability = jsYaml ();
-  const urlStore = nodeUrlstore ( shellGitsops (), defaultOrgConfig ( yamlCapability ) )
-  const schemaNameFn = defaultSchemaNameFn ( urlStore.loadNamed )
-  return thereAndBackContext ( 'fusion', version, fileOpsNode (), yamlCapability, schemaNameFn, defaultCommentFactoryFunction, urlStore )
+  const urlStore = ( dir: string ) => nodeUrlstore ( shellGitsops (), defaultOrgConfig ( dir, yamlCapability ) )
+  return thereAndBackContext ( 'fusion', version, fileOpsNode (), yamlCapability, defaultCommentFactoryFunction, urlStore )
 }
 export const cliTc: CliTc<Commander12, ThereAndBackContext, NoConfig, NoConfig> = commander12Tc<ThereAndBackContext, NoConfig, NoConfig> ()
 export const configFinder = fixedConfig<NoConfig> ( makeContext )
 
 export function thereAndBackContext ( name: string, version: string,
                                       fileOps: FileOps, yaml: YamlCapability,
-                                      schemaNameFn: SchemaNameFn,
                                       commentFactoryFn: CommentFactoryFunction,
-                                      urlStore: UrlStore ): ThereAndBackContext {
+                                      urlStore: ( dir: string ) => UrlStore ): ThereAndBackContext {
   return {
     ...cliContext ( name, version, fileOps ),
     yaml,
     loadFiles: findConfigUsingFileops ( fileOps, yaml ),
-    postProcessors: ( cached, directory ) => postProcessors ( fileOps, schemaNameFn, urlStore.loadNamed, directory, cached ),
+    postProcessors: ( cached, directory ) => {
+      let thisUrlStore = urlStore ( directory );
+      return postProcessors ( fileOps, defaultSchemaNameFn ( thisUrlStore.loadNamed ), thisUrlStore.loadNamed, directory, cached );
+    },
     commentFactoryFn,
     urlStore
   }

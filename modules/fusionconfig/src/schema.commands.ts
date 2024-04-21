@@ -18,9 +18,9 @@ export function viewSchema<Commander, Config, CleanConfig> ( tc: ContextConfigAn
       '--debug': { description: 'Show debug information' },
     },
     action: async ( _, opts, path ) => {
-      const { directory, debug } = opts
+      const { urlStore, debug } = opts
       const url = schemaPathRequestToNamedUrl ( path as string )
-      const schema = await tc.context.urlStore.loadNamed ( parseNamedUrlOrThrow ( url ) )
+      const schema = await tc.context.urlStore ( urlStore.toString () ).loadNamed ( parseNamedUrlOrThrow ( url ) )
       console.log ( JSON.stringify ( schema, null, 2 ) )
       if ( hasErrors ( schema ) ) process.exit ( 2 )
     }
@@ -35,9 +35,9 @@ export function listSchemas<Commander, Config, CleanConfig> ( tc: ContextConfigA
       '--debug': { description: 'Show debug information' },
     },
     action: async ( _, opts, path ) => {
-      const { directory, debug } = opts
+      const { urlStore: dir, debug } = opts
       const query = schemaPathRequestToUrlQuery ( path as string )
-      const schema = await tc.context.urlStore.list ( query )
+      const schema = await tc.context.urlStore ( dir.toString () ).list ( query )
       console.log ( JSON.stringify ( schema, null, 2 ) )
       if ( hasErrors ( schema ) ) process.exit ( 2 )
     }
@@ -56,16 +56,18 @@ export function testReqSchema<Commander, Config, CleanConfig> ( tc: ContextConfi
       '--debug': { description: 'Show debug information' },
     },
     action: async ( _, opts ) => {
-      const { urlStore, debug } = opts
+      const { urlStore: dir, debug } = opts
+      if ( dir === undefined ) throw new Error ( 'urlStore is undefined ' )
       const taskSchemaUrl = parseNamedUrlOrThrow ( schemaPathRequestToNamedUrl ( `task/${opts.task}` ) )
       const serviceSchemaUrl = parseNamedUrlOrThrow ( schemaPathRequestToNamedUrl ( `service/${opts.service}` ) )
       const taskSamples: UrlQuery = samplePathToUrlQueryRequest ( `task/${opts.task}` )
       const serviceSamples: UrlQuery = samplePathToUrlQueryRequest ( `service/${opts.service}` )
-      const { mapped, errors } = await findCachedOrRawTransMapAndErrors ( tc.context.fileOps, urlStore.toString (), tc.context.urlStore.loadNamed ) ( opts.cache === true ) ()
-      const res = await mapErrorsK ( await tc.context.urlStore.loadNamed ( taskSchemaUrl ), async taskSchema =>
-        mapErrorsK ( await tc.context.urlStore.loadNamed ( serviceSchemaUrl ), async serviceSchema =>
-          mapErrorsK ( await tc.context.urlStore.list ( taskSamples ), async taskSamples =>
-            mapErrorsK ( await tc.context.urlStore.list ( serviceSamples ), async serviceSamples => {
+      let urlStore = tc.context.urlStore ( dir.toString () );
+      const { mapped, errors } = await findCachedOrRawTransMapAndErrors ( tc.context.fileOps, urlStore.toString (), urlStore.loadNamed ) ( opts.cache === true ) ()
+      const res = await mapErrorsK ( await urlStore.loadNamed ( taskSchemaUrl ), async taskSchema =>
+        mapErrorsK ( await urlStore.loadNamed ( serviceSchemaUrl ), async serviceSchema =>
+          mapErrorsK ( await urlStore.list ( taskSamples ), async taskSamples =>
+            mapErrorsK ( await urlStore.list ( serviceSamples ), async serviceSamples => {
 
               const txUrl: TransAndMeta | undefined = taskSchemaUrl?.url !== undefined && serviceSchemaUrl?.url !== undefined ? mapped[ taskSchemaUrl.url ]?.[ serviceSchemaUrl.url ] : undefined
               if ( debug ) {
@@ -106,7 +108,7 @@ export function testReqSchema<Commander, Config, CleanConfig> ( tc: ContextConfi
                     if ( ls.names.length === 0 ) console.log ( '  -- none --' )
                     async function testOne ( test: NamedUrl ) {
                       console.log ( `${title}  ${test.url}` )
-                      const result = await mapErrorsK ( await tc.context.urlStore.loadNamed<any> ( test ),
+                      const result = await mapErrorsK ( await urlStore.loadNamed<any> ( test ),
                         async testLr => {
                           console.log ( '   input', JSON.stringify ( testLr.result ) )
                           const output = await js ( testLr.result )

@@ -12,7 +12,7 @@ export type  ApiCommandContext = HasCurrentDirectory & {
   loadFiles: LoadFilesFn
   postProcessors: ( cached: boolean, directory: string ) => PostProcessor[]
   commentFactoryFn: CommentFactoryFunction
-  urlStore: UrlStore
+  urlStore: ( dir: string ) => UrlStore
   yaml: YamlCapability
 }
 export function apiCommand<Commander, Context extends ApiCommandContext, Config> (): CommandFn<Commander, Context, Config> {
@@ -38,7 +38,7 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
       console.log ( 'debug', debug )
       console.log ( 'cached', cache )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
-        fusionHandlers ( directory.toString (), context.urlStore,
+        fusionHandlers ( directory.toString (), context.urlStore ( directory.toString () ),
           context.fileOps,
           context.loadFiles,
           context.postProcessors ( opts.cache === true, urlStore.toString () ),
