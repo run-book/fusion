@@ -54,7 +54,7 @@ export function validateTransformersCommand<Commander, Config, CleanConfig> ( tc
     }
   }
 }
-export function transformerCommands<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig>, transformNs: NameSpaceDetailsForGit ): SubCommandDetails<Commander, Config, ThereAndBackContext> {
+export function transformerCommands<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig>, transformNs: NameSpaceDetailsForGit ):  SubCommandDetails<Commander, ThereAndBackContext, Config>  {
   return {
     cmd: 'transformer',
     description: 'Transformer commands',

@@ -12,10 +12,11 @@ export const getFusion = ( matchFusion: RegExp, loadFiles: LoadFilesFn, postProc
     isDefinedAt: ( ctx ) => {
       const match = matchFusion.exec ( ctx.context.request.path );
       const isMethodMatch = ctx.context.request.method === 'GET';
-      return match && isMethodMatch;
+      return (match && isMethodMatch) === true;
     },
     apply: async ( ctx ) => {
       const match = matchFusion.exec ( ctx.context.request.path );
+      if (match === null) throw new Error ( 'match is null' )
       const rawFile = match[ 1 ];
       const fullFile = path.join ( parent, rawFile )
       const fileParent = path.dirname ( fullFile )

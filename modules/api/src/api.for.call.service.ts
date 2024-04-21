@@ -5,14 +5,14 @@ import { FileOps } from "@laoban/fileops";
 import { parseNamedUrlOrThrow, UrlStore } from "@itsmworkbench/urlstore";
 import { jsonataTransformer } from "@fusionconfig/jsonata";
 import { doubleXmlVariableDefn } from "@laoban/variables/dist/src/variables";
-
+import fetch from "node-fetch";
 export const matchService = /\/service$/;
 export const callService = ( matchService: RegExp, fileOps: FileOps, urlStore: UrlStore, debug?: boolean ): KoaPartialFunction => {
   return ({
     isDefinedAt: ( ctx ) => {
       const match = matchService.exec ( ctx.context.request.path );
       const isMethodMatch = ctx.context.request.method === 'POST';
-      return match && isMethodMatch;
+      return (match && isMethodMatch)===true;
     },
     apply: async ( ctx ) => {
       const params = ctx.context.request.query || {};

@@ -1,7 +1,7 @@
 {
   "name": "@fusionconfig/sample",
   "description": "These are samples of the data for a schema",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "dist/index",
   "types": "dist/index",
   "browserslist": {
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@laoban/utils": "1.4.49",
-    "@itsmworkbench/urlstore": "0.0.27",
+    "@itsmworkbench/urlstore": "0.0.29",
     "debug": "^4.3.4"
   },
   "devDependencies": {

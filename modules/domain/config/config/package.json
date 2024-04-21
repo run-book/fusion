@@ -1,7 +1,7 @@
 {
   "name": "@fusionconfig/config",
   "description": "the interfaces for the configuration",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "dist/index",
   "types": "dist/index",
   "browserslist": {
@@ -19,11 +19,11 @@
   "dependencies": {
     "@laoban/utils": "1.4.49",
     "@laoban/fileops": "1.4.49",
-    "@itsmworkbench/urlstore": "0.0.27",
+    "@itsmworkbench/urlstore": "0.0.29",
     "debug": "^4.3.4"
   },
   "devDependencies": {
-    "@itsmworkbench/jsyaml": "0.0.27",
+    "@itsmworkbench/jsyaml": "0.0.29",
     "typescript": "^5.2.2",
     "@testing-library/jest-dom": "^6.1.4",
     "@types/jest": "^29.0.0",

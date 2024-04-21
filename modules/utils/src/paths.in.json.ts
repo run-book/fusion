@@ -1,5 +1,4 @@
-import { ErrorsAnd, hasErrors } from "@laoban/utils";
-import { Validate } from "./validate";
+import { ErrorsAnd } from "@laoban/utils";
 
 export type PathsInJson = {
   [ key: string ]: PathsInJson | string;
@@ -108,7 +107,7 @@ export function flatMapPaths<T> ( paths: PathsInJson, fn: ( path: string ) => T[
   }, [] );
 }
 
-export function getPath ( path: string, pathInJson: PathsInJson ): string | PathsInJson {
+export function getPath ( path: string, pathInJson: PathsInJson ): string | PathsInJson | undefined {
   const segments = path.split ( '/' );
   const currentNode = segments.reduce<PathsInJson | string | undefined> (
     ( current, segment ) =>

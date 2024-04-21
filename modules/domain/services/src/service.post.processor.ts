@@ -18,11 +18,11 @@ export function defaultKafkaNameFn ( loadNamed: UrlLoadNamedFn ): KafkaNameFn {
 //where:
 //  services: "service/<service>/<reqOrResp>"
 //we could default this of course, but I like to force it to be explicit
-export function   addKafkaSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostProcessor {
+export function addKafkaSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostProcessor {
   return {
     key: 'services',
     postProcess:
-      async ( full: Merged, services: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
+      async ( full: Merged, services: Merged, params: NameAnd<string>, debug: boolean | undefined ): Promise<ErrorsAnd<Merged>> => {
         if ( debug ) console.log ( 'addKafkaSchemasToServices' )
         if ( typeof services.value !== 'object' ) return [ 'services is not an object' ]
 
@@ -44,13 +44,18 @@ export function   addKafkaSchemasToServices ( kafkaNameFn: KafkaNameFn ): PostPr
           if ( hasErrors ( responseResult ) ) errors.push ( ...responseResult )
         }
         if ( errors.length > 0 ) return [ `Error processing 'addTaskSchemasToServices'`, ...errors ]
+        return full
       }
+
   }
 }
 
-export async function addRequestOrResponseToService ( serviceName: string, service: Merged, requestOrResponse: string, kafkaSchemaString: string, addedBy: string, kafkaNameFn: KafkaNameFn ): Promise<ErrorsAnd<Merged>> {
-  const request = findPartInMerged ( service, requestOrResponse )
-  const requestTopic: Merged = findPartInMerged ( request, 'topic' )
+export async function addRequestOrResponseToService ( serviceName: string, service: Merged | undefined, requestOrResponse: string, kafkaSchemaString: string, addedBy: string, kafkaNameFn: KafkaNameFn ): Promise<ErrorsAnd<Merged>> {
+  if ( service === undefined ) return [ `addRequestToSchema(${serviceName})- No service found` ]
+  const request: Merged | undefined = findPartInMerged ( service, requestOrResponse )
+  if ( request === undefined ) return [ `addRequestToSchema(${serviceName})- No ${requestOrResponse} found` ]
+  const requestTopic: Merged | undefined = findPartInMerged ( request, 'topic' )
+  if ( requestTopic === undefined ) return [ `addRequestToSchema(${serviceName})- No topic found in ${requestOrResponse}` ]
   const topicName = requestTopic.value
   if ( !topicName ) return [ `addRequestToSchema(${serviceName})- No topic found in ${requestOrResponse}` ]
   if ( typeof topicName !== 'string' ) return [ `addRequestToSchema(${serviceName}) ${requestOrResponse}- Topic must be a string but is ${JSON.stringify ( topicName )}` ]

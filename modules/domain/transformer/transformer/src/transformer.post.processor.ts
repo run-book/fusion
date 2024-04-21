@@ -14,7 +14,8 @@ export async function addTransformerToRequestOrResponse (
   const reqResp = findPartInMerged ( task, tx.summary.reqOrResp )
   return addIdAndNameToMergedFromLoadResult ( reqResp, 'transformer', tx.loaded, addedBy )
 }
-function findSchemaName ( context: string, merged: Merged, path: string ): ErrorsAnd<string> {
+function findSchemaName ( context: string, merged: Merged|undefined, path: string ): ErrorsAnd<string> {
+  if ( merged === undefined ) return [ `${context}. No merged found when findSchemaName. Path is ${path}` ]
   const schemaName = findPartInMerged ( merged, path )?.value
   if ( !schemaName ) return [ `${context}. No ${path} found. This should be the name of the schema to use. It probably should have been added by another transformer` ]
   if ( typeof schemaName !== 'string' ) return [ `${context}. The item at ${path}  was not a string. it was ${typeof schemaName}. It should just be the name of the schema to use. It was ${JSON.stringify ( schemaName )}` ]
@@ -79,7 +80,7 @@ export const findCachedOrRawTransMapAndErrors = ( fileOps: FileOps, directory: s
 export function addTransformersToTasks ( findTransMapAndErrors: FindTransMapAndErrors, allowErrors?: boolean ): PostProcessor {
   return {
     key: 'tasks',
-    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
+    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string>, debug: boolean|undefined ): Promise<ErrorsAnd<Merged>> => {
       if ( debug ) console.log ( 'addTransformersToTasks' )
       const loadedTransformers = await findTransMapAndErrors ()
       if ( debug ) console.log ( 'loadedTransformers', JSON.stringify ( loadedTransformers ) )

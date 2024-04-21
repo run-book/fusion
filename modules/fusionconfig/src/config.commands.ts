@@ -5,7 +5,6 @@ import { findPart, flatMap, NameAnd, toArray } from "@laoban/utils";
 import { ThereAndBackContext } from "./context";
 import { defaultCommentOffset, findPartInMerged, loadAndMergeAndYamlParts } from "@fusionconfig/config";
 import { parseParams, permutate } from "@fusionconfig/utils";
-import { cachedUrlLoadFn } from "@fusionconfig/transformer";
 
 
 function fromOpts ( opts: NameAnd<string | boolean> ) {
@@ -87,7 +86,7 @@ export function mergeFilesCommand<Commander, Config, CleanConfig> ( tc: ContextC
         fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( f.file, f.errors ) )
         process.exit ( 1 )
       }
-      if ( postProcessorErrors?.length > 0 ) {
+      if ( postProcessorErrors !== undefined && postProcessorErrors.length > 0 ) {
         console.log ( 'Post Processor Errors:' )
         postProcessorErrors.forEach ( f => console.log ( f ) )
         process.exit ( 1 )
@@ -143,7 +142,7 @@ export function checkPermutationsCommand<Commander, Config, CleanConfig> ( tc: C
           console.log ( '   Errors:' )
           fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( '      ', f.file, f.errors ) )
         }
-        if ( postProcessorErrors?.length > 0 ) {
+        if ( postProcessorErrors && postProcessorErrors?.length > 0 ) {
           console.log ( '   Post Processor Errors:' )
           postProcessorErrors.forEach ( f => console.log ( '      ', f ) )
 
@@ -199,7 +198,7 @@ export function permutateCommand<Commander, Config, CleanConfig> ( tc: ContextCo
           console.log ( '   Errors:' )
           fileDetails.filter ( f => f.errors.length > 0 ).forEach ( f => console.log ( '      ', f.file, f.errors ) )
         }
-        if ( postProcessorErrors?.length > 0 ) {
+        if ( postProcessorErrors !== undefined && postProcessorErrors?.length > 0 ) {
           console.log ( '   Post Processor Errors:' )
           postProcessorErrors.forEach ( f => console.log ( '      ', f ) )
         }
@@ -218,7 +217,7 @@ export function permutateCommand<Commander, Config, CleanConfig> ( tc: ContextCo
         await fileOps.removeFile ( fileName )
         await fileOps.removeFile ( errorFileName )
         await fileOps.removeFile ( jsonFileName )
-        await fileOps.saveFile ( allErrors.length > 0 ? errorFileName : fileName, content )
+        await fileOps.saveFile ( allErrors.length > 0 ? errorFileName : fileName, content || '' )
         if ( allErrors.length === 0 && yaml !== undefined )
           await fileOps.saveFile ( jsonFileName, JSON.stringify ( tc.context.yaml.parser ( yaml ), null, 2 ) )
       } )
@@ -257,7 +256,7 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
       if ( opts.full === true ) {
         console.log ( JSON.stringify ( property === '.' ? sorted : findPartInMerged ( sorted, property ), null, 2 ) )
       } else {
-        const simplified = tc.context.yaml.parser ( yaml )
+        const simplified = tc.context.yaml.parser ( yaml || ''  )
         let result = property == '.' ? simplified : findPart ( simplified, property );
         if ( opts.keys ) {
           if ( typeof result === 'object' )
@@ -276,7 +275,7 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
 }
 
 
-export function configCommands<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): SubCommandDetails<Commander, Config, ThereAndBackContext> {
+export function configCommands<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig> ): SubCommandDetails<Commander, ThereAndBackContext, Config> {
   return {
     cmd: 'config',
     description: 'Config commands',

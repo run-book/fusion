@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { makeCli } from "@itsmworkbench/cli";
+import { makeCli, SubCommandDetails } from "@itsmworkbench/cli";
 import { Commander12 } from "@itsmworkbench/commander12";
 import { hasErrors, reportErrors } from "@laoban/utils";
 import { configCommands } from "./src/config.commands";

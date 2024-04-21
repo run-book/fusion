@@ -1,7 +1,7 @@
 {
   "name": "@fusionconfig/tests",
   "description": "the interface for the tests",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "dist/index",
   "types": "dist/index",
   "browserslist": {
@@ -18,8 +18,8 @@
   },
   "dependencies": {
     "@laoban/utils": "1.4.49",
-    "@itsmworkbench/urlstore": "0.0.27",
-    "@fusionconfig/config": "0.0.7",
+    "@itsmworkbench/urlstore": "0.0.29",
+    "@fusionconfig/config": "0.0.8",
     "debug": "^4.3.4"
   },
   "devDependencies": {

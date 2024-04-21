@@ -11,10 +11,11 @@ export const getAxes = ( fileops: FileOps, yaml: YamlCapability, directory: stri
     isDefinedAt: ( ctx ) => {
       const match = matchAxes.exec ( ctx.context.request.path );
       const isMethodMatch = ctx.context.request.method === 'GET';
-      return match && isMethodMatch;
+      return (match && isMethodMatch)===true;
     },
     apply: async ( ctx ) => {
       const match = matchAxes.exec ( ctx.context.request.path );
+      if (match === null) throw new Error ( 'match is null' )
       const rawFile = match[ 1 ];
       const configFileName = path.join ( directory, rawFile )
       const config = await fileops.loadFileOrUrl ( configFileName )

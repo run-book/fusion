@@ -22,7 +22,7 @@ export function listTestsCommand<Commander, Context extends TestContext, Config,
 }
 
 
-export function testCommands<Commander, Context extends TestContext, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, Context, Config, CleanConfig> ): SubCommandDetails<Commander, Config, Context> {
+export function testCommands<Commander, Context extends TestContext, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, Context, Config, CleanConfig> ): SubCommandDetails<Commander, Context, Config> {
   return {
     cmd: 'tests',
     description: 'Test commands',

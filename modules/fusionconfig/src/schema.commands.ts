@@ -2,8 +2,8 @@ import { CommandDetails, ContextConfigAndCommander, SubCommandDetails } from "@i
 
 import { ThereAndBackContext } from "./context";
 import { NamedUrl, NameSpaceDetailsForGit, UrlQuery } from "@itsmworkbench/urlstore";
-import { hasErrors, mapErrorsK, mapK, reportErrors } from "@laoban/utils";
-import { schemaPathRequestToNamedUrl } from "@fusionconfig/schema";
+import { hasErrors, mapErrorsK, reportErrors } from "@laoban/utils";
+import { schemaPathRequestToNamedUrl, schemaPathRequestToUrlQuery } from "@fusionconfig/schema";
 import { ListNamesResult, parseNamedUrlOrThrow } from "@itsmworkbench/urlstore/";
 import { samplePathToUrlQueryRequest, schemaNamedUrlAndNameToInputUrl } from "@fusionconfig/sample";
 import { findCachedOrRawTransMapAndErrors, TransAndMeta } from "@fusionconfig/transformer";
@@ -21,6 +21,23 @@ export function viewSchema<Commander, Config, CleanConfig> ( tc: ContextConfigAn
       const { directory, debug } = opts
       const url = schemaPathRequestToNamedUrl ( path as string )
       const schema = await tc.context.urlStore.loadNamed ( parseNamedUrlOrThrow ( url ) )
+      console.log ( JSON.stringify ( schema, null, 2 ) )
+      if ( hasErrors ( schema ) ) process.exit ( 2 )
+    }
+  }
+}
+export function listSchemas<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig>, transformNs: NameSpaceDetailsForGit ): CommandDetails<Commander> {
+  return {
+    cmd: 'list [path]',
+    description: 'lists the schemas at the path (defaults to root)',
+    options: {
+      '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: tc.context.currentDirectory },
+      '--debug': { description: 'Show debug information' },
+    },
+    action: async ( _, opts, path ) => {
+      const { directory, debug } = opts
+      const query = schemaPathRequestToUrlQuery ( path as string )
+      const schema = await tc.context.urlStore.list ( query )
       console.log ( JSON.stringify ( schema, null, 2 ) )
       if ( hasErrors ( schema ) ) process.exit ( 2 )
     }
@@ -50,9 +67,9 @@ export function testReqSchema<Commander, Config, CleanConfig> ( tc: ContextConfi
           mapErrorsK ( await tc.context.urlStore.list ( taskSamples ), async taskSamples =>
             mapErrorsK ( await tc.context.urlStore.list ( serviceSamples ), async serviceSamples => {
 
-              const txUrl: TransAndMeta = mapped[ taskSchemaUrl.url ]?.[ serviceSchemaUrl.url ]
+              const txUrl: TransAndMeta | undefined = taskSchemaUrl?.url !== undefined && serviceSchemaUrl?.url !== undefined ? mapped[ taskSchemaUrl.url ]?.[ serviceSchemaUrl.url ] : undefined
               if ( debug ) {
-                console.log ( 'txUrl', taskSchemaUrl.url, serviceSchema.url, JSON.stringify ( txUrl.url.url ) )
+                console.log ( 'txUrl', taskSchemaUrl.url, serviceSchema.url, JSON.stringify ( txUrl?.url?.url ) )
                 console.log ( 'task schema url', JSON.stringify ( taskSchemaUrl ) )
                 console.log ( 'task schema', JSON.stringify ( taskSchema ) )
                 console.log ( 'service schema url', JSON.stringify ( serviceSchemaUrl ) )
@@ -117,12 +134,13 @@ export function testReqSchema<Commander, Config, CleanConfig> ( tc: ContextConfi
     }
   }
 }
-export function schemaCommands<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig>, transformNs: NameSpaceDetailsForGit ): SubCommandDetails<Commander, Config, ThereAndBackContext> {
+export function schemaCommands<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, ThereAndBackContext, Config, CleanConfig>, transformNs: NameSpaceDetailsForGit ): SubCommandDetails<Commander, ThereAndBackContext, Config> {
   return {
     cmd: 'schema',
     description: 'Schema commands',
     commands: [
       testReqSchema<Commander, Config, CleanConfig> ( tc, transformNs ),
+      listSchemas<Commander, Config, CleanConfig> ( tc, transformNs ),
       viewSchema<Commander, Config, CleanConfig> ( tc, transformNs ),
     ]
   }

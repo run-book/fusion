@@ -13,7 +13,7 @@ export function parseParams ( params: string | boolean ) {
       const [ key, value ] = pair.split ( '=' )
       acc[ key ] = value
       return acc
-    }, {} )
+    }, {} as any )
   }
   return {}
 }

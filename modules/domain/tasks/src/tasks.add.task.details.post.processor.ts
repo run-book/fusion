@@ -22,7 +22,7 @@ import { SchemaNameFn } from "./tasks.schema.names";
 export function addTaskDetails ( nameFn: SchemaNameFn ): PostProcessor {
   return {
     key: 'tasks',
-    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string>, debug: boolean ): Promise<ErrorsAnd<Merged>> => {
+    postProcess: async ( full: Merged, tasks: Merged, params: NameAnd<string>, debug: boolean | undefined ): Promise<ErrorsAnd<Merged>> => {
       if ( debug ) console.log ( 'addTaskDetails' )
 
       if ( typeof tasks.value !== 'object' ) return [ 'tasks is not an object' ]
@@ -42,12 +42,13 @@ export function addTaskDetails ( nameFn: SchemaNameFn ): PostProcessor {
       const errors: string[] = []
       for ( let taskName of taskNames ) {
         const task = findPartInMerged ( tasks, taskName )
+        if ( task === undefined ) throw new Error ( `Task ${taskName} not found in tasks` )
         const serviceName = findPartInMerged ( task, 'service' )?.value
         if ( !serviceName ) errors.push ( `No service found for tasks ${taskName}. This is mandatory field: we need to know which service will be providing the task` )
         else if ( typeof serviceName !== 'string' ) errors.push ( `The service found for tasks ${taskName} was not a string. It should just be the service name. It was ${JSON.stringify ( serviceName )}` )
         else {
           const service = findPartInMerged ( services, serviceName )
-          if ( !service ) errors.push ( `Service ${serviceName} not found for task ${taskName}. This was added by the file ${task.files} at tasks.${taskName}.service` )
+          if ( !service ) errors.push ( `Service ${serviceName} not found for task ${taskName}. This was added by the file ${task?.files} at tasks.${taskName}.service` )
           else {
             const serviceDetails = addAllFieldsInMergedToMerge ( task, service, 'addTaskSchemasToServices' )
             if ( hasErrors ( serviceDetails ) ) errors.push ( ...serviceDetails )
@@ -61,6 +62,7 @@ export function addTaskDetails ( nameFn: SchemaNameFn ): PostProcessor {
         }
       }
       if ( errors.length > 0 ) return [ `Error processing 'addTaskSchemasToServices'`, ...errors ]
+      return full
     }
   }
 }

@@ -2,7 +2,7 @@ import { NameAnd, toArray } from "@laoban/utils";
 
 export type MergeInput = {
   file: string
-  yaml: any
+  yaml: any | undefined
 }
 
 export interface Merged {
@@ -13,12 +13,13 @@ export function isMerged ( obj: any ): obj is Merged {
   return obj?.value !== undefined && obj?.files !== undefined
 }
 
-export function findPartInMerged ( dic: Merged, ref: string ): Merged | undefined {
+export function findPartInMerged ( dic: Merged | undefined, ref: string ): Merged | undefined {
+  if ( dic === undefined ) return undefined
   if ( ref === undefined ) return undefined
   if ( ref === '' ) return dic
   const parts = ref.split ( '.' )
   try {
-    return parts.reduce ( ( acc, part ) => acc?.value?.[ part ], dic )
+    return parts.reduce ( ( acc, part ) => (acc?.value as any)?.[ part ], dic )
   } catch ( e ) {return undefined}
 }
 
@@ -91,7 +92,7 @@ export function mergePrimitiveInto ( acc: Merged, input: MergeInput ): Merged {
 }
 
 
-export function merge ( acc: Merged | undefined, input: MergeInput ): Merged {
+export function merge ( acc: Merged , input: MergeInput ): Merged {
   // if ( acc.value === undefined ) return { value: input.yaml, files: [ input.file ] }
   if ( Array.isArray ( input.yaml ) ) return postProcessArray ( mergeArrayInto ( acc, input ) )
   if ( typeof input.yaml === 'object' ) return mergeObjectInto ( acc, input )

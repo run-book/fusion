@@ -1,7 +1,7 @@
 {
   "name": "@fusionconfig/i18n",
   "description": "Internationalization library for FusionConfig",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "browserslist": {
     "development": [
       "last 1 chrome version",
