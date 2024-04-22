@@ -6,18 +6,22 @@ import { ErrorsAnd, hasErrors, NameAnd } from "@laoban/utils";
 import { ReqRespAction } from "../state/test.selection";
 import { TestsResult } from "@fusionconfig/tests";
 import { TestTable } from "./tests.view";
+import { Typography } from "@mui/material";
 
+export function trimName(name: string){
+  return name.substring(5)
+}
 
-export type TestSummaryProps<S> = LensProps2<S, ReqRespAction, string, any> & { taskName: string,task?: Task, testResult: ErrorsAnd<TestsResult> | undefined }
+export type TestSummaryProps<S> = LensProps2<S, ReqRespAction, string, any> & { taskName: string, task?: Task, testResult: ErrorsAnd<TestsResult> | undefined }
 export function TestSummary<S> ( { state, taskName, testResult, task }: TestSummaryProps<S> ) {
   if ( task === undefined ) return <div>No task</div>
   if ( testResult === undefined ) return <div>No tests</div>
 
   if ( hasErrors ( testResult ) ) return <pre>{JSON.stringify ( testResult, null, 2 )}</pre>
   return <>
-    Request {taskName} ===&gt; {task.service}. I/P samples in {task.request.schema.name}. O/P samples in {task.request.kafka.name}
+    <Typography>Request: {taskName} ({trimName(task.request.schema.name)}) ===&gt; {task.service} ({trimName(task.request.kafka.name)}).</Typography>
     <TestTable tests={testResult.tests}/>
-    Response {taskName} &lt;=== {task.service}. I/P samples in {task.response.kafka.name}. O/P samples in {task.response.schema.name}
+    <Typography>Response: {taskName} ({trimName(task.response.schema.name)}) &lt;=== {task.service} ({trimName(task.response.kafka.name)}).</Typography>
     <TestTable tests={testResult.tests}/>
     {/*<pre>{JSON.stringify ( testResult, null, 2 )}</pre>*/}
 

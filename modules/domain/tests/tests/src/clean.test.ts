@@ -8,8 +8,8 @@ export const cleanTest = ( list: UrlListFn ): CleanFn => async ( defn: RunTestsD
   return mapErrorsK ( parseNamedUrlOrErrors ( defn.schema.input ), inpSchema =>
     mapErrorsK ( parseNamedUrlOrErrors ( defn.schema.output ), async outSchema =>
       mapErrorsK ( parseNamedUrlOrErrors ( defn.transformer ), async transformer =>
-        mapErrors ( await list ( schemaToTestQuery ( inpSchema, 'input_sample' ) ), async inpTests =>
-          mapErrors ( await list ( schemaToTestQuery ( outSchema, 'output_sample' ) ), async outTests =>
+        mapErrors ( await list ( schemaToTestQuery ( inpSchema ) ), async inpTests =>
+          mapErrors ( await list ( schemaToTestQuery ( outSchema ) ), async outTests =>
             ({
               schema: { input: inpSchema, output: outSchema },
               transformer,

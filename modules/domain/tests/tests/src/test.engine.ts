@@ -1,6 +1,6 @@
 import { ErrorsAnd, hasErrors, mapErrors, mapErrorsK, mapK } from "@laoban/utils";
 import { TestEngine, TransformerFn } from "./test.engine.domain";
-import { OneTestResult, RanTestResult, RunTestsDefn, SchemaTestResult, TestInExpectedActualOut, TestInOut, TestResults, TestsResult, TransformerTestResult } from "./test.domain";
+import { OneTestResult, RanTestResult, ReqRespTestsResult, RunReqRespTests, RunReqRespTestsDefn, RunTestsDefn, SchemaTestResult, TestInExpectedActualOut, TestInOut, TestResults, TestsResult, TransformerTestResult } from "./test.domain";
 import { NamedUrl, UrlLoadNamedFn } from "@itsmworkbench/urlstore";
 import { schemaNameToTestName } from "./schema.to.test.mapping";
 import { NamedLoadResult } from "@itsmworkbench/urlstore/dist/src/url.load.and.store";
@@ -52,8 +52,8 @@ export async function valuesToTestResults ( engine: TestEngine, schemas: TestInO
 }
 
 async function runOneTest ( engine: TestEngine, schemasAndTx: SchemasAndTransformer, test: MergedTest ): Promise<OneTestResult> {
-  const inpTestName: NamedUrl | undefined = schemaNameToTestName ( 'input_sample' ) ( schemasAndTx.schemaNames.input, test.input )
-  const outTestName: NamedUrl | undefined = schemaNameToTestName ( 'output_sample' ) ( schemasAndTx.schemaNames.output, test.output )
+  const inpTestName: NamedUrl | undefined = schemaNameToTestName ( schemasAndTx.schemaNames.input, test.input )
+  const outTestName: NamedUrl | undefined = schemaNameToTestName ( schemasAndTx.schemaNames.output, test.output )
 
   let result = await mapErrorsK ( await loadTestValues ( engine, schemasAndTx.tx, inpTestName, outTestName ),
     async values => mapErrors ( await valuesToTestResults ( engine, schemasAndTx.schemas, values ),
@@ -94,3 +94,10 @@ export const runTestsUsingEngine = ( engine: TestEngine ) =>
           return testResult
         } )
     } )
+
+export const runReqRespTestsUsingEngine = ( engine: TestEngine ): RunReqRespTests =>
+  async ( defn: RunReqRespTestsDefn ): Promise<ErrorsAnd<ReqRespTestsResult>> =>
+    mapErrorsK ( await runTestsUsingEngine ( engine ) ( defn.request ), async request =>
+      mapErrors ( await runTestsUsingEngine ( engine ) ( defn.response ), response =>
+        ({ request, response }) ) )
+

@@ -1,6 +1,17 @@
 import { NamedUrl } from "@itsmworkbench/urlstore";
 import { ErrorsAnd } from "@laoban/utils";
 
+export type RunReqRespTests = ( defn: RunReqRespTestsDefn ) => Promise<ErrorsAnd<ReqRespTestsResult>>
+
+export type RunReqRespTestsDefn = {
+  request: RunTestsDefn
+  response: RunTestsDefn
+}
+export type ReqRespTestsResult = {
+  request: TestsResult
+  response: TestsResult
+}
+
 export type RunTests = ( defn: RunTestsDefn ) => Promise<ErrorsAnd<TestsResult>>
 
 export type CleanFn = ( defn: RunTestsDefn ) => Promise<ErrorsAnd<CleanRunTestsDefn>>
