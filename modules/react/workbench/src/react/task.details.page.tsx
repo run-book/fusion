@@ -65,20 +65,20 @@ let fontSize = '0.5rem';
 export function RequestSummary<S> ( { state }: ReqOrRespSummaryProps<S> ) {
   return <Stack direction='row' spacing={0.5} sx={{ alignItems: 'center', justifyContent: 'space-around', padding: 1, }}> {/* Adjust spacing and padding as needed */}
     <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Task Request Schema' valueToSet={taskRequestInput} state={state}/>
-    &gt;
+    &nbsp;&gt;&nbsp;
     <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Transform' valueToSet={requestTranform} state={state}/>
-    &gt;
+    &nbsp;&gt;&nbsp;
     <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Service Request Schema' valueToSet={serviceRequestInput} state={state}/>
-    &gt;
+    &nbsp;&gt;&nbsp;
   </Stack>
 }
 export function ResponseSummary<S> ( { state }: ReqOrRespSummaryProps<S> ) {
   return <Stack direction='row' spacing={0.5} sx={{ alignItems: 'center', justifyContent: 'space-around', padding: 1 }}> {/* Adjust spacing and padding as needed */}
-    &lt;
+    &nbsp;&lt;&nbsp;
     <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Task Response Schema' valueToSet={taskResponseOutput} state={state}/>
-    &lt;
+    &nbsp;&lt;&nbsp;
     <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Transform' valueToSet={responseTransform} state={state}/>
-    &lt;
+    &nbsp;&lt;&nbsp;
     <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Service Response Schema' valueToSet={serviceResponseOutput} state={state}/>
   </Stack>
 }

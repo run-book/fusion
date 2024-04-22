@@ -1,16 +1,16 @@
-import { isCannotRunTestResult, isRanTestResult, NameAndSchema, NameAndValueAndSchemaResult, OneTestResult, RanTestResult, RanTestSchemaName } from "@fusionconfig/tests";
+import { isCannotRunTestResult, isRanTestResult, NameAndSchema, NameAndValueAndSchemaResult, OneTestResult, RanTestResult, RanTestSchemaName, SchemaTestError, SchemaTestResult } from "@fusionconfig/tests";
 import { Grid } from "@mui/material";
 import React, { useState } from "react";
-import { CardWithTitleAndBody, DataTable, DisplayJson } from "@fusionconfig/react_components";
+import { CardWithTitleAndBody, DataTable } from "@fusionconfig/react_components";
 import { flatMap, lastSegment } from "@laoban/utils";
-import { useRoute } from "@fusionconfig/react_routing";
 
 export type SchemaViewLayoutProps = {
   samples: React.ReactElement
   sample: React.ReactElement
   schema: React.ReactElement
+  errors: React.ReactElement
 }
-export function SchemaViewLayout ( { samples, sample, schema }: SchemaViewLayoutProps ) {
+export function SchemaViewLayout ( { samples, sample, schema, errors }: SchemaViewLayoutProps ) {
   return <Grid container spacing={2}>
     <Grid item xs={12} sm={12} md={4}>
       {schema}
@@ -20,6 +20,9 @@ export function SchemaViewLayout ( { samples, sample, schema }: SchemaViewLayout
     </Grid>
     <Grid item xs={12} sm={6} md={4}>
       {sample}
+    </Grid>
+    <Grid item xs={12} sm={12} md={12}>
+      {errors}
     </Grid>
   </Grid>
 }
@@ -47,11 +50,23 @@ export type SampleProps = {
 }
 export function Sample ( { nvsr }: SampleProps ) {
   if ( nvsr === undefined ) return <></>
-  return <>{nvsr.name?.name}
+  return <>
     <pre>{JSON.stringify ( nvsr.value, null, 2 )}</pre>
   </>
-
 }
+
+export type SchemaErrorsProps = {
+  errors?: SchemaTestResult
+}
+
+export function SchemaErrors ( { errors }: SchemaErrorsProps ) {
+  const cols = [ 'Path', 'Message' ]
+
+  let errArray: SchemaTestError[] = errors === undefined ? [] : errors as SchemaTestError[];
+  const rows = errArray.map ( ( e: SchemaTestError ) => [ e.path, e.message ] )
+  return <DataTable rows={rows} cols={cols} noData={<div>No errors</div>}/>
+}
+
 export function SchemaView ( { nameAndSchema, tests, result }: SchemaViewProps ) {
   const initialRow = tests !== undefined && tests.length > 0 ? 0 : undefined
   const [ row, setRow ] = useState<number | undefined> ( initialRow )
@@ -68,5 +83,6 @@ export function SchemaView ( { nameAndSchema, tests, result }: SchemaViewProps )
                                                       rows={makeRows ( tests, result )}
                                                       noData={<div>No samples</div>}></DataTable>}/>}
       sample={<CardWithTitleAndBody title={`Sample ${nvsr?.name?.name}`} comp={<Sample nvsr={nvsr}/>}/>}
+      errors={<CardWithTitleAndBody title={`Errors`} comp={<SchemaErrors errors={nvsr?.result}/>}/>}
     /> </>
 }
