@@ -10,6 +10,7 @@ import { ReqRespTestsResult, RunReqRespTestsDefn, RunTestsDefn, TestsResult } fr
 
 export type SelectionState = {
   route?: string
+  routeTemplateName?: string
   task?: string
   requestResponse?: ReqRespAction
   testName?: string
@@ -75,8 +76,9 @@ export type FusionWorkbenchState = {
 }
 
 export const idL = Lenses.identity<FusionWorkbenchState> ()
-const selectionL = idL.focusQuery ( 'selectionState' );
+export const selectionL = idL.focusQuery ( 'selectionState' );
 export const taskL = selectionL.focusQuery ( 'task' )
+export const routeTemplateNameL = selectionL.focusQuery ( 'routeTemplateName' )
 export const testNameL = selectionL.focusQuery ( 'testName' )
 export const testL: Optional<FusionWorkbenchState, ErrorsAnd<ReqRespTestsResult>> = idL.focusQuery ( 'tests' )
 export const requestResponseL = selectionL.focusQuery ( 'requestResponse' )

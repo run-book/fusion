@@ -3,8 +3,8 @@ import { addEventStoreListener, EventStore, eventStore, setEventStoreValue } fro
 import { LensProps, LensState, lensState } from '@focuson/state';
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
-import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, requestResponseL, routeL, tagsL, taskL, taskToRunDefn, testL, testNameL } from "./state/fusion.state";
-import { getQueryParams, makeSearchString, Route, RouteDebug, RouteProvider, RouteVars } from "@fusionconfig/react_routing";
+import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, requestResponseL, routeL, routeTemplateNameL, selectionL, tagsL, taskL, taskToRunDefn, testL, testNameL } from "./state/fusion.state";
+import { calculateRoute, getQueryParams, makeSearchString, placeRouteInto, Route, RouteDebug, RouteProvider, RouteVars, RoutingData } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
 import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
 import { ErrorsAnd, hasErrors, mapObject, NameAnd, toArray } from "@laoban/utils";
@@ -22,6 +22,7 @@ import { ReqRespAction, reqRespOptions } from "./state/test.selection";
 import { ReqRespTestsResult } from "@fusionconfig/tests";
 import { browserTestsRun } from "@fusionconfig/browsertests/src/browser.tests";
 import { HomePage } from "./react/home.page";
+import { Optional } from "@focuson/lens";
 
 
 const rootElement = document.getElementById ( 'root' );
@@ -34,6 +35,21 @@ const nameSpaceDetails: NameAnd<NameSpaceDetails> = allDomainDetails ( yaml )
 
 const urlStoreconfig: UrlStoreApiClientConfig = { apiUrlPrefix: rootUrl + "url", details: nameSpaceDetails }
 const urlStore = urlStoreFromApi ( urlStoreconfig )
+
+
+const routingData: RoutingData<FusionWorkbenchState> = {
+  selectionO: routeTemplateNameL,
+  templates: {
+    folders: '/folders',
+    task: '/task/{task}/{action}',
+    home: '/',
+  },
+  optionals: {
+    task: taskL,
+    action: requestResponseL as Optional<FusionWorkbenchState, string>,
+  },
+  parametersO: paramsL
+}
 
 const logForDeps: FCLogRecord<any, any>[] = []
 const tagStore = optionalTagStore ( tagsL );
@@ -64,9 +80,8 @@ const legalParams = depData ( 'legalParams', legalParamsL, {
 
 const params = depData ( 'params', paramsL, legalParams, {
   tag: ( o: NameAnd<string> ) => JSON.stringify ( o ),
-  clean: ( legalParams ) => {
-    const fromUrl = getQueryParams ( window.location.search )
-    if ( Object.keys ( fromUrl ).length > 0 ) return fromUrl
+  clean: ( original, legalParams ) => {
+    if ( original !== undefined ) return original
     if ( legalParams === undefined ) return undefined as any
     return mapObject ( legalParams, ( v, name ) => v[ 0 ] );
   },
@@ -93,16 +108,12 @@ const config = depData ( 'config', configL, rawConfig, {
 
 const legalTasks = depData ( 'configLegalData', configLegalTasksL, rawConfig, config, {
   tag: ( o: string[] ) => o,
-  clean: ( rawConfig, config: any ) => config?.tasks === undefined ? undefined as any as string[] : Object.keys ( config?.tasks ),
+  clean: ( orig, rawConfig, config: any ) => config?.tasks === undefined ? undefined as any as string[] : Object.keys ( config?.tasks ),
 } )
 
 const task = depData ( 'task', taskL, {
   tag: ( o: string ) => o,
-  clean: () => {
-    const path = window.location.pathname
-    if ( path.startsWith ( '/task/' ) ) return path.substring ( 6 )
-    return undefined as any as string
-  }
+  clean: 'leave'
 } )
 const requestResponse = depData ( 'requestResponse', requestResponseL, {
   tag: ( o: ReqRespAction ) => o,
@@ -129,7 +140,9 @@ const tests = depData ( 'tests', testL, config, task, {
 
 const route = depData ( 'route', routeL, task, params, requestResponse, {
   tag: ( o: string ) => o,
-  clean: ( task: string, params: NameAnd<string>, reqRes ) => {
+  clean: ( _, task: string, params: NameAnd<string>, reqRes ) => {
+    const route = calculateRoute ( routingData, container.state )
+    console.log ( 'calculated route', route )
     const rawSearchString = makeSearchString ( params )
     const search = params === undefined ? window.location.search : `?${rawSearchString}`
     const repResString = reqRes === undefined ? 'Summary' : `${reqRes}`
@@ -161,8 +174,8 @@ addEventStoreListener ( container, (( _, s ) => {
   return root.render ( <App state={state}/> );
 }) )
 
-function homeClick<S> ( state: LensState<S, string, any> ) {
-  return () => state.setJson ( undefined as any as string, '' )
+function homeClick<S> ( state: LensState<S, any, any> ) {
+  return () => state.setJson ( undefined as any, '' )
 }
 function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, any> ) {
   const devMode = state.optJson ()?.debug?.devMode;
@@ -173,7 +186,7 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
     <RouteProvider state={state.copyWithLens ( routeL )}>
       <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '600px' }}>
         <WorkbenchLayout
-          clickHome={homeClick ( state.chainLens ( taskL ) )}
+          clickHome={homeClick ( state.chainLens ( selectionL ) )}
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
           Details={<FusionDetails state={state}/>}>
@@ -186,12 +199,20 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
           }</RouteVars>
           {devMode && <DevMode state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )}
                                extra={{ route: <RouteDebug/> }}
-                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters', 'parameters', 'config', 'tests', 'configLegalData', 'tags', 'depDataLog', 'debug' ]}/>}
+                               titles={[ 'selectionState', 'folders', 'rawConfig', 'legal_parameters',
+                                 'parameters', 'config', 'legalTasks', 'tests', 'configLegalData', 'tags', 'depDataLog', 'debug' ]}/>}
         </WorkbenchLayout>
       </SizingContext.Provider>
     </RouteProvider>)
 }
 
+const startState: FusionWorkbenchState = {
+  selectionState: { requestResponse: reqRespOptions[ 0 ] },
+  tags: {}, depDataLog: [],
+  debug: { depData: true },
+}
+const withRoute = placeRouteInto ( routingData, window.location.pathname + window.location.search, startState )
+console.log ( 'withRoute', withRoute )
 let parameters: NameAnd<string> | undefined = getQueryParams ( window.location.search )
 if ( Object.keys ( parameters ).length === 0 ) parameters = undefined
 setJson ( {

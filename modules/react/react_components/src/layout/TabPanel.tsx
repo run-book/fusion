@@ -47,12 +47,14 @@ export function TabsContainer<S, M, C> ( props: TabsContainerProps<S, M, C> ) {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: props.height }}>
-      <Tabs value={activeTab} onChange={handleChange} aria-label={label}>
-        {childrenArray.map ( ( child, index ) => (
-          <Tab label={child.props.title} key={child.props.title}/>
-        ) )}
-      </Tabs>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: props.height, overflowX: 'auto' }}>
+      <Box sx={{ minWidth: 'max-content' }}> {/* Encapsulate Tabs in a Box that can grow in width */}
+        <Tabs value={activeTab} onChange={handleChange} aria-label={label} variant="scrollable" scrollButtons="auto">
+          {childrenArray.map((child, index) => (
+            <Tab label={child.props.title} key={child.props.title} />
+          ))}
+        </Tabs>
+      </Box>
       <Box sx={{ height: '100%' }}>
         {/* Ensure the selected TabPanel is rendered here and is the only part scrollable */}
         {React.cloneElement ( childrenArray[ activeTab ], { key: activeTab } )}

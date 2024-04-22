@@ -10,10 +10,10 @@ export interface DependentItem<S, T> {
 
 
 export type PrimitiveCleanOperation = 'nuke' | 'leave'
-export type CleanFn0<T> = () => T
-export type CleanFn1<T, T1> = ( t: T1 ) => T
-export type CleanFn2<T, T1, T2> = ( t1: T1, t2: T2 ) => T
-export type CleanFn3<T, T1, T2, T3> = ( t1: T1, t2: T2, t3: T3 ) => T
+export type CleanFn0<T> = ( t: T | undefined ) => T
+export type CleanFn1<T, T1> = ( t: T | undefined, t1: T1 ) => T
+export type CleanFn2<T, T1, T2> = ( t: T | undefined, t1: T1, t2: T2 ) => T
+export type CleanFn3<T, T1, T2, T3> = ( t: T | undefined, t1: T1, t2: T2, t3: T3 ) => T
 export type CleanOperation<T> = PrimitiveCleanOperation | CleanFn0<T> | CleanFn1<T, any> | CleanFn2<T, any, any> | CleanFn3<T, any, any, any>
 
 export type RootDepend<T> = {
@@ -74,12 +74,13 @@ export function cleanValue<S, T> ( di: DependentItem<S, T>, s: S, params: any[] 
   const d = di.dependsOn
   const clean = d.clean
   if ( clean === 'nuke' ) return undefined as any
-  if ( clean === 'leave' ) return di.optional.getOption ( s )
+  let currentValue = di.optional.getOption ( s );
+  if ( clean === 'leave' ) return currentValue
   if ( typeof d.clean === 'function' ) {
-    if ( isDependsOn3<S, T, any, any, any> ( d ) ) return d.clean ( params[ 0 ], params[ 1 ], params[ 2 ] )
-    if ( isDependsOn2<S, T, any, any> ( d ) ) return d.clean ( params[ 0 ], params[ 1 ] )
-    if ( isDependsOn1<S, T, any> ( d ) ) return d.clean ( params[ 0 ] )
-    if ( isRootDepend<S, T> ( d ) ) return d.clean ()
+    if ( isDependsOn3<S, T, any, any, any> ( d ) ) return d.clean ( currentValue, params[ 0 ], params[ 1 ], params[ 2 ] )
+    if ( isDependsOn2<S, T, any, any> ( d ) ) return d.clean ( currentValue, params[ 0 ], params[ 1 ] )
+    if ( isDependsOn1<S, T, any> ( d ) ) return d.clean ( currentValue, params[ 0 ] )
+    if ( isRootDepend<S, T> ( d ) ) return d.clean ( currentValue )
   }
   throw new Error ( 'Unknown clean' + JSON.stringify ( di ) )
 }
