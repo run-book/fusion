@@ -3,8 +3,8 @@ import Grid from '@mui/material/Grid';
 import { LensProps, LensState } from "@focuson/state";
 import { NameAnd } from "@laoban/utils";
 
-export type ResponsiveSelectableGridProps<S, T> = LensProps<S, string, any> & {
-  state?: LensState<S, T, any>;
+export type ResponsiveSelectableGridProps<S, T> = {
+  state?: LensState<S, string, any>;
   items: NameAnd<T>
   children: ( name: string, t: T ) => React.ReactElement
 }
