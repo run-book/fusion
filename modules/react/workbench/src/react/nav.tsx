@@ -4,8 +4,8 @@ import EventIcon from '@mui/icons-material/Event';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import React from "react";
 import { Box } from "@mui/material";
-import { configLegalTasksL, FusionWorkbenchState, requestResponseL, routeL, taskL } from "../state/fusion.state";
-import { FocusOnSetValueButton, FocusOnToggleButton, Loading, MultipleSelects, SingleSelect, SingleSelectWithOptions } from "@fusionconfig/react_components";
+import { configLegalTasksL, FusionWorkbenchState, requestResponseL, routeL, routeTemplateNameL, taskL } from "../state/fusion.state";
+import { FocusOnSetValueButton, FocusOnToggleButton, Loading, MultipleSelects, SelectWhenIdIsName, SingleSelect, SingleSelectWithOptions } from "@fusionconfig/react_components";
 import { NameAnd } from "@laoban/utils";
 import { HideNavButton } from "@fusionconfig/react_components/src/buttons/hide.nav.button";
 import { reqRespOptions } from "../state/test.selection";
@@ -35,8 +35,14 @@ export function FusionNav<S> ( { state }: LensProps<S, FusionWorkbenchState, any
       <MultipleSelects state={paramsState}/>}</Loading></HideNavButton>
     <HideNavButton title='Tasks'><Loading state={paramsState.state2 ()}>{_ =>
       <>
-        <SingleSelect name='tasks' state={state.doubleUp ().chain1 ( configLegalTasksL ).chain2 ( taskL )}/>
-        <SingleSelectWithOptions name='requestOrResponse' state={state.chainLens ( requestResponseL )} options={reqRespOptions}/>
+        <SelectWhenIdIsName name='tasks'
+                            onClick={( task ) => state.doubleUp ().chain1 ( taskL ).chain2 ( routeTemplateNameL ).setJson ( task, 'task', 'nav' )}
+                            selected={state.chainLens ( taskL ).optJson ()}
+                            options={state.chainLens ( configLegalTasksL ).optJsonOr ( [] )}/>
+        <SelectWhenIdIsName name='requestOrResponse'
+                            selected={state.chainLens ( requestResponseL ).optJson ()}
+                            onClick={( reqRes ) => state.chainLens ( requestResponseL ).setJson ( reqRes as any, 'nav' )}
+                            options={reqRespOptions}/>
       </>
     }</Loading></HideNavButton>
     <FocusOnToggleButton aria-label='Toggle Developer Mode' startIcon={<DeveloperModeIcon/>} state={state.focusOn ( 'debug' ).focusOn ( 'devMode' )} sx={buttonSx}>Developer Mode</FocusOnToggleButton>

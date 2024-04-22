@@ -4,19 +4,20 @@ import { LensProps, LensProps2 } from "@focuson/state";
 import { splitAndCapitalize } from "@itsmworkbench/utils";
 import { NameAnd, safeArray } from "@laoban/utils";
 
-export type SelectWhenIdIsNameProps<S> = LensProps<S, string, any> & {
-  purpose: string
+export type SelectWhenIdIsNameProps<S> = {
+  selected: string | undefined
+  onClick?: ( key: string ) => void
+  name: string
   options: string[] // In this case the id is the name
 }
-export function SelectWhenIdIsName<S> ( { state, purpose, options }: SelectWhenIdIsNameProps<S> ) {
-  const selected = state.optJson ()
+export function SelectWhenIdIsName<S> ( { selected, onClick, name, options }: SelectWhenIdIsNameProps<S> ) {
   return <Select
     value={selected || ''}
-    onChange={e => state.setJson ( e.target?.value, 'Selectit' )}
-    aria-label={`Select${purpose ? ' ' + purpose : ''}`}
+    onChange={e => onClick && onClick ( e.target?.value )}
+    aria-label={`Select ${name ? ' ' + name : ''}`}
     displayEmpty
     fullWidth
-  ><MenuItem disabled value=""> <em>Please select a {purpose}</em> </MenuItem>
+  ><MenuItem disabled value=""> <em>Please select a {name}</em> </MenuItem>
     {options.map ( ( option ) => (
       <MenuItem key={option} value={option}>{splitAndCapitalize ( option )}</MenuItem>
     ) )}</Select>
@@ -43,7 +44,7 @@ export function SingleSelectWithOptions<S, T extends any> ( { name, state, optio
         );
       } )}
     </Select>
-  }catch(e: any){
+  } catch ( e: any ) {
     return <div>Error: {e}</div>
   }
 }

@@ -174,8 +174,8 @@ addEventStoreListener ( container, (( _, s ) => {
   return root.render ( <App state={state}/> );
 }) )
 
-function homeClick<S> ( state: LensState<S, any, any> ) {
-  return () => state.setJson ( undefined as any, '' )
+function homeClick<S,T> ( state: LensState<S, T, any>, t: T ) {
+  return () => state.setJson ( t, '' )
 }
 function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, any> ) {
   const devMode = state.optJson ()?.debug?.devMode;
@@ -186,7 +186,7 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
     <RouteProvider state={state.copyWithLens ( routeL )}>
       <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '600px' }}>
         <WorkbenchLayout
-          clickHome={homeClick ( state.chainLens ( selectionL ) )}
+          clickHome={homeClick ( state.chainLens ( selectionL ), {routeTemplateName: 'home', requestResponse: 'Summary'} )}
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
           Details={<FusionDetails state={state}/>}>

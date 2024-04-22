@@ -1,11 +1,11 @@
-import { FusionWorkbenchState, rawConfigL, Task, taskL } from "../state/fusion.state";
+import { FusionWorkbenchState, rawConfigL, routeTemplateNameL, Task, taskL } from "../state/fusion.state";
 import { LensProps } from "@focuson/state";
-import { CardWithTitleAndBody, ResponsiveSelectableGridSize2, ResponsiveSelectableGridSize4 } from "@fusionconfig/react_components";
+import { CardWithTitleAndBody, ResponsiveSelectableGridSize4 } from "@fusionconfig/react_components";
 import { splitAndCapitalize } from "@itsmworkbench/utils";
-import { Grid, Paper, Stack, Toolbar, Typography } from "@mui/material";
+import { Grid, Stack, Typography } from "@mui/material";
 import React from "react";
 import { MultiParagraphText } from "@fusionconfig/i18n";
-import { FilesDetails, findLines } from "./files.details";
+import { findLines } from "./files.details";
 import { NameAnd } from "@laoban/utils";
 
 export type TaskOnHomePageProps = { taskName: string, task: Task }
@@ -55,8 +55,9 @@ export function HomePage<S> ( { state }: LensProps<S, FusionWorkbenchState, any>
   const { foundLines, notFoundLines } = findLines ( state.chainLens ( rawConfigL ).optJson () )
   return <HomePageLayout
     tasks={
-      <ResponsiveSelectableGridSize4 state={state.chainLens ( taskL )} items={items} children={( name, task: Task ) =>
-        <TaskOnHomeCardPage taskName={name} task={task}/>}/>}
+      <ResponsiveSelectableGridSize4 onClick={( name: string ) => state.doubleUp ().chain1 ( taskL ).chain2 ( routeTemplateNameL ).setJson ( name, 'task', '' )}
+                                     items={items}
+                                     children={( name, task: Task ) => <TaskOnHomeCardPage taskName={name} task={task}/>}/>}
     description={
       <CardWithTitleAndBody title='What you can see' sx={{ height: undefined }} comp={<MultiParagraphText i18nKey={[ "fusion.home.description" ]}/>}/>
     } foundLines={
