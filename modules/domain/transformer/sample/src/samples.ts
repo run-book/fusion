@@ -31,18 +31,10 @@ export function schemaNamedUrlAndNameToInputUrl ( namedUrl: NamedUrl, name: stri
 }
 export type RequestOrResponse = 'request' | 'response'
 
-export type InputOutputSampleNS = 'input_sample' | 'output_sample'
-export const inputSampleNs: NameSpaceDetailsForGit =
-               nameSpaceDetailsForGit ( 'input_sample', {
+export const sampleNs: NameSpaceDetailsForGit =
+               nameSpaceDetailsForGit ( 'sample', {
                  pathInGitRepo: 'schema', //not an error. we store the samples next to the schema
                  parser: async ( id: string, s: string ) => JSON.parse ( s ),
                  writer: s => JSON.stringify ( s, null, 2 ),
                  extension: 'input.json',
-               } )
-export const outputSampleNs: NameSpaceDetailsForGit =
-               nameSpaceDetailsForGit ( 'output_sample', {
-                 pathInGitRepo: 'schema', //not an error. we store the samples next to the schema
-                 parser: async ( id: string, s: string ) => JSON.parse ( s ),
-                 writer: s => JSON.stringify ( s, null, 2 ),
-                 extension: 'output.json',
                } )

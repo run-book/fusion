@@ -2,7 +2,7 @@
   "fusion.home.description": [
     "The Fusion Workbench is a tool to view the configuration of camunda workflows using Fusion Config",
     "Above you can see all the tasks that are configured, along with the service that implements the task",
-    "Click the task for more information"
+    "Click the task to see information about schemas, transformations and tests"
   ],
 
   "fusion.task.description":    [
