@@ -9,6 +9,7 @@ import { TestTable } from "./tests.view";
 import { Stack, Typography } from "@mui/material";
 import { SchemaView } from "./schema.view";
 import { CardWithTitleAndBody, ErrorOr } from "@fusionconfig/react_components";
+import { TransformView } from "./transform.view";
 
 export function trimName ( name: string ) {
   return name.substring ( 5 )
@@ -41,15 +42,30 @@ export function TestsDetailsPage<S> ( { state, tasks, testResult }: TestsDetails
   return <>
     <RouteVars path='/task/{task}/Summary'>{( { task } ) =>
       <TestSummary task={tasks[ task ]} taskName={task} testResult={testResult} state={state}/>}</RouteVars>
+
     <RouteVars path='/task/{task}/TaskRequestInput'>{( { task } ) =>
       <ErrorOr value={testResult}>{tr =>
         <SchemaView nameAndSchema={tr.request.inputSchema} result='input' tests={tr.request.tests}/>}</ErrorOr>}</RouteVars>
+
+    <RouteVars path='/task/{task}/RequestTransform'>{( { task } ) =>
+      <ErrorOr value={testResult}>{tr =>
+        <TransformView results={tr.request} />}</ErrorOr>}</RouteVars>
+
+
+
     <RouteVars path='/task/{task}/ServiceRequestInput'>{( { task } ) =>
       <ErrorOr value={testResult}>{tr =>
         <SchemaView nameAndSchema={tr.request.outputSchema} result='expectedOutput' tests={tr.request.tests}/>}</ErrorOr>}</RouteVars>
+
     <RouteVars path='/task/{task}/ServiceResponseOutput'>{( { task } ) =>
       <ErrorOr value={testResult}>{tr =>
         <SchemaView nameAndSchema={tr.response.inputSchema} result='input' tests={tr.response.tests}/>}</ErrorOr>}</RouteVars>
+
+    <RouteVars path='/task/{task}/ResponseTransform'>{( { task } ) =>
+      <ErrorOr value={testResult}>{tr =>
+        <TransformView results={tr.response} />}</ErrorOr>}</RouteVars>
+
+
     <RouteVars path='/task/{task}/TaskResponseOutput'>{( { task } ) =>
       <ErrorOr value={testResult}>{tr =>
         <SchemaView nameAndSchema={tr.response.outputSchema} result='expectedOutput' tests={tr.response.tests}/>}</ErrorOr>}</RouteVars>
