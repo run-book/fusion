@@ -1,6 +1,6 @@
 import { ErrorsAnd, hasErrors, mapErrors, mapErrorsK, mapK } from "@laoban/utils";
 import { TestEngine, TransformerFn } from "./test.engine.domain";
-import { OneTestResult, RanTestResult, ReqRespTestsResult, RunReqRespTests, RunReqRespTestsDefn, RunTestsDefn, SchemaTestResult, TestInExpectedActualOut, TestInOut, TestResults, TestsResult, TransformerTestResult } from "./test.domain";
+import { OneTestResult, RanTestResult, ReqRespTestsResult, RunReqRespTests, RunReqRespTestsDefn, RunTestsDefn, SchemaTestResult, TestInExpectedActualOut, TestInOut, SchemaTransformerTestResults, TestsResult, TransformerTestResult } from "./test.domain";
 import { NamedUrl, UrlLoadNamedFn } from "@itsmworkbench/urlstore";
 import { schemaNameToTestName } from "./schema.to.test.mapping";
 import { NamedLoadResult } from "@itsmworkbench/urlstore/dist/src/url.load.and.store";
@@ -39,7 +39,7 @@ export async function loadTestValues ( engine: TestEngine, tx: TransformerFn, in
       } ) )
 
 }
-export async function valuesToTestResults ( engine: TestEngine, schemas: TestInOut<any>, values: TestInExpectedActualOut<any> ): Promise<TestResults> {
+export async function valuesToTestResults ( engine: TestEngine, schemas: TestInOut<any>, values: TestInExpectedActualOut<any> ): Promise<SchemaTransformerTestResults> {
   const schemaResults: TestInExpectedActualOut<SchemaTestResult> = {
     input: values.input === undefined ? undefined : engine.testSchema ( schemas.input, values.input ),
     actualOutput: values.actualOutput === undefined ? undefined : engine.testSchema ( schemas.output, values.actualOutput ),
@@ -66,7 +66,7 @@ async function runOneTest ( engine: TestEngine, schemasAndTx: SchemasAndTransfor
         return ran
       }
     ) )
-  if ( hasErrors ( result ) ) return { errors: result }
+  if ( hasErrors ( result ) ) return {name: inpTestName|| outTestName, errors: result }
   return result
 }
 export type MergedTest = {

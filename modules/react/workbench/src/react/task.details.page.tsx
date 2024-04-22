@@ -34,7 +34,7 @@ export const TaskDetailsLayout: React.FC<TaskDetailsLayoutProps> = ( { task, req
       {/* Service on the right */}
       <Grid item xs={12} sm={4}>{service} </Grid>
       <Grid item xs={12} sm={12}>
-        <CardWithTitleAndBody title='Tests' comp={tests}/>
+        {tests}
       </Grid>
     </Grid>
   );
@@ -64,22 +64,22 @@ export type ReqOrRespSummaryProps<S> = LensProps<S, ReqRespAction, any>
 let fontSize = '0.5rem';
 export function RequestSummary<S> ( { state }: ReqOrRespSummaryProps<S> ) {
   return <Stack direction='row' spacing={0.5} sx={{ alignItems: 'center', justifyContent: 'space-around', padding: 1, }}> {/* Adjust spacing and padding as needed */}
-    <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Task Input Schema' valueToSet={taskRequestInput} state={state}/>
+    <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Task Request Schema' valueToSet={taskRequestInput} state={state}/>
     &gt;
     <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Transform' valueToSet={requestTranform} state={state}/>
     &gt;
-    <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Service Input Schema' valueToSet={serviceRequestInput} state={state}/>
+    <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Service Request Schema' valueToSet={serviceRequestInput} state={state}/>
     &gt;
   </Stack>
 }
 export function ResponseSummary<S> ( { state }: ReqOrRespSummaryProps<S> ) {
   return <Stack direction='row' spacing={0.5} sx={{ alignItems: 'center', justifyContent: 'space-around', padding: 1 }}> {/* Adjust spacing and padding as needed */}
     &lt;
-    <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Service Output Schema' valueToSet={serviceResponseOutput} state={state}/>
+    <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Task Response Schema' valueToSet={taskResponseOutput} state={state}/>
     &lt;
     <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Transform' valueToSet={responseTransform} state={state}/>
     &lt;
-    <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Task output Schema' valueToSet={taskResponseOutput} state={state}/>
+    <FocusOnSetValueButton size='small' sx={{ fontSize }} title='Service Response Schema' valueToSet={serviceResponseOutput} state={state}/>
   </Stack>
 }
 export function RequestResponse<S> ( { state }: ReqOrRespSummaryProps<S> ) {

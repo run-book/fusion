@@ -41,6 +41,8 @@ export type TransformerAndDesc = { name: NamedUrl, transformerDesc: string }
 export type NameAndValueAndSchemaResult = { name: NamedUrl, value: any, result: SchemaTestResult }
 export type ValueAndTransformerResult = { value: any, result: TransformerTestResult }
 
+export type RanTestResultName = keyof RanTestResult
+export type RanTestSchemaName = 'input' |'expectedOutput'
 export type RanTestResult = {
   input?: NameAndValueAndSchemaResult
   expectedOutput?: NameAndValueAndSchemaResult
@@ -50,6 +52,7 @@ export function isRanTestResult ( x: any ): x is RanTestResult {
   return x && x.input && x.expectedOutput && x.actualOutput
 }
 export type CannotRunTestResult = {
+  name: NamedUrl|undefined
   errors: string[]
 }
 export function isCannotRunTestResult ( x: any ): x is CannotRunTestResult {
@@ -76,7 +79,7 @@ export type TestInExpectedActualOut<T> = {
 }
 
 
-export type TestResults = {
+export type SchemaTransformerTestResults = {
   schema: TestInExpectedActualOut<SchemaTestResult>
   transformer?: TransformerTestResult
 }

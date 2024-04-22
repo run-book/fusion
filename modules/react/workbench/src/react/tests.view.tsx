@@ -24,11 +24,4 @@ export function TestTable<S> ( { tests }: TestTableProps<S> ) {
   } )
 
   return <DataTable cols={cols} noData={<div>No tests</div>} rows={rows}/>
-
-}
-
-export type TestStatusProps<S> = LensProps<S, string, any>
-
-export function TestStatus<S> ( { state }: TestStatusProps<S> ) {
-
 }
