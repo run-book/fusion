@@ -36,5 +36,5 @@ export const sampleNs: NameSpaceDetailsForGit =
                  pathInGitRepo: 'schema', //not an error. we store the samples next to the schema
                  parser: async ( id: string, s: string ) => JSON.parse ( s ),
                  writer: s => JSON.stringify ( s, null, 2 ),
-                 extension: 'input.json',
+                 extension: 'sample.json',
                } )

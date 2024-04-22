@@ -1,7 +1,7 @@
-import { RunTests } from "@fusionconfig/tests";
+import { RunReqRespTests, RunTests } from "@fusionconfig/tests";
 
 
-export function browserTestsRun ( baseUri: string ): RunTests {
+export function browserTestsRun ( baseUri: string ): RunReqRespTests {
   return async ( defn ) => {
     const response = await fetch ( baseUri + '/tests', {
       method: 'POST',

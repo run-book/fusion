@@ -5,10 +5,11 @@ import { CommentFactoryFunction, defaultCommentOffset, LoadFilesFn, PostProcesso
 import { UrlStore } from "@itsmworkbench/urlstore";
 import { FileOps } from "@laoban/fileops";
 import { YamlCapability } from "@itsmworkbench/yaml";
-import { cleanTest, RunTests, runTestsUsingEngine, TestEngine } from "@fusionconfig/tests";
+import { cleanTest, RunReqRespTests, TestEngine } from "@fusionconfig/tests";
 import { ajvTest } from "@fusionconfig/ajv/src/ajv";
 import { jsonataTransformer } from "@fusionconfig/jsonata";
 import { jsonDiffPatchFn } from "@fusionconfig/jsondiffpatch";
+import { runReqRespTestsUsingEngine } from "@fusionconfig/tests/src/test.engine";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
@@ -53,7 +54,7 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
         compileTransfomer: jsonataTransformer,
         testTransformer: jsonDiffPatchFn
       }
-      const rt: RunTests = runTestsUsingEngine ( testEngine )
+      const rt: RunReqRespTests = runReqRespTestsUsingEngine ( testEngine )
       startKoa ( directory.toString (), Number.parseInt ( port.toString () ), debugBoolean,
         fusionHandlers ( directory.toString (), urlStore,
           context.fileOps,

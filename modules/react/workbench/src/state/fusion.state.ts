@@ -5,7 +5,7 @@ import { ListNamesResult, UrlFolder } from "@itsmworkbench/urlstore"
 import { DiTag } from "@itsmworkbench/dependentdata";
 import { ConfigFile } from "@fusionconfig/config";
 import { ReqRespAction } from "./test.selection";
-import { RunTestsDefn, TestsResult } from "@fusionconfig/tests";
+import { ReqRespTestsResult, RunReqRespTestsDefn, RunTestsDefn, TestsResult } from "@fusionconfig/tests";
 
 
 export type SelectionState = {
@@ -42,11 +42,16 @@ export interface Task {
   request: TaskRequestOrResponse
   response: TaskRequestOrResponse
 }
-export function taskToRunDefn ( task: Task ): RunTestsDefn {
-  return {
+export function taskToRunDefn ( task: Task ): RunReqRespTestsDefn {
+  const request = {
     schema: { input: task.request.schema.name, output: task.request.kafka.name },
     transformer: task.request.transformer.name
-  }
+  };
+  const response = {
+    schema: { input: task.response.kafka.name, output: task.response.schema.name },
+    transformer: task.response.transformer.name
+  };
+  return { request, response }
 }
 
 
@@ -66,14 +71,14 @@ export type FusionWorkbenchState = {
   rawConfig?: string
   config?: FusionConfigFile
   configLegalData?: ConfigData
-  tests?: ErrorsAnd<TestsResult>
+  tests?: ErrorsAnd<ReqRespTestsResult>
 }
 
 export const idL = Lenses.identity<FusionWorkbenchState> ()
-let selectionL = idL.focusQuery ( 'selectionState' );
+const selectionL = idL.focusQuery ( 'selectionState' );
 export const taskL = selectionL.focusQuery ( 'task' )
 export const testNameL = selectionL.focusQuery ( 'testName' )
-export const testL: Optional<FusionWorkbenchState,ErrorsAnd<TestsResult>> = idL.focusQuery ( 'tests' )
+export const testL: Optional<FusionWorkbenchState, ErrorsAnd<ReqRespTestsResult>> = idL.focusQuery ( 'tests' )
 export const requestResponseL = selectionL.focusQuery ( 'requestResponse' )
 export const routeL: Optional<FusionWorkbenchState, string> = selectionL.focusQuery ( 'route' )
 export const tagsL = idL.focusQuery ( 'tags' )

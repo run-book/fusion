@@ -12,7 +12,7 @@ import { getAxes, matchAxes } from "./api.for.axes";
 import { getFolders } from "@itsmworkbench/apiurlstore/dist/src/api.for.url.store";
 import { YamlCapability } from "@itsmworkbench/yaml";
 import { runTests } from "@fusionconfig/apitests/src/tests.api";
-import { RunTests } from "@fusionconfig/tests";
+import { RunReqRespTests, RunTests } from "@fusionconfig/tests";
 
 
 export const fusionHandlers = (
@@ -23,7 +23,7 @@ export const fusionHandlers = (
   postProcessors: PostProcessor[],
   yaml: YamlCapability,
   commentFn: CommentFunction,
-  rt: RunTests,
+  rt: RunReqRespTests,
   parent: string,
   debug: boolean | undefined,
   ...handlers: KoaPartialFunction[] ): ( from: ContextAndStats ) => Promise<void> =>

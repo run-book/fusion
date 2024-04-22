@@ -19,7 +19,7 @@ import { objectToQueryString } from "@fusionconfig/utils";
 import { FusionDetails } from "./react/details";
 import { TaskDetailsPage } from "./react/task.details.page";
 import { ReqRespAction, reqRespOptions } from "./state/test.selection";
-import { TestsResult } from "@fusionconfig/tests";
+import { ReqRespTestsResult } from "@fusionconfig/tests";
 import { browserTestsRun } from "@fusionconfig/browsertests/src/browser.tests";
 import { HomePage } from "./react/home.page";
 
@@ -115,13 +115,13 @@ async function loadOne ( query: UrlQuery ) {
   return res
 }
 const tests = depData ( 'tests', testL, config, task, {
-  tag: ( o: ErrorsAnd<TestsResult> ) => o ? 'tests' : undefined,
+  tag: ( o: ErrorsAnd<ReqRespTestsResult> ) => o ? 'tests' : undefined,
   clean: 'leave',
-  load: async ( config, task ): Promise<ErrorsAnd<TestsResult>> => {
+  load: async ( config, task ): Promise<ErrorsAnd<ReqRespTestsResult>> => {
     const theTask = config.tasks[ task ]
     if ( theTask === undefined ) throw new Error ( `Task ${task} not found in config` )
     const runDefn = taskToRunDefn ( theTask )
-    const res: ErrorsAnd<TestsResult> = await browserTestsRun ( rootUrl ) ( runDefn )
+    const res: ErrorsAnd<ReqRespTestsResult> = await browserTestsRun ( rootUrl ) ( runDefn )
     return res;
   }
 } )

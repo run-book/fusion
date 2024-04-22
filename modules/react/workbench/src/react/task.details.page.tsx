@@ -9,7 +9,7 @@ import { LensProps, LensProps2 } from "@focuson/state";
 import { TestsDetailsPage } from "./tests.details.page";
 import { ReqRespAction, requestTranform, responseTransform, serviceRequestInput, serviceResponseOutput, summary, taskRequestInput, taskResponseOutput } from "../state/test.selection";
 import { Task } from "../state/fusion.state";
-import { TestsResult } from "@fusionconfig/tests";
+import { ReqRespTestsResult, TestsResult } from "@fusionconfig/tests";
 import { splitAndCapitalize } from "@itsmworkbench/utils";
 
 export type TaskDetailsLayoutProps = {
@@ -90,7 +90,7 @@ export function RequestResponse<S> ( { state }: ReqOrRespSummaryProps<S> ) {
   </Stack>
 
 }
-export type TaskDetailsPageProps<S> = LensProps2<S, ReqRespAction, string, any> & { task: string | undefined, tasks?: NameAnd<Task>, testResult?: ErrorsAnd<TestsResult> }
+export type TaskDetailsPageProps<S> = LensProps2<S, ReqRespAction, string, any> & { task: string | undefined, tasks?: NameAnd<Task>, testResult?: ErrorsAnd<ReqRespTestsResult> }
 export function TaskDetailsPage<S> ( { state, task, tasks, testResult }: TaskDetailsPageProps<S> ) {
   if ( tasks === undefined ) return <div>No tasks</div>
   if ( task === undefined ) return <div>No task name</div>

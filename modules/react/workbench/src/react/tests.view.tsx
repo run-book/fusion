@@ -10,7 +10,7 @@ export type TestTableProps<S> = {
 }
 export function TestTable<S> ( { tests }: TestTableProps<S> ) {
   if ( !tests ) return <div>No tests</div>
-  const cols = [ 'name', 'i/p schema', 'transform', 'o/p schema' ]
+  const cols = [ 'Name', 'I/P schema', 'Transform', 'O/P schema' ]
   const rows = tests.map ( ( test: OneTestResult, i ) => {
     if ( isCannotRunTestResult ( test ) ) return [ test.errors.join ( ', ' ) ]
     const inpName = test.input?.name?.name;
@@ -20,7 +20,7 @@ export function TestTable<S> ( { tests }: TestTableProps<S> ) {
       if ( result.length > 0 ) return `failed ${result.length}`
       return 'passed'
     }
-    return [ lastSegment(inpName || outName||'error'), findStringFor ( test.input?.result ), 'tx', findStringFor ( test.expectedOutput?.result ) ]
+    return [ lastSegment(inpName || outName||'error'), findStringFor ( test.input?.result ), 'not implemented yet', findStringFor ( test.expectedOutput?.result ) ]
   } )
 
   return <DataTable cols={cols} noData={<div>No tests</div>} rows={rows}/>
