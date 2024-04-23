@@ -41,12 +41,12 @@ const routingData: RoutingData<FusionWorkbenchState> = {
   selectionO: routeTemplateNameL,
   templates: {
     folders: '/folders',
-    task: '/task/{task}/{action}',
+    task: '/task/{task}/{requestResponse}',
     home: '/',
   },
   optionals: {
     task: taskL,
-    action: requestResponseL as Optional<FusionWorkbenchState, string>,
+    requestResponse: requestResponseL as Optional<FusionWorkbenchState, string>,
   },
   parametersO: paramsL
 }
@@ -141,8 +141,9 @@ const tests = depData ( 'tests', testL, config, task, {
 const route = depData ( 'route', routeL, task, params, requestResponse, {
   tag: ( o: string ) => o,
   clean: ( _, task: string, params: NameAnd<string>, reqRes ) => {
-    const route = calculateRoute ( routingData, container.state )
-    console.log ( 'calculated route', route )
+    // const route = calculateRoute ( routingData, container.state )
+    // console.log ( 'calculated route', route )
+    // return route || '/'
     const rawSearchString = makeSearchString ( params )
     const search = params === undefined ? window.location.search : `?${rawSearchString}`
     const repResString = reqRes === undefined ? 'Summary' : `${reqRes}`
@@ -213,11 +214,10 @@ const startState: FusionWorkbenchState = {
 }
 const withRoute = placeRouteInto ( routingData, window.location.pathname + window.location.search, startState )
 console.log ( 'withRoute', withRoute )
-let parameters: NameAnd<string> | undefined = getQueryParams ( window.location.search )
-if ( Object.keys ( parameters ).length === 0 ) parameters = undefined
+// let parameters: NameAnd<string> | undefined = getQueryParams ( window.location.search )
+// if ( Object.keys ( parameters ).length === 0 ) parameters = undefined
 setJson ( {
   selectionState: { requestResponse: reqRespOptions[ 0 ] },
-  parameters,
   tags: {}, depDataLog: [],
   debug: { depData: true },
 } )
