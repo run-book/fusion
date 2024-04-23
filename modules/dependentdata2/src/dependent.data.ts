@@ -1,10 +1,10 @@
 import { Optional } from "@focuson/lens";
 
-export type DDF<S, T> = RootDDF0<S, T> | DDF1<S, any, T> | DDF2<S, any, any, T> | DD3<S, any, any, any, T> | DD4<S, any, any, any, any, T> | DD5<S, any, any, any, any, any, T>
+export type DDF<S, T> = RootDDF0<S, T> | DDF1<S, any, T> | DDF2<S, any, any, T> | DDF3<S, any, any, any, T> | DDF4<S, any, any, any, any, T> | DDF5<S, any, any, any, any, any, T>
 export function isDDF<S, T> ( dd: DD<S, T> ): dd is DDF<S, T> {
   return !dd.wait
 }
-export type DDK<S, T> = RootDDK0<S, T> | DDK1<S, any, T> | DDK2<S, any, any, T> | DDK3<S, any, any, any, T> | DDK4<S, any, any, any, any, T> | DDK5<S, any, any, any, any, any, T>
+export type DDK<S, T> = DDK0<S, T> | DDK1<S, any, T> | DDK2<S, any, any, T> | DDK3<S, any, any, any, T> | DDK4<S, any, any, any, any, T> | DDK5<S, any, any, any, any, any, T>
 export function isDDK<S, T> ( dd: DD<S, T> ): dd is DDK<S, T> {
   return dd.wait
 }
@@ -25,18 +25,18 @@ export interface DDPrim<S, T> extends DDDecisions {
 }
 
 export type RootDDF0<S, T> = DDPrim<S, T> & {
-  type: 'root',
+  type: 'dd0',
   fn: ( old: T ) => T
 }
-export type RootDDK0<S, T> = DDPrim<S, T> & {
-  type: 'root',
+export type DDK0<S, T> = DDPrim<S, T> & {
+  type: 'dd0',
   wait: true
   fn: ( old: T ) => Promise<T>
 }
 
 export type DDF1<S, P1, T> = DDPrim<S, T> & {
   type: 'dd1',
-  p1: DD<S, T>
+  p1: DD<S, P1>
   fn: ( old: T, p1: P1 ) => T
 }
 export type DDK1<S, P1, T> = DDPrim<S, T> & {
@@ -58,7 +58,7 @@ export type DDK2<S, P1, P2, T> = DDPrim<S, T> & {
   wait: true
   fn: ( old: T, p1: P1, p2: P2 ) => Promise<T>
 }
-export type DD3<S, P1, P2, P3, T> = DDPrim<S, T> & {
+export type DDF3<S, P1, P2, P3, T> = DDPrim<S, T> & {
   type: 'dd3',
   p1: DD<S, P1>
   p2: DD<S, P2>
@@ -73,7 +73,7 @@ export type DDK3<S, P1, P2, P3, T> = DDPrim<S, T> & {
   wait: true
   fn: ( old: T, p1: P1, p2: P2, p3: P3 ) => Promise<T>
 }
-export type DD4<S, P1, P2, P3, P4, T> = DDPrim<S, T> & {
+export type DDF4<S, P1, P2, P3, P4, T> = DDPrim<S, T> & {
   type: 'dd4',
   p1: DD<S, P1>
   p2: DD<S, P2>
@@ -90,7 +90,7 @@ export type DDK4<S, P1, P2, P3, P4, T> = DDPrim<S, T> & {
   wait: true
   fn: ( old: T, p1: P1, p2: P2, p3: P3, p4: P4 ) => Promise<T>
 }
-export type DD5<S, P1, P2, P3, P4, P5, T> = DDPrim<S, T> & {
+export type DDF5<S, P1, P2, P3, P4, P5, T> = DDPrim<S, T> & {
   type: 'dd5',
   p1: DD<S, P1>
   p2: DD<S, P2>
@@ -112,18 +112,18 @@ export type DDK5<S, P1, P2, P3, P4, P5, T> = DDPrim<S, T> & {
 export function callDDF<S, T> ( dd: DDF<S, T>, old: T, ps: any[] ): T {
   try {
     switch ( dd.type ) {
-      case 'root':
+      case 'dd0':
         return dd.fn ( old )
       case 'dd1':
         return (dd as DDF1<S, any, T>).fn ( old, ps[ 0 ] )
       case 'dd2':
         return (dd as DDF2<S, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ] )
       case 'dd3':
-        return (dd as DD3<S, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ] )
+        return (dd as DDF3<S, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ] )
       case 'dd4':
-        return (dd as DD4<S, any, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ], ps[ 3 ] )
+        return (dd as DDF4<S, any, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ], ps[ 3 ] )
       case 'dd5':
-        return (dd as DD5<S, any, any, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ], ps[ 3 ], ps[ 4 ] )
+        return (dd as DDF5<S, any, any, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ], ps[ 3 ], ps[ 4 ] )
     }
   } catch ( e ) {
     if ( dd.recover ) return dd.recover ( e, old, ps )
@@ -134,8 +134,8 @@ export function callDDF<S, T> ( dd: DDF<S, T>, old: T, ps: any[] ): T {
 export async function callDDK<S, T> ( dd: DDK<S, T>, old: T, ps: any[] ): Promise<T> {
   try {
     switch ( dd.type ) {
-      case 'root':
-        return await (dd as RootDDK0<S, T>).fn ( old )
+      case 'dd0':
+        return await (dd as DDK0<S, T>).fn ( old )
       case 'dd1':
         return await (dd as DDK1<S, any, T>).fn ( old, ps[ 0 ] )
       case 'dd2':
@@ -155,7 +155,7 @@ export async function callDDK<S, T> ( dd: DDK<S, T>, old: T, ps: any[] ): Promis
 
 export function findParams<S, T> ( dd: DD<S, T> ): DD<S, T>[] {
   switch ( dd.type ) {
-    case 'root':
+    case 'dd0':
       return []
     case 'dd1':
       return [ dd.p1 ]

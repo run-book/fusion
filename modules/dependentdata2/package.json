@@ -1,5 +1,5 @@
 {
-  "name": "@itsmworkbench/dependentdata",
+  "name": "@itsmworkbench/dependentdata2",
   "description": "Often some data is dependendent on other data. Needs nuking or reloading when earlier changes",
   "version": "0.0.8",
   "main": "dist/index",

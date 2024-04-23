@@ -1,7 +1,8 @@
-import { NameAnd } from "@laoban/utils";
-import { callDDF, DD, DDDecisions, findParams } from "./dependent.data";
+import { mapK, NameAnd } from "@laoban/utils";
+import { callDDF, callDDK, DD, DDDecisions, DDK, findParams } from "./dependent.data";
 import { Optional } from "@focuson/lens";
-import { chainOfResponsibility, PartialFunction } from "@itsmworkbench/utils";
+import { callListeners, chainOfResponsibility, PartialFunction } from "@itsmworkbench/utils";
+import { FutureCache, getOrUpdateFromFutureCache } from "./future.cache";
 
 
 export type BasicStatus<S> = {
@@ -38,7 +39,7 @@ export function findBasics<S> ( status: NameAnd<DDStatus<S>>, dd: DD<S, any>, ol
   let paramNames = ps.map ( p => p.name );
   return {
     paramNames,
-    upstreamUndefined: paramNames.filter ( p => status[ p ] === undefined ),
+    upstreamUndefined: paramNames.filter ( p => status[ p ]?.value === undefined ),
     upstreamChanged: paramNames.filter ( p => status[ p ]?.rawChanged ),
     rawValue: newValue,
     rawChanged: oldValue !== newValue,
@@ -50,12 +51,12 @@ export const calcParams = ( status: AllDdStatus<any> ) => ( paramNames: string[]
   return status[ p ]?.value;
 } );
 
-export const upstreamsUndefined = <S> (): PartialFunction<BasicStatus<S>, DDStatus<S>> => ({
+export const upstreamsUndefined = <S> ( dd: DDDecisions ): PartialFunction<BasicStatus<S>, DDStatus<S>> => ({
   isDefinedAt: ( bs: BasicStatus<S> ) => bs.upstreamUndefined.length > 0,
   apply: ( bs: BasicStatus<S> ) => {
-    const cleared = false
-    const value = bs.rawValue
-    const changed = bs.rawChanged
+    const cleared = dd.clearIfUpstreamUndefinedOrLoad && bs.rawValue !== undefined;
+    const value = cleared ? undefined : bs.rawValue
+    const changed = value !== bs.rawValue
     return { ...bs, needsLoad: false, cleared, changed, value, reason: 'Upstream has undefined value' }
   }
 });
@@ -99,14 +100,14 @@ export const asyncAllGoodButUndefined = <S> ( paramFn: ParamFn, dd: DD<S, any> )
 
 export const allGood = <S> (): PartialFunction<BasicStatus<S>, DDStatus<S>> => ({
   isDefinedAt: ( bs: BasicStatus<S> ) => bs.rawValue !== undefined && bs.upstreamUndefined.length === 0 && bs.upstreamChanged.length === 0,
-  apply: ( bs: BasicStatus<S> ) => ({ ...bs, value: bs.rawValue, changed: false, reason: 'All upstreams are defined and unchanged, our value is defined' })
+  apply: ( bs: BasicStatus<S> ) => ({ ...bs, value: bs.rawValue, changed: bs.rawChanged, reason: 'All upstreams are defined and unchanged, our value is defined' })
 })
 
 export function calcStatusFor<S> ( status: NameAnd<DDStatus<S>>, dd: DD<S, any>, basics: BasicStatus<S> ): DDStatus<S> {
   const paramFn: ParamFn = calcParams ( status )
   const fn = chainOfResponsibility<BasicStatus<S>, DDStatus<S>> (
     ( bs ) => {throw new Error ( 'Chain didnt match for ' + JSON.stringify ( bs ) )},
-    upstreamsUndefined<S> (),
+    upstreamsUndefined<S> (dd),
     asyncUpstreamsChanged ( paramFn, dd ),
     syncUpstreamsChanged ( paramFn, dd ),
     syncAllGoodButUndefined ( paramFn, dd ),
@@ -153,11 +154,47 @@ export function calcAllStatus<S> ( dds: DD<S, any>[], oldS: S, s: S ): AllDdStat
   }
   return status
 }
-export function foldIntoState<S> ( dds: DD<S, any>[], status: AllDdStatus<S>, s: S ) {
+export function foldIntoState<S> ( status: AllDdStatus<S>, dds: DD<S, any>[], s: S ) {
   let acc = s
   for ( const dd of dds ) {
     const st = status[ dd.name ];
     acc = st.changed ? dd.target.set ( acc, st.rawValue ) : acc
   }
   return acc
+}
+
+export type  DependentDataEngine<S> = FutureCache<DD<S, any>> & {
+  current: () => S,
+  setS: ( s: S ) => void
+}
+
+export async function callAndWorkOutChanged<S> ( engine: DependentDataEngine<S>,
+                                                 st: DDStatus<S>,
+                                                 d: DDK<S, any> ): Promise<any> {
+  const res: any = await getOrUpdateFromFutureCache ( engine, d, st.params, () => callDDK ( d, st.rawValue, st.params ) )
+  const { current, setS } = engine
+  const originalParamValues = st.params
+  if ( originalParamValues === undefined ) throw new Error ( `Params are undefined for ${d.name}` )
+  const s = current ()
+  const params = findParams ( d )
+  const currentParamValues = st.params.map ( ( p, i ) => getFromOptional ( 'asyncReturned', params[ i ].target, s ) )
+  const changed = currentParamValues.filter ( ( cv, i ) => cv !== originalParamValues[ i ] )
+  return { setS, res, s, changed };
+}
+
+async function callAsync<S> ( engine: DependentDataEngine<S>, st: DDStatus<S>, d: DDK<S, any> ) {
+  const { setS, res, s, changed } = await callAndWorkOutChanged ( engine, st, d );
+  if ( changed.length > 0 )
+    callListeners ( engine.listeners, 'loadAbandoned', l => l.loadAbandoned ( d, `Changed ${changed}` ) )
+  else
+    setS ( d.target.set ( s, res ) )
+  return res;
+}
+/** The promise is just for testing. Normally we wouldn't wait for it. */
+export function callAsyncs<S> ( engine: DependentDataEngine<S>, status: AllDdStatus<any>, dds: DD<S, any>[] ): Promise<any[]> {
+  const asyncs = dds.filter ( d => d.wait && status[ d.name ].needsLoad ) as DDK<S, any>[]
+  return mapK ( asyncs, async ( d ) => {
+    const st = status[ d.name ]
+    return await callAsync ( engine, st, d )
+  } )
 }

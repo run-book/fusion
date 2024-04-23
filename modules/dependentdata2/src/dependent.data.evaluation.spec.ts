@@ -13,7 +13,7 @@ const bL = idL.focusOn ( 'b' )
 
 const aDD: RootDDF0<StateForCalcStatus, number> = {
   name: 'a',
-  type: 'root',
+  type: 'dd0',
   target: aL,
   fn: ( old: number ) => old // aka do nothing
 }
@@ -154,5 +154,5 @@ describe ( "validateDDs", () => {
     expect ( () => validateDDs ( [ bDD ] ) ).toThrow ( "Param a not found for b" )
     expect ( () => validateDDs ( [ bDD, aDD ] ) ).toThrow ( "Param a not found for b" )
     validateDDs ( [ aDD, bDD ] )
-  })
+  } )
 } )
