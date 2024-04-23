@@ -17,20 +17,20 @@ export function depData<S, P1, T> ( name: string,
                                     config: DDConfig<T> ): DDF1<S, P1, T> ;
 export function depData<S, P1, P2, T> ( name: string,
                                         target: Optional<S, T>,
-                                        fn: ( old: T, p1: DD<S, P1>, p2: DD<S, P2> ) => T,
+                                        fn: ( old: T, p1: P1, p2: P2 ) => T,
                                         p1: DD<S, P1>,
                                         p2: DD<S, P2>,
                                         config: DDConfig<T> ): DDF2<S, P1, P2, T> ;
 export function depData<S, P1, P2, P3, T> ( name: string,
                                             target: Optional<S, T>,
-                                            fn: ( old: T, p1: DD<S, P1>, p2: DD<S, P2>, p3: DD<S, P3> ) => T,
+                                            fn: ( old: T, p1: P1, p2: P2, p3: P3 ) => T,
                                             p1: DD<S, P1>,
                                             p2: DD<S, P2>,
                                             p3: DD<S, P3>,
                                             config: DDConfig<T> ): DDF3<S, P1, P2, P3, T> ;
 export function depData<S, P1, P2, P3, P4, T> ( name: string,
                                                 target: Optional<S, T>,
-                                                fn: ( old: T, p1: DD<S, P1>, p2: DD<S, P2>, p3: DD<S, P3>, p4: DD<S, P4> ) => T,
+                                                fn: ( old: T, p1: P1, p2: P2, p3: P3, p4: P4 ) => T,
                                                 p1: DD<S, P1>,
                                                 p2: DD<S, P2>,
                                                 p3: DD<S, P3>,
@@ -38,7 +38,7 @@ export function depData<S, P1, P2, P3, P4, T> ( name: string,
                                                 config: DDConfig<T> ): DDF4<S, P1, P2, P3, P4, T> ;
 export function depData<S, P1, P2, P3, P4, P5, T> ( name: string,
                                                     target: Optional<S, T>,
-                                                    fn: ( old: T, p1: DD<S, P1>, p2: DD<S, P2>, p3: DD<S, P3>, p4: DD<S, P4>, p5: DD<S, P5> ) => T,
+                                                    fn: ( old: T, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5 ) => T,
                                                     p1: DD<S, P1>,
                                                     p2: DD<S, P2>,
                                                     p3: DD<S, P3>,
@@ -76,7 +76,7 @@ export function depData<S, P1, P2, P3, P4, P5, T> ( name: string,
     return res
   }
   if ( arguments.length === 4 ) {
-    let res: RootDDF0<S, T> = { name, target, fn, type: 'dd0', ...(p1  as DDConfig<T> || {}) };
+    let res: RootDDF0<S, T> = { name, target, fn, type: 'dd0', ...(p1 as DDConfig<T> || {}) };
     return res
   }
   throw new Error ( "Invalid number of arguments for depData function" );
@@ -95,20 +95,20 @@ export function depDataK<S, P1, T> ( name: string,
                                      config: DDConfigK<T> ): DDK1<S, P1, T> ;
 export function depDataK<S, P1, P2, T> ( name: string,
                                          target: Optional<S, T>,
-                                         fn: ( old: T, p1: DD<S, P1>, p2: DD<S, P2> ) => Promise<T>,
+                                         fn: ( old: T, p1: P1, p2: P2 ) => Promise<T>,
                                          p1: DD<S, P1>,
                                          p2: DD<S, P2>,
                                          config: DDConfigK<T> ): DDK2<S, P1, P2, T> ;
 export function depDataK<S, P1, P2, P3, T> ( name: string,
                                              target: Optional<S, T>,
-                                             fn: ( old: T, p1: DD<S, P1>, p2: DD<S, P2>, p3: DD<S, P3> ) => Promise<T>,
+                                             fn: ( old: T, p1: P1, p2: P2, p3: P3 ) => Promise<T>,
                                              p1: DD<S, P1>,
                                              p2: DD<S, P2>,
                                              p3: DD<S, P3>,
                                              config: DDConfigK<T> ): DDK3<S, P1, P2, P3, T> ;
 export function depDataK<S, P1, P2, P3, P4, T> ( name: string,
                                                  target: Optional<S, T>,
-                                                 fn: ( old: T, p1: DD<S, P1>, p2: DD<S, P2>, p3: DD<S, P3>, p4: DD<S, P4> ) => Promise<T>,
+                                                 fn: ( old: T, p1: P1, p2: P2, p3: P3, p4: P4 ) => Promise<T>,
                                                  p1: DD<S, P1>,
                                                  p2: DD<S, P2>,
                                                  p3: DD<S, P3>,
@@ -116,7 +116,7 @@ export function depDataK<S, P1, P2, P3, P4, T> ( name: string,
                                                  config: DDConfigK<T> ): DDK4<S, P1, P2, P3, P4, T> ;
 export function depDataK<S, P1, P2, P3, P4, P5, T> ( name: string,
                                                      target: Optional<S, T>,
-                                                     fn: ( old: T, p1: DD<S, P1>, p2: DD<S, P2>, p3: DD<S, P3>, p4: DD<S, P4>, p5: DD<S, P5> ) => Promise<T>,
+                                                     fn: ( old: T, p1: P1, p2: P2, p3: P3, P4: P4, p5: P5 ) => Promise<T>,
                                                      p1: DD<S, P1>,
                                                      p2: DD<S, P2>,
                                                      p3: DD<S, P3>,

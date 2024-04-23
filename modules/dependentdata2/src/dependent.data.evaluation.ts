@@ -2,7 +2,7 @@ import { mapK, NameAnd } from "@laoban/utils";
 import { callDDF, callDDK, DD, DDDecisions, DDK, findParams } from "./dependent.data";
 import { Optional } from "@focuson/lens";
 import { callListeners, chainOfResponsibility, PartialFunction } from "@itsmworkbench/utils";
-import { FutureCache, getOrUpdateFromFutureCache } from "./future.cache";
+import { futureCache, FutureCache, getOrUpdateFromFutureCache } from "./future.cache";
 
 
 export type BasicStatus<S> = {
@@ -158,7 +158,7 @@ export function foldIntoState<S> ( status: AllDdStatus<S>, dds: DD<S, any>[], s:
   let acc = s
   for ( const dd of dds ) {
     const st = status[ dd.name ];
-    acc = st.changed ? dd.target.set ( acc, st.rawValue ) : acc
+    acc = st.changed ? dd.target.set ( acc, st.value ) : acc
   }
   return acc
 }
@@ -167,7 +167,13 @@ export type  DependentDataEngine<S> = FutureCache<DD<S, any>> & {
   current: () => S,
   setS: ( s: S ) => void
 }
-
+export function dependentDataEngine<S> ( current: () => S, setS: ( s: S ) => void ): DependentDataEngine<S> {
+  return {
+    ...futureCache<DD<S, any>> (),
+    current,
+    setS
+  }
+}
 export async function callAndWorkOutChanged<S> ( engine: DependentDataEngine<S>,
                                                  st: DDStatus<S>,
                                                  d: DDK<S, any> ): Promise<any> {
@@ -182,20 +188,20 @@ export async function callAndWorkOutChanged<S> ( engine: DependentDataEngine<S>,
   return { setS, res, s, changed };
 }
 
-async function callAsync<S> ( engine: DependentDataEngine<S>, st: DDStatus<S>, d: DDK<S, any> ) {
+async function callAsync<S> ( engine: DependentDataEngine<S>, st: DDStatus<S>, d: DDK<S, any>, setJson: ( s: S ) => void ) {
   const { setS, res, s, changed } = await callAndWorkOutChanged ( engine, st, d );
   if ( changed.length > 0 )
     callListeners ( engine.listeners, 'loadAbandoned', l => l.loadAbandoned ( d, `Changed ${changed}` ) )
   else
-    setS ( d.target.set ( s, res ) )
+    setJson ( d.target.set ( s, res ) )
   return res;
 }
 /** The promise is just for testing. Normally we wouldn't wait for it. */
-export function callAsyncs<S> ( engine: DependentDataEngine<S>, status: AllDdStatus<any>, dds: DD<S, any>[] ): Promise<any[]> {
+export function callAsyncs<S> ( engine: DependentDataEngine<S>, status: AllDdStatus<any>, dds: DD<S, any>[], setJson: ( s: S ) => void ): Promise<any[]> {
   const asyncs = dds.filter ( d => d.wait && status[ d.name ].needsLoad ) as DDK<S, any>[]
   return mapK ( asyncs, async ( d ) => {
     const st = status[ d.name ]
-    return await callAsync ( engine, st, d )
+    return await callAsync ( engine, st, d, setJson )
   } )
 }
 
@@ -218,14 +224,14 @@ export const setJsonForDepData = <S extends any> ( depEngine: DependentDataEngin
     const { debug: debugFn, updateLogs, delay } = cleanOptions
     const setJson = ( s: S ) => {
       const debug = debugFn () === true;
-      console.log ( 'setJson', count++, s )
+      if ( debug ) console.log ( 'setJson', count++, s )
       const allStatus = calcAllStatus ( deps, depEngine.current (), s )
       if ( debug ) console.log ( 'allStatus', allStatus )
       const newS = foldIntoState ( allStatus, deps, s )
       const cleanedS = updateLogs ( newS )
       if ( debug ) console.log ( 'cleanedS', count, cleanedS )
       depEngine.setS ( cleanedS )
-      setTimeout ( () => callAsyncs ( depEngine, allStatus, deps ), delay )
+      setTimeout ( () => callAsyncs ( depEngine, allStatus, deps, setJson ), delay )
     };
     return setJson
   }

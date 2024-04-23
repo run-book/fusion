@@ -3,10 +3,9 @@ import { addEventStoreListener, EventStore, eventStore, setEventStoreValue } fro
 import { LensProps, LensState, lensState } from '@focuson/state';
 import { createRoot } from 'react-dom/client';
 import { DevMode, SizingContext, WorkbenchLayout } from "@fusionconfig/react_components";
-import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, requestResponseL, routeL, routeTemplateNameL, selectionL, tagsL, taskL, taskToRunDefn, testL, testNameL } from "./state/fusion.state";
-import { calculateRoute, getQueryParams, makeSearchString, placeRouteInto, Route, RouteDebug, RouteProvider, RouteVars, RoutingData } from "@fusionconfig/react_routing";
+import { configL, configLegalTasksL, foldersO, FusionConfigFile, FusionWorkbenchState, legalParamsL, paramsL, rawConfigL, requestResponseL, routeL, routeTemplateNameL, selectionL, taskL, taskToRunDefn, testL, testNameL } from "./state/fusion.state";
+import { makeSearchString, placeRouteInto, Route, RouteDebug, RouteProvider, RouteVars, RoutingData } from "@fusionconfig/react_routing";
 import { FusionNav } from "./react/nav";
-import { depData, dependentEngine, DependentItem, optionalTagStore, setJsonForDepData } from "@itsmworkbench/dependentdata";
 import { ErrorsAnd, hasErrors, mapObject, NameAnd, toArray } from "@laoban/utils";
 import { FCLogRecord, futureCacheConsoleLog, futureCacheLog } from "@itsmworkbench/utils";
 import { UrlStoreApiClientConfig, urlStoreFromApi } from "@itsmworkbench/browserurlstore";
@@ -18,11 +17,12 @@ import { DebugFolders } from "./playground/debug.folders";
 import { objectToQueryString } from "@fusionconfig/utils";
 import { FusionDetails } from "./react/details";
 import { TaskDetailsPage } from "./react/task.details.page";
-import { ReqRespAction, reqRespOptions } from "./state/test.selection";
+import { reqRespOptions } from "./state/test.selection";
 import { ReqRespTestsResult } from "@fusionconfig/tests";
-import { browserTestsRun } from "@fusionconfig/browsertests/src/browser.tests";
+import { browserTestsRun } from "@fusionconfig/browsertests";
 import { HomePage } from "./react/home.page";
 import { Optional } from "@focuson/lens";
+import { DD, depData, depDataK, dependentDataEngine, setJsonForDepData } from "@itsmworkbench/dependentdata2";
 
 
 const rootElement = document.getElementById ( 'root' );
@@ -52,95 +52,72 @@ const routingData: RoutingData<FusionWorkbenchState> = {
 }
 
 const logForDeps: FCLogRecord<any, any>[] = []
-const tagStore = optionalTagStore ( tagsL );
-const depEngine = dependentEngine<FusionWorkbenchState> (
-  { listeners: [ futureCacheLog ( logForDeps ), futureCacheConsoleLog ( 'fc -' ) ], cache: {} },
-  tagStore )
+// const tagStore = optionalTagStore ( tagsL );
+const depEngine = {
+  ...dependentDataEngine<FusionWorkbenchState> ( () => container.state, setEventStoreValue ( container ) ),
+  listeners: [ futureCacheLog ( logForDeps ), futureCacheConsoleLog ( 'fc -' ) ]
+}
 
-const dirList = depData ( 'dirlist', foldersO, {
-  clean: 'leave',
-  tag: ( o: UrlFolder ) => o?.name,
-  load: async (): Promise<UrlFolder> => {
+const dirList = depDataK ( 'dirlist', foldersO,
+  async (): Promise<UrlFolder> => {
     const folders = await urlStore.folders ( "org", "schema" )
     if ( hasErrors ( folders ) ) throw new Error ( 'Failed to load ticketList\n' + folders.join ( '\n' ) )
     return folders
-  }
-} )
+  }, {} )
 
-const legalParams = depData ( 'legalParams', legalParamsL, {
-  clean: 'leave',
-  tag: ( o: NameAnd<string[]> ) => JSON.stringify ( o ),
-  load: async (): Promise<NameAnd<string[]>> => {
+const legalParamsD = depDataK ( 'legalParams', legalParamsL,
+  async (): Promise<NameAnd<string[]>> => {
     const response = await fetch ( `${rootUrl}/axes/global.yaml` );
     if ( response.status >= 400 ) throw new Error ( `Failed to load parameters\n${response.statusText}` )
     const json: any = await response.json ()
     return json
-  }
-} )
+  }, {} )
 
-const params = depData ( 'params', paramsL, legalParams, {
-  tag: ( o: NameAnd<string> ) => JSON.stringify ( o ),
-  clean: ( original, legalParams ) => {
+const paramsD = depData<FusionWorkbenchState, NameAnd<string[]>, NameAnd<string>> ( 'params', paramsL,
+  ( original, lp ) => {
     if ( original !== undefined ) return original
-    if ( legalParams === undefined ) return undefined as any
-    return mapObject ( legalParams, ( v, name ) => v[ 0 ] );
-  },
-} )
+    if ( lp === undefined ) return undefined as any
+    return mapObject ( lp, ( v, name ) => v[ 0 ] );
+  }, legalParamsD, {} )
 
-const rawConfig = depData ( 'rawConfig', rawConfigL, params, {
-  clean: 'leave',
-  tag: ( o: string ) => o?.substring ( 0, 100 ),
-  load: async ( ps: NameAnd<string> ): Promise<string> => {
+const rawConfig = depDataK ( 'rawConfig', rawConfigL,
+  async ( _, ps: NameAnd<string> ): Promise<string> => {
     const params = objectToQueryString ( ps )
     const paramString = params ? `?${params}` : ''
     const response = await fetch ( `${rootUrl}/fusion/global.yaml${paramString}`, {} );
     if ( response.status >= 400 ) throw new Error ( `Failed to load parameters\n${response.statusText}` )
     return await response.text ()
-  }
-} )
+  }, paramsD, {} )
 
-const config = depData ( 'config', configL, rawConfig, {
-  clean: 'leave',
-  tag: ( o: FusionConfigFile ) => o === undefined ? undefined : 'config',
-  load: async ( raw: string ): Promise<FusionConfigFile> => yaml.parser ( raw )
-} )
+const configD = depData ( 'config', configL,
+  ( _, raw: string ): FusionConfigFile => yaml.parser ( raw ), rawConfig, {} )
 
 
-const legalTasks = depData ( 'configLegalData', configLegalTasksL, rawConfig, config, {
-  tag: ( o: string[] ) => o,
-  clean: ( orig, rawConfig, config: any ) => config?.tasks === undefined ? undefined as any as string[] : Object.keys ( config?.tasks ),
-} )
+const legalTasks = depData ( 'configLegalData', configLegalTasksL,
+  ( orig, rawConfig, config: any ) => config?.tasks === undefined ? undefined as any as string[] : Object.keys ( config?.tasks ),
+  rawConfig, configD, {} )
 
-const task = depData ( 'task', taskL, {
-  tag: ( o: string ) => o,
-  clean: 'leave'
-} )
-const requestResponse = depData ( 'requestResponse', requestResponseL, {
-  tag: ( o: ReqRespAction ) => o,
-  clean: 'leave'
-} )
+const taskD = depData ( 'task', taskL, ( old ) => old, {} )
+const requestResponseD = depData ( 'requestResponse', requestResponseL, old => old, {} )
 
 async function loadOne ( query: UrlQuery ) {
   const res = urlStore.list ( query )
   if ( hasErrors ( res ) ) throw new Error ( res.join ( '\n' ) )
   return res
 }
-const tests = depData ( 'tests', testL, config, task, {
-  tag: ( o: ErrorsAnd<ReqRespTestsResult> ) => o ? 'tests' : undefined,
-  clean: 'leave',
-  load: async ( config, task ): Promise<ErrorsAnd<ReqRespTestsResult>> => {
+const testsD = depDataK<FusionWorkbenchState, FusionConfigFile, string, ErrorsAnd<ReqRespTestsResult>> ( 'tests',
+  testL,
+  async ( x, config, task ): Promise<ErrorsAnd<ReqRespTestsResult>> => {
     const theTask = config.tasks[ task ]
     if ( theTask === undefined ) throw new Error ( `Task ${task} not found in config` )
     const runDefn = taskToRunDefn ( theTask )
     const res: ErrorsAnd<ReqRespTestsResult> = await browserTestsRun ( rootUrl ) ( runDefn )
-    return res;
-  }
-} )
+    return res
+  }, configD, taskD, {} )
 
 
-const route = depData ( 'route', routeL, task, params, requestResponse, {
-  tag: ( o: string ) => o,
-  clean: ( _, task: string, params: NameAnd<string>, reqRes ) => {
+const route = depData ( 'route', routeL,
+  ( _, task: string, params: NameAnd<string>, reqRes ) => {
     // const route = calculateRoute ( routingData, container.state )
     // console.log ( 'calculated route', route )
     // return route || '/'
@@ -149,17 +126,12 @@ const route = depData ( 'route', routeL, task, params, requestResponse, {
     const repResString = reqRes === undefined ? 'Summary' : `${reqRes}`
     const taskString = task ? `/task/${task}/${repResString}` : '/'
     return taskString + search
-  },
-} )
+  }, taskD, paramsD, requestResponseD, {} )
 
 
-const deps: DependentItem<FusionWorkbenchState, any> [] = [ dirList, legalParams, params, rawConfig, config, legalTasks, task, requestResponse, tests, route ]
+const deps: DD<FusionWorkbenchState, any> [] = [ dirList, legalParamsD, paramsD, rawConfig, configD, legalTasks, taskD, requestResponseD, testsD, route ]
 
-const setJson = setJsonForDepData ( depEngine, () => container.state, setEventStoreValue ( container ) ) ( deps, {
-  setTag: ( s, name, tag ) => { // could do it with optional, but don't need to
-    s.tags[ name ] = tag
-    return s
-  },
+const setJson = setJsonForDepData ( depEngine ) ( deps, {
   updateLogs: s => {
     s.depDataLog = [ ...toArray ( s.depDataLog ), ...logForDeps ]
     logForDeps.length = 0
@@ -167,7 +139,6 @@ const setJson = setJsonForDepData ( depEngine, () => container.state, setEventSt
   },
   debug: () => container.state?.debug?.depData,
   delay: 500,
-
 } )
 // const setJson = setEventStoreValue ( container );
 addEventStoreListener ( container, (( _, s ) => {
@@ -175,7 +146,7 @@ addEventStoreListener ( container, (( _, s ) => {
   return root.render ( <App state={state}/> );
 }) )
 
-function homeClick<S,T> ( state: LensState<S, T, any>, t: T ) {
+function homeClick<S, T> ( state: LensState<S, T, any>, t: T ) {
   return () => state.setJson ( t, '' )
 }
 function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, any> ) {
@@ -187,7 +158,7 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
     <RouteProvider state={state.copyWithLens ( routeL )}>
       <SizingContext.Provider value={{ leftDrawerWidth: '240px', rightDrawerWidth: '600px' }}>
         <WorkbenchLayout
-          clickHome={homeClick ( state.chainLens ( selectionL ), {routeTemplateName: 'home', requestResponse: 'Summary'} )}
+          clickHome={homeClick ( state.chainLens ( selectionL ), { routeTemplateName: 'home', requestResponse: 'Summary' } )}
           title='Fusion Workbench'
           Nav={<FusionNav state={state}/>}
           Details={<FusionDetails state={state}/>}>

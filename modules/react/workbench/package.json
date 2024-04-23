@@ -21,7 +21,7 @@
     "@laoban/utils": "1.4.45",
     "@itsmworkbench/browserurlstore": "0.0.29",
     "@itsmworkbench/events": "0.0.29",
-    "@itsmworkbench/dependentdata": "0.0.8",
+    "@itsmworkbench/dependentdata2": "0.0.8",
     "@fusionconfig/config": "0.0.8",
     "@fusionconfig/jsonata": "0.0.8",
     "@fusionconfig/react_components": "0.0.8",
