@@ -107,7 +107,7 @@ export function calcStatusFor<S> ( status: NameAnd<DDStatus<S>>, dd: DD<S, any>,
   const paramFn: ParamFn = calcParams ( status )
   const fn = chainOfResponsibility<BasicStatus<S>, DDStatus<S>> (
     ( bs ) => {throw new Error ( 'Chain didnt match for ' + JSON.stringify ( bs ) )},
-    upstreamsUndefined<S> (dd),
+    upstreamsUndefined<S> ( dd ),
     asyncUpstreamsChanged ( paramFn, dd ),
     syncUpstreamsChanged ( paramFn, dd ),
     syncAllGoodButUndefined ( paramFn, dd ),
@@ -198,3 +198,34 @@ export function callAsyncs<S> ( engine: DependentDataEngine<S>, status: AllDdSta
     return await callAsync ( engine, st, d )
   } )
 }
+
+export type SetJsonForDepDataOptions<S> = {
+  debug?: () => boolean | undefined
+  updateLogs?: ( s: S ) => S // called just before we update the value in the store allowing us to add in any logging/debugging into the state
+  delay?: number
+}
+function extractDepDataOptionsWithSafeDefaults<S> ( options: SetJsonForDepDataOptions<S> ): Required<SetJsonForDepDataOptions<S>> {
+  let { debug, updateLogs, delay } = options
+  if ( debug === undefined ) debug = () => false
+  if ( updateLogs === undefined ) updateLogs = ( s ) => s
+  if ( delay === undefined ) delay = 100
+  return { debug, updateLogs, delay };
+}
+let count = 0
+export const setJsonForDepData = <S extends any> ( depEngine: DependentDataEngine<S> ) =>
+  ( deps: DD<S, any>[], options: SetJsonForDepDataOptions<S> ) => {
+    const cleanOptions = extractDepDataOptionsWithSafeDefaults<S> ( options );
+    const { debug: debugFn, updateLogs, delay } = cleanOptions
+    const setJson = ( s: S ) => {
+      const debug = debugFn () === true;
+      console.log ( 'setJson', count++, s )
+      const allStatus = calcAllStatus ( deps, depEngine.current (), s )
+      if ( debug ) console.log ( 'allStatus', allStatus )
+      const newS = foldIntoState ( allStatus, deps, s )
+      const cleanedS = updateLogs ( newS )
+      if ( debug ) console.log ( 'cleanedS', count, cleanedS )
+      depEngine.setS ( cleanedS )
+      setTimeout ( () => callAsyncs ( depEngine, allStatus, deps ), delay )
+    };
+    return setJson
+  }

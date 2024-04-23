@@ -40,13 +40,32 @@ const bIsundefinedBS: BasicStatus<number> = { paramNames: [ 'a' ], upstreamUndef
 describe ( "calcStatusFor", () => {
   describe ( "upstreamsUndefined", () => {
     it ( "should only match when upstream is undefined", () => {
-      expect ( upstreamsUndefined ().isDefinedAt ( { upstreamUndefined: [] } as BasicStatus<any> ) ).toBe ( false )
-      expect ( upstreamsUndefined ().isDefinedAt ( { upstreamUndefined: [ 'something', 'was', 'undefined' ] } as BasicStatus<any> ) ).toBe ( true )
+      expect ( upstreamsUndefined ( {} ).isDefinedAt ( { upstreamUndefined: [] } as BasicStatus<any> ) ).toBe ( false )
+      expect ( upstreamsUndefined ( {} ).isDefinedAt ( { upstreamUndefined: [ 'something', 'was', 'undefined' ] } as BasicStatus<any> ) ).toBe ( true )
     } )
     it ( "should clear when we have a value and upstream is undefined", () => {
       const bs = { upstreamUndefined: [ 'something', 'was', 'undefined' ], rawValue: 3, rawChanged: false } as BasicStatus<number>
-      const result = upstreamsUndefined ().apply ( bs )
-      expect ( result ).toEqual ( { ...bs, needsLoad: false, cleared: false, changed: false, value: 3, reason: 'Upstream has undefined value' } )
+      const result = upstreamsUndefined ( { clearIfUpstreamUndefinedOrLoad: true } ).apply ( bs )
+      expect ( result ).toEqual ( {
+        "changed": true,
+        "cleared": true,
+        "needsLoad": false,
+        "rawChanged": false,
+        "rawValue": 3,
+        value: undefined,
+        "reason": "Upstream has undefined value",
+        "upstreamUndefined": [ "something", "was", "undefined" ]
+      } )
+    } )
+    it ( "should not clearif we dont ask for it", () => {
+      const bs = { upstreamUndefined: [ 'something', 'was', 'undefined' ], rawValue: 3, rawChanged: false } as BasicStatus<number>
+      const result = upstreamsUndefined ( {} ).apply ( bs )
+      expect ( result ).toEqual ( { ...bs, needsLoad: false, changed: false, value: 3, reason: 'Upstream has undefined value' } )
+    } )
+    it ( "should not clearif we dont ask for it", () => {
+      const bs = { upstreamUndefined: [ 'something', 'was', 'undefined' ], rawValue: 3, rawChanged: false } as BasicStatus<number>
+      const result = upstreamsUndefined ( { clearIfLoad: true } ).apply ( bs )
+      expect ( result ).toEqual ( { ...bs, needsLoad: false, changed: false, value: 3, reason: 'Upstream has undefined value' } )
     } )
   } )
   describe ( "asyncUpstreamsChanged", () => {
