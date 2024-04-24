@@ -22,7 +22,7 @@ import { ReqRespTestsResult } from "@fusionconfig/tests";
 import { browserTestsRun } from "@fusionconfig/browsertests";
 import { HomePage } from "./react/home.page";
 import { Optional } from "@focuson/lens";
-import { DD, depData, depDataK, dependentDataEngine, setJsonForDepData } from "@itsmworkbench/dependentdata2";
+import { DD, depData, depDataK, dependentDataEngine, setJsonForDepData } from "@itsmworkbench/dependentdata";
 
 
 const rootElement = document.getElementById ( 'root' );

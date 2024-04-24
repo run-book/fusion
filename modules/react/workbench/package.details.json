@@ -14,7 +14,7 @@
     }
   },
   "links":       [
-    "@itsmworkbench/dependentdata2",
+    "@itsmworkbench/dependentdata",
     "@fusionconfig/config",
     "@fusionconfig/jsonata",
     "@fusionconfig/react_components",

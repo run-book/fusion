@@ -1,87 +1,171 @@
 import { Optional } from "@focuson/lens";
-import { DiTagFn } from "./tag";
 
-export interface DependentItem<S, T> {
+export type DDF<S, T> = RootDDF0<S, T> | DDF1<S, any, T> | DDF2<S, any, any, T> | DDF3<S, any, any, any, T> | DDF4<S, any, any, any, any, T> | DDF5<S, any, any, any, any, any, T>
+export function isDDF<S, T> ( dd: DD<S, T> ): dd is DDF<S, T> {
+  return !dd.wait
+}
+export type DDK<S, T> = DDK0<S, T> | DDK1<S, any, T> | DDK2<S, any, any, T> | DDK3<S, any, any, any, T> | DDK4<S, any, any, any, any, T> | DDK5<S, any, any, any, any, any, T>
+export function isDDK<S, T> ( dd: DD<S, T> ): dd is DDK<S, T> {
+  return dd.wait
+}
+export type DD<S, T> = DDF<S, T> | DDK<S, T>
+
+export interface DDDecisions {
+  wait?: true
+  clearIfUpstreamUndefinedOrLoad?: true
+  clearIfLoad?: true
+
+}
+export interface DDPrim<S, T> extends DDDecisions {
   name: string
-  tagFn: DiTagFn<T>
-  optional: Optional<S, T>
-  dependsOn: DependsOn<S, T>
+  type: string
+  target: Optional<S, T>
+  //if the fn blows up this will be called. Note that this can throw errors as well (for example a more descriptive one) but it should be very simple in nature or debugging issues will be hard
+  recover?: ( e: any, old: T, params: any[] ) => T
 }
 
-
-export type PrimitiveCleanOperation = 'nuke' | 'leave'
-export type CleanFn0<T> = ( t: T | undefined ) => T
-export type CleanFn1<T, T1> = ( t: T | undefined, t1: T1 ) => T
-export type CleanFn2<T, T1, T2> = ( t: T | undefined, t1: T1, t2: T2 ) => T
-export type CleanFn3<T, T1, T2, T3> = ( t: T | undefined, t1: T1, t2: T2, t3: T3 ) => T
-export type CleanOperation<T> = PrimitiveCleanOperation | CleanFn0<T> | CleanFn1<T, any> | CleanFn2<T, any, any> | CleanFn3<T, any, any, any>
-
-export type RootDepend<T> = {
-  root: true
-  load?: () => Promise<T>
-  clean: PrimitiveCleanOperation | CleanFn0<T>
+export type RootDDF0<S, T> = DDPrim<S, T> & {
+  type: 'dd0',
+  fn: ( old: T ) => T
 }
-function isRootDepend<S, T> ( d: DependsOn<S, T> ): d is RootDepend<T> {
-  return 'root' in d
+export type DDK0<S, T> = DDPrim<S, T> & {
+  type: 'dd0',
+  wait: true
+  fn: ( old: T ) => Promise<T>
 }
 
-export type DependsOn1<S, T, T1> = {
-  dependentOn: DependentItem<S, T1>
-  load?: ( p1: T1 ) => Promise<T>
-  clean: PrimitiveCleanOperation | CleanFn1<T, T1>
+export type DDF1<S, P1, T> = DDPrim<S, T> & {
+  type: 'dd1',
+  p1: DD<S, P1>
+  fn: ( old: T, p1: P1 ) => T
 }
-function isDependsOn1<S, T, T1> ( d: DependsOn<S, T> ): d is DependsOn1<S, T, T1> {
-  return 'dependentOn' in d
+export type DDK1<S, P1, T> = DDPrim<S, T> & {
+  type: 'dd1',
+  p1: DD<S, P1>
+  wait: true
+  fn: ( old: T, p1: P1 ) => Promise<T>
 }
-export type DependsOn2<S, T, T1, T2> = {
-  dependentOn1: DependentItem<S, T1>
-  dependentOn2: DependentItem<S, T2>
-  load?: ( p1: T1, p2: T2 ) => Promise<T>
-  clean: PrimitiveCleanOperation | CleanFn2<T, T1, T2>
+export type DDF2<S, P1, P2, T> = DDPrim<S, T> & {
+  type: 'dd2',
+  p1: DD<S, P1>
+  p2: DD<S, P2>
+  fn: ( old: T, p1: P1, p2: P2 ) => T
 }
-function isDependsOn2<S, T, T1, T2> ( d: DependsOn<S, T> ): d is DependsOn2<S, T, any, any> {
-  return 'dependentOn1' in d && 'dependentOn2' in d
+export type DDK2<S, P1, P2, T> = DDPrim<S, T> & {
+  type: 'dd2',
+  p1: DD<S, P1>
+  p2: DD<S, P2>
+  wait: true
+  fn: ( old: T, p1: P1, p2: P2 ) => Promise<T>
 }
-export type DependsOn3<S, T, T1, T2, T3> = {
-  dependentOn1: DependentItem<S, T1>
-  dependentOn2: DependentItem<S, T2>
-  dependentOn3: DependentItem<S, T3>
-  load?: ( p1: T1, p2: T2, p: T3 ) => Promise<T>
-  clean: PrimitiveCleanOperation | CleanFn3<T, T1, T2, T3>
+export type DDF3<S, P1, P2, P3, T> = DDPrim<S, T> & {
+  type: 'dd3',
+  p1: DD<S, P1>
+  p2: DD<S, P2>
+  p3: DD<S, P3>
+  fn: ( old: T, p1: P1, p2: P2, p3: P3 ) => T
 }
-function isDependsOn3<S, T, T1, T2, T3> ( d: DependsOn<S, T> ): d is DependsOn3<S, T, any, any, any> {
-  return 'dependentOn3' in d && 'dependentOn2' in d && 'dependentOn1' in d
+export type DDK3<S, P1, P2, P3, T> = DDPrim<S, T> & {
+  type: 'dd3',
+  p1: DD<S, P1>
+  p2: DD<S, P2>
+  p3: DD<S, P3>
+  wait: true
+  fn: ( old: T, p1: P1, p2: P2, p3: P3 ) => Promise<T>
 }
-export type DependsOn<S, T> = DependsOn1<S, T, any> | DependsOn2<S, T, any, any> | DependsOn3<S, T, any, any, any> | RootDepend<T>
-export function dependents<S, T> ( d: DependsOn<S, T> ): DependentItem<S, any>[] {
-  if ( isDependsOn3<S, T, any, any, any> ( d ) ) return [ d.dependentOn1, d.dependentOn2, d.dependentOn3 ]
-  if ( isDependsOn2<S, T, any, any> ( d ) ) return [ d.dependentOn1, d.dependentOn2 ]
-  if ( isDependsOn1<S, T, any> ( d ) ) return [ d.dependentOn ]
-  if ( isRootDepend<S, T> ( d ) ) return []
-  throw new Error ( 'Unknown depends' + JSON.stringify ( d ) )
+export type DDF4<S, P1, P2, P3, P4, T> = DDPrim<S, T> & {
+  type: 'dd4',
+  p1: DD<S, P1>
+  p2: DD<S, P2>
+  p3: DD<S, P3>
+  p4: DD<S, P4>
+  fn: ( old: T, p1: P1, p2: P2, p3: P3, p4: P4 ) => T
 }
-export function loadFn<S, T> ( d: DependsOn<S, T>, params: any[] ): () => Promise<T> | undefined {
-  return () => {
-    if ( isDependsOn3<S, T, any, any, any> ( d ) ) return d.load !== undefined && d.load ( params[ 0 ], params[ 1 ], params[ 2 ] )
-    if ( isDependsOn2<S, T, any, any> ( d ) ) return d.load !== undefined && d.load ( params[ 0 ], params[ 1 ] )
-    if ( isDependsOn1<S, T, any> ( d ) ) return d.load !== undefined && d.load ( params[ 0 ] )
-    if ( isRootDepend<S, T> ( d ) ) return d.load !== undefined && d.load ()
-    throw new Error ( 'Unknown depends' + JSON.stringify ( d ) )
+export type DDK4<S, P1, P2, P3, P4, T> = DDPrim<S, T> & {
+  type: 'dd4',
+  p1: DD<S, P1>
+  p2: DD<S, P2>
+  p3: DD<S, P3>
+  p4: DD<S, P4>
+  wait: true
+  fn: ( old: T, p1: P1, p2: P2, p3: P3, p4: P4 ) => Promise<T>
+}
+export type DDF5<S, P1, P2, P3, P4, P5, T> = DDPrim<S, T> & {
+  type: 'dd5',
+  p1: DD<S, P1>
+  p2: DD<S, P2>
+  p3: DD<S, P3>
+  p4: DD<S, P4>
+  p5: DD<S, P5>
+  fn: ( old: T, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5 ) => T
+}
+export type DDK5<S, P1, P2, P3, P4, P5, T> = DDPrim<S, T> & {
+  type: 'dd5',
+  p1: DD<S, P1>
+  p2: DD<S, P2>
+  p3: DD<S, P3>
+  p4: DD<S, P4>
+  p5: DD<S, P5>
+  fn: ( old: T, p1: P1, p2: P2, p3: P3, p4: P4, p5: P5 ) => Promise<T>
+}
+
+export function callDDF<S, T> ( dd: DDF<S, T>, old: T, ps: any[] ): T {
+  try {
+    switch ( dd.type ) {
+      case 'dd0':
+        return dd.fn ( old )
+      case 'dd1':
+        return (dd as DDF1<S, any, T>).fn ( old, ps[ 0 ] )
+      case 'dd2':
+        return (dd as DDF2<S, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ] )
+      case 'dd3':
+        return (dd as DDF3<S, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ] )
+      case 'dd4':
+        return (dd as DDF4<S, any, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ], ps[ 3 ] )
+      case 'dd5':
+        return (dd as DDF5<S, any, any, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ], ps[ 3 ], ps[ 4 ] )
+    }
+  } catch ( e ) {
+    if ( dd.recover ) return dd.recover ( e, old, ps )
+    throw e
   }
 }
 
-export function cleanValue<S, T> ( di: DependentItem<S, T>, s: S, params: any[] ): T {
-  const d = di.dependsOn
-  const clean = d.clean
-  if ( clean === 'nuke' ) return undefined as any
-  let currentValue = di.optional.getOption ( s );
-  if ( clean === 'leave' ) return currentValue
-  if ( typeof d.clean === 'function' ) {
-    if ( isDependsOn3<S, T, any, any, any> ( d ) ) return d.clean ( currentValue, params[ 0 ], params[ 1 ], params[ 2 ] )
-    if ( isDependsOn2<S, T, any, any> ( d ) ) return d.clean ( currentValue, params[ 0 ], params[ 1 ] )
-    if ( isDependsOn1<S, T, any> ( d ) ) return d.clean ( currentValue, params[ 0 ] )
-    if ( isRootDepend<S, T> ( d ) ) return d.clean ( currentValue )
+export async function callDDK<S, T> ( dd: DDK<S, T>, old: T, ps: any[] ): Promise<T> {
+  try {
+    switch ( dd.type ) {
+      case 'dd0':
+        return await (dd as DDK0<S, T>).fn ( old )
+      case 'dd1':
+        return await (dd as DDK1<S, any, T>).fn ( old, ps[ 0 ] )
+      case 'dd2':
+        return await (dd as DDK2<S, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ] )
+      case 'dd3':
+        return await (dd as DDK3<S, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ] )
+      case 'dd4':
+        return await (dd as DDK4<S, any, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ], ps[ 3 ] )
+      case 'dd5':
+        return await (dd as DDK5<S, any, any, any, any, any, T>).fn ( old, ps[ 0 ], ps[ 1 ], ps[ 2 ], ps[ 3 ], ps[ 4 ] )
+    }
+  } catch ( e ) {
+    if ( dd.recover ) return dd.recover ( e, old, ps )
+    throw e
   }
-  throw new Error ( 'Unknown clean' + JSON.stringify ( di ) )
 }
 
+export function findParams<S, T> ( dd: DD<S, T> ): DD<S, T>[] {
+  switch ( dd.type ) {
+    case 'dd0':
+      return []
+    case 'dd1':
+      return [ dd.p1 ]
+    case 'dd2':
+      return [ dd.p1, dd.p2 ]
+    case 'dd3':
+      return [ dd.p1, dd.p2, dd.p3 ]
+    case 'dd4':
+      return [ dd.p1, dd.p2, dd.p3, dd.p4 ]
+    case 'dd5':
+      return [ dd.p1, dd.p2, dd.p3, dd.p4, dd.p5 ]
+  }
+}
