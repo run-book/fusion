@@ -1,6 +1,6 @@
 import { Optional } from "@focuson/lens";
 
-export type DDF<S, T> = RootDDF0<S, T> | DDF1<S, any, T> | DDF2<S, any, any, T> | DDF3<S, any, any, any, T> | DDF4<S, any, any, any, any, T> | DDF5<S, any, any, any, any, any, T>
+export type DDF<S, T> = DDF0<S, T> | DDF1<S, any, T> | DDF2<S, any, any, T> | DDF3<S, any, any, any, T> | DDF4<S, any, any, any, any, T> | DDF5<S, any, any, any, any, any, T>
 export function isDDF<S, T> ( dd: DD<S, T> ): dd is DDF<S, T> {
   return !dd.wait
 }
@@ -12,9 +12,7 @@ export type DD<S, T> = DDF<S, T> | DDK<S, T>
 
 export interface DDDecisions {
   wait?: true
-  clearIfUpstreamUndefinedOrLoad?: true
-  clearIfLoad?: true
-
+  clear?: true
 }
 export interface DDPrim<S, T> extends DDDecisions {
   name: string
@@ -24,7 +22,7 @@ export interface DDPrim<S, T> extends DDDecisions {
   recover?: ( e: any, old: T, params: any[] ) => T
 }
 
-export type RootDDF0<S, T> = DDPrim<S, T> & {
+export type DDF0<S, T> = DDPrim<S, T> & {
   type: 'dd0',
   fn: ( old: T ) => T
 }

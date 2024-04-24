@@ -1,6 +1,7 @@
-import { allGood, asyncAllGoodButUndefined, asyncUpstreamsChanged, BasicStatus, syncAllGoodButUndefined, syncUpstreamsChanged, upstreamsUndefined, validateDDs } from "./dependent.data.evaluation";
-import { DDF1, DDK1, RootDDF0 } from "./dependent.data";
+import { allGood, asyncAllGoodButUndefined, asyncUpstreamsChanged, BasicStatus, syncAllGoodButUndefined, syncUpstreamsChanged, upstreamsUndefined } from "./dependant.data.status";
+import { DDF1, DDK1, DDF0 } from "./dependent.data.domain";
 import { Lenses } from "@focuson/lens";
+import { validateDDs } from "./dependent.data.evaluation";
 
 type StateForCalcStatus = {
   a: number
@@ -11,7 +12,7 @@ const idL = Lenses.identity<StateForCalcStatus> ()
 const aL = idL.focusOn ( 'a' )
 const bL = idL.focusOn ( 'b' )
 
-const aDD: RootDDF0<StateForCalcStatus, number> = {
+const aDD: DDF0<StateForCalcStatus, number> = {
   name: 'a',
   type: 'dd0',
   target: aL,
@@ -45,7 +46,7 @@ describe ( "calcStatusFor", () => {
     } )
     it ( "should clear when we have a value and upstream is undefined", () => {
       const bs = { upstreamUndefined: [ 'something', 'was', 'undefined' ], rawValue: 3, rawChanged: false } as BasicStatus<number>
-      const result = upstreamsUndefined ( { clearIfUpstreamUndefinedOrLoad: true } ).apply ( bs )
+      const result = upstreamsUndefined ( { clear: true } ).apply ( bs )
       expect ( result ).toEqual ( {
         "changed": true,
         "cleared": true,
@@ -57,15 +58,15 @@ describe ( "calcStatusFor", () => {
         "upstreamUndefined": [ "something", "was", "undefined" ]
       } )
     } )
-    it ( "should not clearif we dont ask for it", () => {
+    it ( "should not clear if we dont ask for it", () => {
       const bs = { upstreamUndefined: [ 'something', 'was', 'undefined' ], rawValue: 3, rawChanged: false } as BasicStatus<number>
       const result = upstreamsUndefined ( {} ).apply ( bs )
       expect ( result ).toEqual ( { ...bs, needsLoad: false, changed: false, value: 3, reason: 'Upstream has undefined value' } )
     } )
-    it ( "should not clearif we dont ask for it", () => {
+    it ( "should clear if we ask for it", () => {
       const bs = { upstreamUndefined: [ 'something', 'was', 'undefined' ], rawValue: 3, rawChanged: false } as BasicStatus<number>
-      const result = upstreamsUndefined ( { clearIfLoad: true } ).apply ( bs )
-      expect ( result ).toEqual ( { ...bs, needsLoad: false, changed: false, value: 3, reason: 'Upstream has undefined value' } )
+      const result = upstreamsUndefined ( { clear: true } ).apply ( bs )
+      expect ( result ).toEqual ( { ...bs, needsLoad: false, changed: true, cleared: true, value: undefined, reason: 'Upstream has undefined value' } )
     } )
   } )
   describe ( "asyncUpstreamsChanged", () => {
@@ -78,14 +79,14 @@ describe ( "calcStatusFor", () => {
     it ( "should clear when requested and  we have a value and upstream is changed", () => {
       const bs: BasicStatus<number> = { ...bIs3BS, upstreamChanged: [ 'something' ], rawValue: 3 }
 
-      expect ( asyncUpstreamsChanged ( () => [ 1 ], { wait: true, clearIfLoad: true } ).apply ( bs ) ).toEqual (
+      expect ( asyncUpstreamsChanged ( () => [ 1 ], { wait: true, clear: true } ).apply ( bs ) ).toEqual (
         { ...bs, params: [ 1 ], needsLoad: true, cleared: true, changed: true, value: undefined, reason: 'Async, upstream has changed' } )
-      expect ( asyncUpstreamsChanged ( () => [ 1 ], { wait: true, clearIfUpstreamUndefinedOrLoad: true } ).apply ( bs ) ).toEqual (
+      expect ( asyncUpstreamsChanged ( () => [ 1 ], { wait: true, clear: true } ).apply ( bs ) ).toEqual (
         { ...bs, params: [ 1 ], needsLoad: true, cleared: true, changed: true, value: undefined, reason: 'Async, upstream has changed' } )
     } )
     it ( "should not clear, even if requested, if value is already undefined", () => {
       const bs: BasicStatus<number> = { ...bIsundefinedBS, upstreamChanged: [ 'something' ], rawValue: undefined }
-      expect ( asyncUpstreamsChanged ( () => [ 1 ], { wait: true, clearIfLoad: true } ).apply ( bs ) ).toEqual (
+      expect ( asyncUpstreamsChanged ( () => [ 1 ], { wait: true, clear: true } ).apply ( bs ) ).toEqual (
         { ...bs, params: [ 1 ], needsLoad: true, cleared: false, changed: false, value: undefined, reason: 'Async, upstream has changed' } )
 
     } )

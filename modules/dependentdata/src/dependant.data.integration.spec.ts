@@ -1,7 +1,8 @@
 import { mapObjectValues, NameAnd } from "@laoban/utils";
 import { Lenses } from "@focuson/lens";
-import { depData, depDataK } from "./dep.data";
-import { calcAllStatus, calcParams, findBasics } from "./dependent.data.evaluation";
+import { depData, depDataK } from "./dependant.data.dsl";
+import { findBasics } from "./dependant.data.status";
+import { calcAllStatus } from "./dependent.data.evaluation";
 
 type StateForInt = {
   legalParams?: NameAnd<string[]>
@@ -30,12 +31,12 @@ const paramsD = depDataK ( 'params', paramsL,
   async ( old: NameAnd<string>, lp: NameAnd<string[]> ) =>
     mapObjectValues ( lp, ps => ps[ 0 ] ),
   legalParamsD,
-  { clearIfUpstreamUndefinedOrLoad: true } )
+  { clear: true } )
 
 const rawConfigD = depDataK ( 'rawConfig', rawConfigL,
   async ( old: string ) => rawConfig,
-  paramsD, { clearIfUpstreamUndefinedOrLoad: true } )
-const configD = depData ( 'config', configL, ( old, config ) => config + '_parsed', rawConfigD, { clearIfUpstreamUndefinedOrLoad: true } )
+  paramsD, { clear: true } )
+const configD = depData ( 'config', configL, ( old, config ) => config + '_parsed', rawConfigD, { clear: true } )
 const testsD = depData ( 'tests', testsL,
   ( old, params, config ) => 'tests for ' + config + ' with ' + JSON.stringify ( params ),
   paramsD, configD, {} )
@@ -50,7 +51,7 @@ describe ( "depData", () => {
         "target": paramsL,
         "type": "dd1",
         "wait": true,
-        clearIfUpstreamUndefinedOrLoad: true
+        clear: true
       } )
     } )
     test ( 'rawConfigD', () => {
@@ -61,7 +62,7 @@ describe ( "depData", () => {
         "target": rawConfigL,
         "type": "dd1",
         "wait": true,
-        clearIfUpstreamUndefinedOrLoad: true
+        clear: true
       } )
     } )
     // clean: expect.any ( Function ),
@@ -159,7 +160,7 @@ describe ( "calcAllStatus", () => {
       expect ( calcAllStatus ( [ legalParamsD, paramsD, rawConfigD, configD, testsD ], {}, {} ) ).toEqual ( {
         "config": {
           "changed": false,
-          "cleared": false,
+          cleared: false,
           "needsLoad": false,
           "paramNames": [ "rawConfig" ],
           "rawChanged": false,
@@ -244,31 +245,31 @@ describe ( "calcAllStatus", () => {
           "paramNames": [ "legalParams" ],
           "params": [ { "geo": [ "ch", "uk", "us" ], "product": [ "p1", "p2", "p3" ] } ],
           "rawChanged": false,
-          "rawValue": {            "geo": "us",            "product": "p1"          },
+          "rawValue": { "geo": "us", "product": "p1" },
           "reason": "Async, upstream has changed",
-          "upstreamChanged": [            "legalParams"          ],
+          "upstreamChanged": [ "legalParams" ],
           "upstreamUndefined": []
         },
         "rawConfig": {
           "changed": true,
           "cleared": true,
           "needsLoad": false,
-          "paramNames": [            "params"          ],
+          "paramNames": [ "params" ],
           "rawChanged": false,
           "rawValue": "config1",
           "reason": "Upstream has undefined value",
           "upstreamChanged": [],
-          "upstreamUndefined": [            "params"          ]
+          "upstreamUndefined": [ "params" ]
         },
         "tests": {
           "changed": false,
           "needsLoad": false,
-          "paramNames": [            "params",            "config"          ],
+          "paramNames": [ "params", "config" ],
           "rawChanged": false,
           "rawValue": "sometests",
           "reason": "Upstream has undefined value",
           "upstreamChanged": [],
-          "upstreamUndefined": [            "params",            "config"          ],
+          "upstreamUndefined": [ "params", "config" ],
           "value": "sometests"
         }
       } )

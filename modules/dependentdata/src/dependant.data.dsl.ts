@@ -1,15 +1,15 @@
 import { Optional } from "@focuson/lens";
-import { DD, DDF, DDF1, DDF2, DDF3, DDF4, DDF5, DDK, DDK0, DDK1, DDK2, DDK3, DDK4, DDK5, RootDDF0 } from "./dependent.data";
+import { DD, DDF, DDF0, DDF1, DDF2, DDF3, DDF4, DDF5, DDK, DDK0, DDK1, DDK2, DDK3, DDK4, DDK5 } from "./dependent.data.domain";
 
 export type DDConfig<T> = {
-  clearIfUpstreamUndefinedOrLoad?: true
+  clear?: true
   recover?: ( e: any, old: T, params: any[] ) => T
 }
 
 export function depData<S, T> ( name: string,
                                 target: Optional<S, T>,
                                 fn: ( old: T ) => T,
-                                config: DDConfig<T> ): RootDDF0<S, T> ;
+                                config: DDConfig<T> ): DDF0<S, T> ;
 export function depData<S, P1, T> ( name: string,
                                     target: Optional<S, T>,
                                     fn: ( old: T, p1: P1 ) => T,
@@ -76,7 +76,7 @@ export function depData<S, P1, P2, P3, P4, P5, T> ( name: string,
     return res
   }
   if ( arguments.length === 4 ) {
-    let res: RootDDF0<S, T> = { name, target, fn, type: 'dd0', ...(p1 as DDConfig<T> || {}) };
+    let res: DDF0<S, T> = { name, target, fn, type: 'dd0', ...(p1 as DDConfig<T> || {}) };
     return res
   }
   throw new Error ( "Invalid number of arguments for depData function" );
