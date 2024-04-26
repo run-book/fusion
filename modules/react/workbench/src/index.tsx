@@ -23,6 +23,9 @@ import { browserTestsRun } from "@fusionconfig/browsertests";
 import { HomePage } from "./react/home.page";
 import { Optional } from "@focuson/lens";
 import { DD, depData, depDataK, dependentDataEngine, setJsonForDepData } from "@itsmworkbench/dependentdata";
+import RoomBooking from "../roombooking/room.booking";
+import { BookingGrid2 } from "../roombooking/room.booking2";
+
 
 
 const rootElement = document.getElementById ( 'root' );
@@ -163,6 +166,9 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
           Nav={<FusionNav state={state}/>}
           Details={<FusionDetails state={state}/>}>
           <Route path='/'><HomePage state={state}/></Route>
+          <Route path='/booking'><RoomBooking/></Route>
+          <Route path='/booking2'><BookingGrid2/></Route>
+          {/*<Route path='/booking3'><BookingGrid3/></Route>*/}
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           <RouteVars path='/task/{task}/{action}'>{
             ( { task } ) => <>

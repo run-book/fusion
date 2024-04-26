@@ -107,6 +107,7 @@ function extractDepDataOptionsWithSafeDefaults<S> ( options: SetJsonForDepDataOp
 let count = 0
 export const setJsonForDepData = <S extends any> ( depEngine: DependentDataEngine<S> ) =>
   ( deps: DD<S, any>[], options: SetJsonForDepDataOptions<S> ) => {
+    validateDDs ( deps )
     const cleanOptions = extractDepDataOptionsWithSafeDefaults<S> ( options );
     const { debug: debugFn, updateLogs, delay } = cleanOptions
     const setJson = ( s: S ) => {

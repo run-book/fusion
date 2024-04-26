@@ -51,11 +51,24 @@ export function FusionNav<S> ( { state }: LensProps<S, FusionWorkbenchState, any
                                startIcon={<EventIcon/>}
                                valueToSet='/folders' state={state.chainLens ( routeL )}
                                sx={buttonSx}>Debug Folders</FocusOnSetValueButton>
-      {/*<FocusOnSetValueButton aria-label='Debug Variables'*/}
-      {/*                       valueToSet={{ workspaceTab: 'debugVariables' }}*/}
-      {/*                       state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )} sx={buttonSx}>Debug Variables</FocusOnSetValueButton>*/}
-      {/*<FocusOnSetValueButton aria-label='Debug Enriched Events' startIcon={<EventIcon/>} valueToSet={{ workspaceTab: 'debugEnrichedEvents' }} state={tabsState} sx={buttonSx}>Debug Enriched Events</FocusOnSetValueButton>*/}
-      {/*<FocusOnSetValueButton aria-label='Chat' startIcon={<ChatIcon/>} valueToSet={{ workspaceTab: 'chat' }} state={tabsState} sx={buttonSx}>Chat</FocusOnSetValueButton>*/}
+        <FocusOnSetValueButton aria-label='Booking1'
+                               startIcon={<EventIcon/>}
+                               valueToSet='/booking' state={state.chainLens ( routeL )}
+                               sx={buttonSx}>Booking1</FocusOnSetValueButton>
+        <FocusOnSetValueButton aria-label='Booking2'
+                               startIcon={<EventIcon/>}
+                               valueToSet='/booking2' state={state.chainLens ( routeL )}
+                               sx={buttonSx}>Booking2</FocusOnSetValueButton>
+        <FocusOnSetValueButton aria-label='Booking3'
+                               startIcon={<EventIcon/>}
+                               valueToSet='/booking3' state={state.chainLens ( routeL )}
+                               sx={buttonSx}>Booking3</FocusOnSetValueButton>
+
     </>}
   </Box>
 }
+// {/*<FocusOnSetValueButton aria-label='Debug Variables'*/}
+// {/*                       valueToSet={{ workspaceTab: 'debugVariables' }}*/}
+// {/*                       state={state.focusOn ( 'debug' ).focusOn ( 'debugTab' )} sx={buttonSx}>Debug Variables</FocusOnSetValueButton>*/}
+// {/*<FocusOnSetValueButton aria-label='Debug Enriched Events' startIcon={<EventIcon/>} valueToSet={{ workspaceTab: 'debugEnrichedEvents' }} state={tabsState} sx={buttonSx}>Debug Enriched Events</FocusOnSetValueButton>*/}
+// {/*<FocusOnSetValueButton aria-label='Chat' startIcon={<ChatIcon/>} valueToSet={{ workspaceTab: 'chat' }} state={tabsState} sx={buttonSx}>Chat</FocusOnSetValueButton>*/}
