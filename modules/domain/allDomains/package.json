@@ -1,7 +1,7 @@
 {
   "name": "@fusionconfig/alldomains",
   "description": "where all the domains are combined",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "dist/index",
   "types": "dist/index",
   "browserslist": {
@@ -17,15 +17,15 @@
     ]
   },
   "dependencies": {
-    "@laoban/utils": "1.4.49",
+    "@laoban/utils": "1.4.51",
     "@itsmworkbench/urlstore": "0.0.30",
     "@itsmworkbench/yaml": "0.0.30",
-    "@fusionconfig/config": "0.0.8",
-    "@fusionconfig/schema": "0.0.8",
-    "@fusionconfig/tasks": "0.0.8",
-    "@fusionconfig/sample": "0.0.8",
-    "@fusionconfig/services": "0.0.8",
-    "@fusionconfig/transformer": "0.0.8",
+    "@fusionconfig/config": "0.0.9",
+    "@fusionconfig/schema": "0.0.9",
+    "@fusionconfig/tasks": "0.0.9",
+    "@fusionconfig/sample": "0.0.9",
+    "@fusionconfig/services": "0.0.9",
+    "@fusionconfig/transformer": "0.0.9",
     "debug": "^4.3.4"
   },
   "devDependencies": {

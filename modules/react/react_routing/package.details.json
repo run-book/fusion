@@ -4,7 +4,7 @@
   "description": "like react-router but uses the state as the source of truth so we have atomic updates",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils": "1.4.49"
+      "@laoban/utils": "1.4.51"
     },
     "devDependencies": {},
     "bin":             {

@@ -4,7 +4,7 @@
   "description": "accessing transformers",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":           "1.4.49",
+      "@laoban/utils":           "1.4.51",
       "@itsmworkbench/yaml": "0.0.30",
       "@itsmworkbench/urlstore": "0.0.30"
     },

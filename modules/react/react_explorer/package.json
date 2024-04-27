@@ -1,7 +1,7 @@
 {
   "name": "@fusionconfig/react_explorer",
   "description": "a file explorer like component",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "bin": {
     "fusion": "dist/index.js"
   },
@@ -25,9 +25,9 @@
     "@itsmworkbench/jsyaml": "0.0.30",
     "@itsmworkbench/eventstore": "0.0.30",
     "@monaco-editor/react": "^4.6.0",
-    "@fusionconfig/config": "0.0.8",
-    "@fusionconfig/jsonata": "0.0.8",
-    "@fusionconfig/utils": "0.0.8",
+    "@fusionconfig/config": "0.0.9",
+    "@fusionconfig/jsonata": "0.0.9",
+    "@fusionconfig/utils": "0.0.9",
     "debug": "^4.3.4",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",

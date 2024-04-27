@@ -4,7 +4,7 @@
   "description": "the interface for the tests",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":           "1.4.49",
+      "@laoban/utils":           "1.4.51",
       "@itsmworkbench/urlstore": "0.0.30"
     },
     "devDependencies": {

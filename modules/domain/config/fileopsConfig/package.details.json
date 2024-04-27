@@ -4,11 +4,11 @@
   "description": "loads the merged configuration from the file system",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils": "1.4.49"
+      "@laoban/utils": "1.4.51"
     },
     "devDependencies": {
-      "@laoban/variables":       "1.4.49",
-      "@laoban/filesops-node":   "1.4.49",
+      "@laoban/variables":       "1.4.51",
+      "@laoban/filesops-node":   "1.4.51",
       "@itsmworkbench/urlstore": "0.0.30",
       "@itsmworkbench/yaml":   "0.0.30"
     }

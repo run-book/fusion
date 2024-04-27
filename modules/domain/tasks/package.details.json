@@ -4,8 +4,8 @@
   "description": "How we process tasks in the config",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":           "1.4.49",
-      "@laoban/fileops":         "1.4.49",
+      "@laoban/utils":           "1.4.51",
+      "@laoban/fileops":         "1.4.51",
       "@itsmworkbench/urlstore": "0.0.30"
     },
     "devDependencies": {

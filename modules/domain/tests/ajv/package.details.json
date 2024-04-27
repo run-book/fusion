@@ -4,7 +4,7 @@
   "description": "using ajv for schema validation",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":           "1.4.49",
+      "@laoban/utils":           "1.4.51",
       "@itsmworkbench/urlstore": "0.0.30",
       "ajv":                     "8.12.0"
     },

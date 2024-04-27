@@ -1,7 +1,7 @@
 {
   "name": "@itsmworkbench/dependentdata",
   "description": "Often some data is dependendent on other data. Needs nuking or reloading when earlier changes",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "dist/index",
   "types": "dist/index",
   "browser": {
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "node": "^v14.4.0",
-    "@laoban/utils": "1.4.50",
+    "@laoban/utils": "1.4.51",
     "@focuson/lens": "1.44.3",
     "@itsmworkbench/utils": "0.0.30",
     "debug": "^4.3.4"

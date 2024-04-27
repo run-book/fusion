@@ -4,7 +4,7 @@
   "description": "indexing data",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils": "1.4.49"
+      "@laoban/utils": "1.4.51"
     },
     "devDependencies": {
     }

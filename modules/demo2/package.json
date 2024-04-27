@@ -1,7 +1,7 @@
 {
   "name": "demo2",
   "description": "Like heira but for whole files",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "dist/index",
   "types": "dist/index",
   "bin": {
@@ -20,9 +20,9 @@
     ]
   },
   "dependencies": {
-    "@laoban/variables": "1.4.49",
-    "@laoban/utils": "1.4.49",
-    "@fusionconfig/utils": "0.0.8",
+    "@laoban/variables": "1.4.51",
+    "@laoban/utils": "1.4.51",
+    "@fusionconfig/utils": "0.0.9",
     "debug": "^4.3.4"
   },
   "devDependencies": {

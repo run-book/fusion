@@ -1,7 +1,7 @@
 {
   "name": "@fusionconfig/api",
   "description": "The api for the fusionconfig project",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "dist/index",
   "types": "dist/index",
   "browserslist": {
@@ -18,16 +18,16 @@
   },
   "dependencies": {
     "@runbook/utils": "0.3.15",
-    "@laoban/utils": "1.4.49",
+    "@laoban/utils": "1.4.51",
     "@itsmworkbench/apiurlstore": "0.0.30",
     "@itsmworkbench/nodeurlstore": "0.0.30",
     "@itsmworkbench/cli": "0.0.30",
     "@itsmworkbench/shellgit": "0.0.30",
     "@itsmworkbench/jsyaml": "0.0.30",
     "@itsmworkbench/koa": "0.0.30",
-    "@fusionconfig/alldomains": "0.0.8",
-    "@fusionconfig/config": "0.0.8",
-    "@fusionconfig/fileopsconfig": "0.0.8",
+    "@fusionconfig/alldomains": "0.0.9",
+    "@fusionconfig/config": "0.0.9",
+    "@fusionconfig/fileopsconfig": "0.0.9",
     "debug": "^4.3.4"
   },
   "devDependencies": {

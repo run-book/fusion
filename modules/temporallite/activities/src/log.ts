@@ -1,7 +1,16 @@
 import { NameAnd } from "@laoban/utils";
 import { extractVariableNames } from "@itsmworkbench/utils"
 
-export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'none';
+
+export type LogLevel = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'NONE';
+export const LogLevelValue = {
+  TRACE: 0,
+  DEBUG: 1,
+  INFO: 2,
+  WARN: 3,
+  ERROR: 4,
+  NONE: 5
+}
 
 export interface LogConfig0<T> {
   loglevel?: LogLevel;
