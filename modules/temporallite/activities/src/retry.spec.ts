@@ -1,5 +1,5 @@
 import { withRetry } from "./retry";
-import { workspaceHookState } from "./async.hooks";
+import { runWithWorkflowHookState } from "./async.hooks";
 import { NameAnd } from "@laoban/utils";
 import { inMemoryIncMetric } from "./metrics";
 
@@ -18,8 +18,8 @@ describe ( 'withRetry', () => {
       maximumInterval: 20, // ms
       maximumAttempts: 3
     };
-    const fetchDataWithRetry = withRetry ( fetchData, retryConfig );
-    const result = await workspaceHookState.run ( { incMetric } as any, fetchDataWithRetry );
+    const fetchDataWithRetry = withRetry ( retryConfig, fetchData );
+    const result = await runWithWorkflowHookState ( { incMetric } as any, fetchDataWithRetry );
 
     expect ( fetchData ).toHaveBeenCalledTimes ( 1 );
     expect ( result ).toBe ( 'Data' );
@@ -37,8 +37,8 @@ describe ( 'withRetry', () => {
       maximumAttempts: 3
     };
 
-    const fetchDataWithRetry = withRetry ( fetchData, retryConfig );
-    const result = await workspaceHookState.run ( { incMetric } as any, fetchDataWithRetry );
+    const fetchDataWithRetry = withRetry ( retryConfig, fetchData );
+    const result = await runWithWorkflowHookState ( { incMetric } as any, fetchDataWithRetry );
 
     expect ( fetchData ).toHaveBeenCalledTimes ( 2 ); // Should be called twice: fail then succeed
     expect ( result ).toBe ( 'Data' );
@@ -53,9 +53,9 @@ describe ( 'withRetry', () => {
       maximumAttempts: 3
     };
 
-    const fetchDataWithRetry = withRetry ( fetchData, retryConfig );
+    const fetchDataWithRetry = withRetry ( retryConfig, fetchData );
 
-    const result = workspaceHookState.run ( { incMetric } as any, fetchDataWithRetry );
+    const result = runWithWorkflowHookState ( { incMetric } as any, fetchDataWithRetry );
 
 
     await expect ( result ).rejects.toThrow ( 'Network error' );
@@ -81,8 +81,8 @@ describe ( 'withRetry', () => {
     };
 
     // Create the retry wrapper
-    const retryFn = withRetry ( fn, retryPolicy );
-    const result = workspaceHookState.run ( { incMetric } as any, retryFn );
+    const retryFn = withRetry ( retryPolicy, fn );
+    const result = runWithWorkflowHookState ( { incMetric } as any, retryFn );
 
     // Expect the function to throw the non-recoverable error
     await expect ( result ).rejects.toThrow ( "Fatal error" );

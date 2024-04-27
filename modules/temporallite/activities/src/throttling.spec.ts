@@ -22,7 +22,7 @@ describe ( 'throttle testing', () => {
     // Create a bunch of promises
     const promises = [];
     for ( let i = 0; i < 9; i++ ) {
-      const p = withThrottle ( incrementCount, throttle );
+      const p = withThrottle ( throttle, incrementCount );
       promises.push ( p () );
     }
 

@@ -2,7 +2,7 @@ import { LogConfig0, makeObjectFromParams, makeObjectFromParamsAndOutput } from 
 import { useLogging } from "./async.hooks";
 import { simpleTemplate } from "@fusionconfig/utils";
 
-export function withDebug<T> ( fn: ( ...args: any[] ) => Promise<T>, config: LogConfig0<T> & { id: string } ): ( ...args: any ) => Promise<T> {
+export function withDebug<T> ( config: LogConfig0<T> & { id: string }, fn: ( ...args: any[] ) => Promise<T> ): ( ...args: any ) => Promise<T> {
   return async ( ...args: any[] ) => {
     let { enterMessage, exitMessage, id, loglevel } = config
     if ( loglevel === undefined && enterMessage === undefined && exitMessage === undefined ) return fn ( ...args )

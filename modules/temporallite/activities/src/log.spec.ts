@@ -1,5 +1,5 @@
 import { LogConfig1, LogLevel, makeObjectFromParams, makeObjectFromParamsAndOutput } from "./log";
-import { cleanLoggingHookState, loggingHookState, LoggingHookState, useLogging } from "./async.hooks";
+import { cleanLoggingHookState, loggingHookState, LoggingHookState, SafeLoggingHookState, useLogging } from "./async.hooks";
 
 describe ( 'makeObjectFromParams', () => {
   it ( 'should handle simple parameter extraction correctly', () => {
@@ -170,7 +170,7 @@ describe ( 'useLogging', () => {
     mainTemplate: '{time} {level} [CorrelationId: {correlationId}] {message}',
   }
   it ( 'should log messages using the provided message templates', async () => {
-    const testState: Required<LoggingHookState> = { ...empty, log: jest.fn () };
+    const testState: SafeLoggingHookState = { ...empty, log: jest.fn () };
 
     await loggingHookState.run ( testState, () => {
       const log = useLogging ( { 'testMessage': 'Custom test message' } );
@@ -180,7 +180,7 @@ describe ( 'useLogging', () => {
     } );
   } );
   it ( 'should not log message if the log level is below the globalLogLevel', async () => {
-    const testState: Required<LoggingHookState> = { ...empty, log: jest.fn () };
+    const testState: SafeLoggingHookState = { ...empty, log: jest.fn () };
     await loggingHookState.run ( testState, () => {
       const log = useLogging ( { 'testMessage': 'Custom test message' } );
       log ( 'DEBUG', 'testMessage' );
@@ -189,7 +189,7 @@ describe ( 'useLogging', () => {
   } )
 
   it ( 'should fallback to raw message if no template is found', async () => {
-    const testState: Required<LoggingHookState> = { ...empty, log: jest.fn () };
+    const testState: SafeLoggingHookState= { ...empty, log: jest.fn () };
 
     await loggingHookState.run ( testState, () => {
       const log = useLogging ();
@@ -200,7 +200,7 @@ describe ( 'useLogging', () => {
     } );
   } );
   it ( 'should log messages using the provided message templates with parameters', async () => {
-    const testState: Required<LoggingHookState> = { ...empty, log: jest.fn () };
+    const testState: SafeLoggingHookState = { ...empty, log: jest.fn () };
     await loggingHookState.run ( testState, () => {
       const log = useLogging ( { 'testMessage': 'Custom test message with {a}, {b} and {c}. Id is {correlationId}' }, { c: 3 } );
       log ( 'INFO', 'testMessage' );

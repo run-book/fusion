@@ -1,52 +1,37 @@
-import {} from "./replay.state";
-import { workspaceHookState } from "./async.hooks";
+import { runWithWorkflowHookState } from "./async.hooks";
 import { withReplay } from "./replay";
-import { IncMetric, inMemoryIncMetric } from "./metrics";
+import { inMemoryIncMetric } from "./metrics";
 import { NameAnd } from "@laoban/utils";
+import { ActivityEvents } from "./activity.events";
 
 
 describe ( 'replay', () => {
   const activityId = 'testActivity';
   let replayState;
-  let updateState; // Separate state for updates
+  let updateState: ActivityEvents // Separate state for updates
   let metrics: NameAnd<number> = {}
   const incMetric = inMemoryIncMetric ( metrics );
   const empty = { workflowId: 'someId', workflowInstanceId: 'anotherId', currentReplayIndex: 0, incMetric }
   beforeEach ( () => {
     replayState = []; // Replay state is now an array of ReplayItems
-    updateState = {
-      successes: {},
-      failures: {}
-    };
+    updateState = []
     for ( const key in metrics ) delete metrics[ key ]
   } );
 
-  const updateCache = ( activityId, result ) => {
-    if ( !updateState.successes[ activityId ] ) {
-      updateState.successes[ activityId ] = [];
-    }
-    updateState.successes[ activityId ].push ( result );
-  };
+  const updateCache = async ( e ) => {updateState.push ( e )}
 
-  const updateCacheWithError = async ( activityId, error ) => {
-    if ( !updateState.failures[ activityId ] ) {
-      updateState.failures[ activityId ] = [];
-    }
-    updateState.failures[ activityId ].push ( error );
-  };
 
   it ( 'should return a cached success result without executing the function', async () => {
     const fn = jest.fn ( () => Promise.resolve ( 'new data' ) );
     replayState.push ( { id: activityId, success: 'cached data' } ); // Add a successful replay item
 
-    const replayFunction = withReplay<string> ( fn, activityId );
-    const result = await workspaceHookState.run ( { ...empty, replayState, updateCache, updateCacheWithError },
+    const replayFunction = withReplay<string> ( activityId,fn );
+    const result = await runWithWorkflowHookState ( { ...empty, replayState, updateCache },
       async () => await replayFunction () );
 
     expect ( result ).toBe ( 'cached data' );
     expect ( fn ).not.toHaveBeenCalled ();
-    expect ( updateState.successes[ activityId ] ).toBeUndefined ();
-    expect ( updateState.failures[ activityId ] ).toBeUndefined ();
+    expect ( updateState ).toEqual ( [] )
     expect ( metrics ).toEqual ( { 'activity.replay.success': 1 } )
   } );
 
@@ -54,13 +39,12 @@ describe ( 'replay', () => {
     const fn = jest.fn ( () => Promise.resolve ( 'new data' ) );
     // No previous executions or cached results
 
-    const replayFunction = withReplay ( fn, activityId );
-    const result = await workspaceHookState.run ( { ...empty, replayState, updateCache, updateCacheWithError }, async () => await replayFunction () );
+    const replayFunction = withReplay (  activityId,fn  );
+    const result = await runWithWorkflowHookState ( { ...empty, replayState, updateCache }, async () => await replayFunction () );
 
     expect ( result ).toBe ( 'new data' );
     expect ( fn ).toHaveBeenCalledTimes ( 1 );
-    expect ( updateState.successes[ activityId ] ).toEqual ( [ 'new data' ] );
-    expect ( updateState.failures[ activityId ] ).toBeUndefined ();
+    expect ( updateState ).toEqual ( [ { "id": "testActivity", "success": "new data" } ] )
     expect ( metrics ).toEqual ( {} )
   } );
 
@@ -68,14 +52,13 @@ describe ( 'replay', () => {
     const fn = jest.fn ( () => Promise.resolve ( 'new data' ) );
     replayState.push ( { id: activityId, failure: new Error ( 'Error during execution' ) } ); // Add a failed replay item
 
-    const replayFunction = await withReplay ( fn, activityId );
+    const replayFunction = await withReplay (  activityId,fn );
 
-    const result = workspaceHookState.run ( { ...empty, replayState, updateCache, updateCacheWithError }, async () => await replayFunction () );
+    const result = runWithWorkflowHookState ( { ...empty, replayState, updateCache }, async () => await replayFunction () );
     // Expect the function to throw the recorded error
     await expect ( result ).rejects.toThrow ( 'Error during execution' );
     expect ( fn ).not.toHaveBeenCalled ();
-    expect ( updateState.successes[ activityId ] ).toBeUndefined ();
-    expect ( updateState.failures[ activityId ] ).toBeUndefined ();
+    expect ( updateState ).toEqual ( [] )
     expect ( metrics ).toEqual ( { 'activity.replay.success': 1 } )
   } );
 } );

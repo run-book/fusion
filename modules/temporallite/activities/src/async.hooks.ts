@@ -1,31 +1,50 @@
 import { AsyncLocalStorage } from "async_hooks";
-import { ReplayState } from "./replay.state";
-import { IncMetric } from "./metrics";
+import { ActivityEvent, ActivityEvents } from "./activity.events";
+import { IncMetric, inMemoryIncMetric, nullIncMetric, Sideeffect } from "./metrics";
 import { NameAnd } from "@laoban/utils";
 import { LogLevel, LogLevelValue } from "./log";
 import { simpleTemplate } from "@fusionconfig/utils";
-import { derefence, dollarsBracesVarDefn } from "@laoban/variables";
+import { derefence } from "@laoban/variables";
 import { parensVariableDefn } from "@laoban/variables/dist/src/variables";
+import { rememberUpdateCache } from "./activities";
 
 export type MetricHookState = {
-  incMetric: IncMetric
+  incMetric?: IncMetric
+  writeMetrics?: Sideeffect
 }
-export type WorkspaceHookState = MetricHookState & {
+export type WorkflowHookState = MetricHookState & {
   workflowId: string
   workflowInstanceId: string
-  replayState: ReplayState
+  replayState: ActivityEvents
   currentReplayIndex: number
-  updateCache: ( activityId: string, t: any ) => void,
-  updateCacheWithError: ( activityId: string, error: any ) => Promise<void>
+  updateCache: ( e: ActivityEvent ) => Promise<void>,
 }
 
-export const workspaceHookState = new AsyncLocalStorage<WorkspaceHookState> ()
+const workspaceHookState = new AsyncLocalStorage<WorkflowHookState> ()
 
-export function useWorkspaceHookState (): WorkspaceHookState {
-  return workspaceHookState.getStore ()
+export function runWithWorkflowHookState<T> ( state: WorkflowHookState, fn: () => T ): T {
+  return workspaceHookState.run ( state, fn )
 }
+export function useWorkflowHookState (): WorkflowHookState {
+  let store = workspaceHookState.getStore ();
+  if ( store === undefined ) throw new Error ( 'Software error: workflow hook state not set' )
+  return store
+}
+
+export function workflowHookStateForTest ( store: ActivityEvent[], metrics: NameAnd<number> ): WorkflowHookState {
+  const state: WorkflowHookState = {
+    incMetric: inMemoryIncMetric ( metrics ),
+    workflowId: '1',
+    workflowInstanceId: '2',
+    replayState: [], //nothing to replay
+    currentReplayIndex: 0,
+    updateCache: rememberUpdateCache ( store )
+  }
+  return state;
+}
+
 export function useMetricHookState (): IncMetric {
-  return workspaceHookState.getStore ().incMetric
+  return workspaceHookState.getStore ().incMetric || nullIncMetric
 }
 
 export type LogFn = ( level: LogLevel, key: string ) => void
@@ -38,10 +57,17 @@ export type LoggingHookState = {
   params?: NameAnd<any>
   globalLogLevel?: LogLevel
   log?: LogFn// defaults to console.log if not present
+  writeMetrics?: Sideeffect
 }
-export const loggingHookState = new AsyncLocalStorage<Required<LoggingHookState>> ()
+export type SafeLoggingHookState = {
+  [K in keyof Omit<LoggingHookState, 'writeMetrics'>]-?: LoggingHookState[K];
+} & {
+  writeMetrics?: LogFn
+}
 
-export function cleanLoggingHookState ( l: LoggingHookState ): Required<LoggingHookState> {
+export const loggingHookState = new AsyncLocalStorage<SafeLoggingHookState> ()
+
+export function cleanLoggingHookState ( l: LoggingHookState ): SafeLoggingHookState {
   return {
     timeService: l.timeService || Date.now,
     correlationId: l.correlationId || '',

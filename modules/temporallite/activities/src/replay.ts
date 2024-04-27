@@ -1,20 +1,20 @@
 import { K0, K1, K2, K3, K4, K5 } from "./kleisli";
-import { useWorkspaceHookState } from "./async.hooks";
-import { isFailedReplayItem, isSuccessfulReplayItem } from "./replay.state";
+import { useWorkflowHookState } from "./async.hooks";
+import { isActivityFailedEvent, isActivitySucessfulEvent } from "./activity.events";
 
 
-export function withReplay<T> ( fn: K0<T>, activityId: string ): K0<T>
-export function withReplay<P1, T> ( fn: K1<P1, T>, activityId: string ): K1<P1, T>
-export function withReplay<P1, P2, T> ( fn: K2<P1, P2, T>, activityId: string ): K2<P1, P2, T>
-export function withReplay<P1, P2, P3, T> ( fn: K3<P1, P2, P3, T>, activityId: string ): K3<P1, P2, P3, T>
-export function withReplay<P1, P2, P3, P4, T> ( fn: K4<P1, P2, P3, P4, T>, activityId: string ): K4<P1, P2, P3, P4, T>
-export function withReplay<P1, P2, P3, P4, P5, T> ( fn: K5<P1, P2, P3, P4, P5, T>, activityId: string ): K5<P1, P2, P3, P4, P5, T>
+export function withReplay<T> ( activityId: string, fn: K0<T> ): K0<T>
+export function withReplay<P1, T> ( activityId: string, fn: K1<P1, T> ): K1<P1, T>
+export function withReplay<P1, P2, T> ( activityId: string, fn: K2<P1, P2, T> ): K2<P1, P2, T>
+export function withReplay<P1, P2, P3, T> ( activityId: string, fn: K3<P1, P2, P3, T> ): K3<P1, P2, P3, T>
+export function withReplay<P1, P2, P3, P4, T> ( activityId: string, fn: K4<P1, P2, P3, P4, T> ): K4<P1, P2, P3, P4, T>
+export function withReplay<P1, P2, P3, P4, P5, T> ( activityId: string, fn: K5<P1, P2, P3, P4, P5, T> ): K5<P1, P2, P3, P4, P5, T>
 export function withReplay<T, Args extends any[]> (
-  fn: ( activityId: string, ...args: Args ) => Promise<T>,
-  activityId: string ): ( ...args: Args ) => Promise<T> {
+  activityId: string,
+  fn: (  ...args: Args ) => Promise<T> ): ( ...args: Args ) => Promise<T> {
   return async ( ...args: Args ): Promise<T> => {
-    let state = useWorkspaceHookState ()
-    const { currentReplayIndex, replayState, updateCache, updateCacheWithError, incMetric } = state
+    let state = useWorkflowHookState ()
+    const { currentReplayIndex, replayState, updateCache, incMetric } = state
     // Retrieve the current replay item if it exists
     const replayItem = replayState[ currentReplayIndex ];
 
@@ -22,11 +22,11 @@ export function withReplay<T, Args extends any[]> (
     state.currentReplayIndex++;
     // Check if we can use a cached result
     if ( replayItem && replayItem.id === activityId ) {
-      if ( isSuccessfulReplayItem<T> ( replayItem ) ) {
+      if ( isActivitySucessfulEvent<T> ( replayItem ) ) {
         incMetric ( 'activity.replay.success' )
         return replayItem.success;
       }  // Return the successful result from cache
-      if ( isFailedReplayItem ( replayItem ) ) {
+      if ( isActivityFailedEvent ( replayItem ) ) {
         incMetric ( 'activity.replay.success' )
         throw enhanceErrorWithOriginalProperties ( replayItem.failure );
       } else {
@@ -37,12 +37,12 @@ export function withReplay<T, Args extends any[]> (
 
     // Execute the function and update the cache if no valid cache item was found
     try {
-      const result = await fn ( activityId, ...args );
-      updateCache ( activityId, result );
+      const result = await fn ( ...args );
+      updateCache ( { id: activityId, success: result } );
       return result;
-    } catch ( error ) {
-      updateCacheWithError ( activityId, error );
-      throw error;
+    } catch ( failure ) {
+      updateCache ( { id: activityId, failure } );
+      throw failure;
     }
   };
 }

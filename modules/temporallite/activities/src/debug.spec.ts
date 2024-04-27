@@ -21,7 +21,7 @@ describe ( 'withDebug', () => {
       loglevel: 'INFO'
     };
 
-    const wrappedFunction = withDebug ( mockFn, config );
+    const wrappedFunction = withDebug ( config, mockFn );
 
     let result;
     await loggingHookState.run ( testState, async () => {
@@ -47,7 +47,7 @@ describe ( 'withDebug', () => {
       exitMessage: 'Custom {id} with {out} and correlationid {correlationId}'
     };
 
-    const wrappedFunction = withDebug ( mockFn, config );
+    const wrappedFunction = withDebug ( config, mockFn );
 
     let result;
     await loggingHookState.run ( testState, async () => {
@@ -71,7 +71,7 @@ describe ( 'withDebug', () => {
     const mockFn = jest.fn ().mockResolvedValue ( 'direct result' );
     const config: LogConfig0<any> & { id: string } = { id: 'directFunction' }; // No logging info
 
-    const wrappedFunction = withDebug ( mockFn, config );
+    const wrappedFunction = withDebug ( config, mockFn );
 
     let result;
     await loggingHookState.run ( testState, async () => {

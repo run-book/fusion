@@ -16,6 +16,11 @@ export type RetryPolicyConfig = {
   maximumAttempts: number;
   nonRecoverableErrors?: string[];
 };
+export const defaultRetryPolicy: RetryPolicyConfig = {
+  initialInterval: 1000,
+  maximumInterval: 30000,
+  maximumAttempts: 3,
+}
 
 export type SystemConfig = {
   sources: NameAnd<WorkerConfig>;

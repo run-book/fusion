@@ -1,16 +1,17 @@
-import { RetryPolicyConfig } from "@fusionconfig/indexing";
+import { defaultRetryPolicy, RetryPolicyConfig } from "@fusionconfig/indexing";
 import { K0, K1, K2, K3, K4, K5, Kleisli } from "./kleisli";
 import { useMetricHookState } from "./async.hooks";
 
 export type RetryResult<T> = { result: T, attempts: number };
-export function withRetry<T> ( fn: K0<T>, retryPolicy: RetryPolicyConfig ): K0<T>;
-export function withRetry<P1, T> ( fn: K1<P1, T>, retryPolicy: RetryPolicyConfig ): K1<P1, T>;
-export function withRetry<P1, P2, T> ( fn: K2<P1, P2, T>, retryPolicy: RetryPolicyConfig ): K2<P1, P2, T>;
-export function withRetry<P1, P2, P3, T> ( fn: K3<P1, P2, P3, T>, retryPolicy: RetryPolicyConfig ): K3<P1, P2, P3, T>;
-export function withRetry<P1, P2, P3, P4, T> ( fn: K4<P1, P2, P3, P4, T>, retryPolicy: RetryPolicyConfig ): K4<P1, P2, P3, P4, T>;
-export function withRetry<P1, P2, P3, P4, P5, T> ( fn: K5<P1, P2, P3, P4, P5, T>, retryPolicy: RetryPolicyConfig ): K5<P1, P2, P3, P4, P5, T>;
+export function withRetry<T> ( retryPolicy: RetryPolicyConfig, fn: K0<T> ): K0<T>;
+export function withRetry<P1, T> ( retryPolicy: RetryPolicyConfig, fn: K1<P1, T> ): K1<P1, T>;
+export function withRetry<P1, P2, T> ( retryPolicy: RetryPolicyConfig, fn: K2<P1, P2, T> ): K2<P1, P2, T>;
+export function withRetry<P1, P2, P3, T> ( retryPolicy: RetryPolicyConfig, fn: K3<P1, P2, P3, T> ): K3<P1, P2, P3, T>;
+export function withRetry<P1, P2, P3, P4, T> ( retryPolicy: RetryPolicyConfig, fn: K4<P1, P2, P3, P4, T> ): K4<P1, P2, P3, P4, T>;
+export function withRetry<P1, P2, P3, P4, P5, T> ( retryPolicy: RetryPolicyConfig, fn: K5<P1, P2, P3, P4, P5, T> ): K5<P1, P2, P3, P4, P5, T>;
 
-export function withRetry<T> ( fn: ( ...args: any[] ) => Promise<T>, retryPolicy: RetryPolicyConfig ): Kleisli<T> {
+export function withRetry<T> ( retryPolicy: RetryPolicyConfig | undefined, fn: ( ...args: any[] ) => Promise<T> ): Kleisli<T> {
+  if ( retryPolicy === undefined ) retryPolicy = defaultRetryPolicy
   const nonRecoverableErrors = retryPolicy.nonRecoverableErrors || [];
   return async ( ...args: any ): Promise<T> => {
     let attempts = 0;
