@@ -27,9 +27,9 @@ export function activity<P1, P2, P3, P4, P5, T> ( config: ActivityCommon & LogCo
 
 export function activity<T> ( config: ActivityCommon & LogConfig<T>, fn: ( ...args: any[] ) => Promise<T> ): any {
   const newFn: ( ...args: any[] ) => Promise<T> =
-          // updateCacheAtEnd ( config.id,
-            withWriteMetrics (
-              withReplay ( config.id, withRetry ( config.retry || defaultRetryPolicy,
+          withWriteMetrics (
+            withReplay ( config.id,
+              withRetry ( config.retry || defaultRetryPolicy,
                 withThrottle ( config.throttle,
                   withDebug ( config, fn ) ) ) ) )
   newFn[ 'config' ] = config
@@ -38,19 +38,4 @@ export function activity<T> ( config: ActivityCommon & LogConfig<T>, fn: ( ...ar
 }
 
 
-export function updateCacheAtEnd<T> ( activityId: string, fn: ( ...args: any[] ) => Promise<T>, ): ( ...args: any ) => Promise<T> {
-  return async ( ...args: any[] ) => {
-    const { updateCache, currentReplayIndex, replayState } = useWorkflowHookState ()
-    if ( currentReplayIndex <= replayState.length )
-      return fn ( ...args )
-    try {
-      let success = await fn ( ...args );
-      await updateCache ( { id: activityId, success } );
-      return success
-    } catch ( failure ) {
-      await updateCache ( { id: activityId, failure } );
-      throw failure;
-    }
-  }
-}
 export const rememberUpdateCache = <T> ( store: ActivityEvents ) => async e => {store.push ( e );}

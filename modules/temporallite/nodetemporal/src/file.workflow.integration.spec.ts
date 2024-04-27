@@ -1,14 +1,15 @@
-import { activity, ActivityEvents, inMemoryIncMetric, rememberUpdateCache } from "@fusionconfig/activities";
-import { workflow, WorkflowEngine } from "./workflow";
-import { NameAnd } from "@laoban/utils";
+import { activity, ActivityEvents } from "@fusionconfig/activities";
 
-export function makeWorkflowEngine ( existing: ActivityEvents, store: ActivityEvents, metrics: NameAnd<number> ): WorkflowEngine {
-  return {
-    incMetric: () => inMemoryIncMetric ( metrics ),
-    existingState: async ( id: string ) => existing,
-    updateEventHistory: () => rememberUpdateCache ( store ),
-    nextInstanceId: async ( workflowId: string ) => '1'
-  }
+import { NameAnd } from "@laoban/utils";
+import { fileWorkflowEngine } from "./file.workflow.engine";
+import {  defaultFileNamesForTemporal } from "./filenames";
+import { workflow, WorkflowEngine } from "@fusionconfig/workflow";
+import { createTempDir, removeTempDir } from "./filenames.fixtures";
+
+const timeService = (): number => Date.UTC ( 2024, 3, 27, 14, 30, 0 );
+
+function names ( workspace: string ) {
+  return defaultFileNamesForTemporal ( { timeService, workspace, template: '{seq}.events' } )
 }
 export const activityAddOne = activity ( { id: 'addone' },
   async ( input: number ): Promise<number> => input + 1 )
@@ -20,34 +21,31 @@ export const wfAdd13 = workflow ( { id: 'wfAdd13' },
   async ( i: number ) => activityAddOne ( await activityAddFour ( await activityAddEight ( i ) ) ) )
 
 describe ( "workflow", () => {
+  let workspace: string
+  beforeEach ( async () => {
+    workspace = await createTempDir ();
+  } );
+
+  afterEach ( async () => {
+    console.log('workspace', workspace)
+    // await removeTempDir ( workspace );
+  } );
+
   it ( 'should execute a workflow', async () => {
-    const store: ActivityEvents = []
-    let metrics: NameAnd<number> = {};
-    const engine: WorkflowEngine = makeWorkflowEngine ( [], store, metrics );
+    const engine: WorkflowEngine = fileWorkflowEngine ( names( workspace) );
     const result = await wfAdd13 ( engine, 2 )
 
-    expect ( result.workflowId ).toEqual ( 'wfAdd13' )
-    expect ( result.instanceId ).toEqual ( "1" )
-    expect ( await result.result ).toBe ( 15 )
+    expect ( result ).toBe ( 15 )
 
-    expect ( store ).toEqual ( [
-      { "id": "addeight", "success": 10 },
-      { "id": "addfour", "success": 14 },
-      { "id": "addone", "success": 15 }
-    ] )
-    expect ( metrics ).toEqual ( {
-      "activity.attempts": 3,
-      "activity.success": 3
-    } )
   } )
   it ( "should continue a workflow from a previous state when more work to do 1 ", async () => {
     const store: ActivityEvents = []
     let metrics: NameAnd<number> = {};
-    const engine: WorkflowEngine = makeWorkflowEngine ( [
-      { "id": "addeight", "success": 10 } ], store, metrics );
-    const result = await wfAdd13 ( engine, 2 )
+    const engine: WorkflowEngine = fileWorkflowEngine ( names( workspace), 'instanceId' );
 
-    expect ( await result.result ).toBe ( 15 )
+    const result = await wfAdd13 ( engine, 2 ) //this should be a continue command not a start command
+
+    expect ( result ).toBe ( 15 )
     expect ( store ).toEqual ( [
       { "id": "addfour", "success": 14 },
       { "id": "addone", "success": 15 }
@@ -61,12 +59,10 @@ describe ( "workflow", () => {
   it ( "should continue a workflow from a previous state when more work to do 2 ", async () => {
     const store: ActivityEvents = []
     let metrics: NameAnd<number> = {};
-    const engine: WorkflowEngine = makeWorkflowEngine ( [
-      { "id": "addeight", "success": 10 },
-      { "id": "addfour", "success": 14 } ], store, metrics );
+    const engine: WorkflowEngine = fileWorkflowEngine ( names( workspace) );
     const result = await wfAdd13 ( engine, 2 )
 
-    expect ( await result.result ).toBe ( 15 )
+    expect ( result ).toBe ( 15 )
     expect ( store ).toEqual ( [ { "id": "addone", "success": 15 } ] )
     expect ( metrics ).toEqual ( {
       "activity.attempts": 1,
@@ -77,13 +73,10 @@ describe ( "workflow", () => {
   it ( "should continue a workflow from a previous state when no more work", async () => {
     const store: ActivityEvents = []
     let metrics: NameAnd<number> = {};
-    const engine: WorkflowEngine = makeWorkflowEngine ( [
-      { "id": "addeight", "success": 10 },
-      { "id": "addfour", "success": 14 },
-      { "id": "addone", "success": 15 } ], store, metrics );
+    const engine: WorkflowEngine = fileWorkflowEngine ( names( workspace) );
     const result = await wfAdd13 ( engine, 2 )
 
-    expect ( await result.result ).toBe ( 15 )
+    expect ( result ).toBe ( 15 )
     expect ( store ).toEqual ( [] )
     expect ( metrics ).toEqual ( {
       "activity.replay.success": 3

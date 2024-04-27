@@ -17,7 +17,7 @@ export type WorkflowHookState = MetricHookState & {
   workflowInstanceId: string
   replayState: ActivityEvents
   currentReplayIndex: number
-  updateCache: ( e: ActivityEvent ) => Promise<void>,
+  updateEventHistory: ( e: ActivityEvent ) => Promise<void>,
 }
 
 const workspaceHookState = new AsyncLocalStorage<WorkflowHookState> ()
@@ -38,7 +38,7 @@ export function workflowHookStateForTest ( store: ActivityEvent[], metrics: Name
     workflowInstanceId: '2',
     replayState: [], //nothing to replay
     currentReplayIndex: 0,
-    updateCache: rememberUpdateCache ( store )
+    updateEventHistory: rememberUpdateCache ( store )
   }
   return state;
 }

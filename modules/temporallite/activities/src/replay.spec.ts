@@ -26,7 +26,7 @@ describe ( 'replay', () => {
     replayState.push ( { id: activityId, success: 'cached data' } ); // Add a successful replay item
 
     const replayFunction = withReplay<string> ( activityId,fn );
-    const result = await runWithWorkflowHookState ( { ...empty, replayState, updateCache },
+    const result = await runWithWorkflowHookState ( { ...empty, replayState, updateEventHistory: updateCache },
       async () => await replayFunction () );
 
     expect ( result ).toBe ( 'cached data' );
@@ -40,7 +40,7 @@ describe ( 'replay', () => {
     // No previous executions or cached results
 
     const replayFunction = withReplay (  activityId,fn  );
-    const result = await runWithWorkflowHookState ( { ...empty, replayState, updateCache }, async () => await replayFunction () );
+    const result = await runWithWorkflowHookState ( { ...empty, replayState, updateEventHistory: updateCache }, async () => await replayFunction () );
 
     expect ( result ).toBe ( 'new data' );
     expect ( fn ).toHaveBeenCalledTimes ( 1 );
@@ -54,7 +54,7 @@ describe ( 'replay', () => {
 
     const replayFunction = await withReplay (  activityId,fn );
 
-    const result = runWithWorkflowHookState ( { ...empty, replayState, updateCache }, async () => await replayFunction () );
+    const result = runWithWorkflowHookState ( { ...empty, replayState, updateEventHistory: updateCache }, async () => await replayFunction () );
     // Expect the function to throw the recorded error
     await expect ( result ).rejects.toThrow ( 'Error during execution' );
     expect ( fn ).not.toHaveBeenCalled ();

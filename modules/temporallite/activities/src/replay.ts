@@ -14,7 +14,7 @@ export function withReplay<T, Args extends any[]> (
   fn: (  ...args: Args ) => Promise<T> ): ( ...args: Args ) => Promise<T> {
   return async ( ...args: Args ): Promise<T> => {
     let state = useWorkflowHookState ()
-    const { currentReplayIndex, replayState, updateCache, incMetric } = state
+    const { currentReplayIndex, replayState, updateEventHistory, incMetric } = state
     // Retrieve the current replay item if it exists
     const replayItem = replayState[ currentReplayIndex ];
 
@@ -38,10 +38,10 @@ export function withReplay<T, Args extends any[]> (
     // Execute the function and update the cache if no valid cache item was found
     try {
       const result = await fn ( ...args );
-      updateCache ( { id: activityId, success: result } );
+      updateEventHistory ( { id: activityId, success: result } );
       return result;
     } catch ( failure ) {
-      updateCache ( { id: activityId, failure } );
+      updateEventHistory ( { id: activityId, failure } );
       throw failure;
     }
   };

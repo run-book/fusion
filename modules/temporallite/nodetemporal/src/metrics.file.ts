@@ -1,7 +1,7 @@
-import { MetricHookState } from "@fusionconfig/activities";
-import { inMemoryIncMetric } from "@fusionconfig/activities";
+import { inMemoryIncMetric, MetricHookState } from "@fusionconfig/activities";
 import { NameAnd } from "@laoban/utils";
 import fs from "fs";
+import { FileNamesForTemporal } from "./filenames";
 
 export async function swapFiles ( file: string, newData: string ): Promise<void> {
   const tempFilePath = `${file}.tmp`;
@@ -11,13 +11,12 @@ export async function swapFiles ( file: string, newData: string ): Promise<void>
 }
 
 
-export function metricsOnFile ( filename: string ): MetricHookState {
+export const metricsOnFile = ( names: FileNamesForTemporal ) => ( workspaceInstanceId: string ): MetricHookState => {
+  const file = names.metrics ( workspaceInstanceId );
   const metrics: NameAnd<number> = {}
   return {
     incMetric: inMemoryIncMetric ( metrics ),
-    writeMetrics: async () =>
-      swapFiles ( filename, JSON.stringify ( metrics ) )
-
+    writeMetrics: async () => swapFiles ( file, JSON.stringify ( metrics ) )
   }
 
-}
+};
