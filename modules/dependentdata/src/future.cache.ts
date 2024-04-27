@@ -1,4 +1,5 @@
 import { callListeners, PromiseCacheListener } from "@itsmworkbench/utils";
+import { shallowCompareArrays } from "@fusionconfig/utils";
 
 
 /** This cache is written assuming that there won't be that many calls at once. It's for the dependant data. Thus a linear search for the params */
@@ -68,12 +69,7 @@ export function futureCache<Context> (): FutureCache<Context> {
   }
 }
 
-function shallowCompareArrays ( arr1: any[], arr2: any[] ) {
-  if ( arr1.length !== arr2.length ) return false; // Different lengths, definitely not equal
-  for ( let i = 0; i < arr1.length; i++ )
-    if ( arr1[ i ] !== arr2[ i ] ) return false;
-  return true;
-}
+
 
 
 /**

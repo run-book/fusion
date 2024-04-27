@@ -14,6 +14,7 @@ export type RetryPolicyConfig = {
   initialInterval: number; // In milliseconds
   maximumInterval: number; // In milliseconds
   maximumAttempts: number;
+  nonRecoverableErrors?: string[];
 };
 
 export type SystemConfig = {

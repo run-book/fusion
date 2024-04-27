@@ -1,0 +1,20 @@
+{
+  "template":    "typescript",
+  "name":        "@fusionconfig/activities",
+  "description": "indexing data",
+  "packageJson": {
+    "dependencies":    {
+      "@laoban/utils": "1.4.49"
+    },
+    "devDependencies": {
+    }
+  },
+  "links":       [
+    "@fusionconfig/indexing"
+  ],
+  "guards":      {
+    "compile": true,
+    "publish": true,
+    "test":    false
+  }
+}
