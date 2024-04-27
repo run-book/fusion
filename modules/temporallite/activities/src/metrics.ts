@@ -8,3 +8,4 @@ export function inMemoryIncMetric ( metrics: NameAnd<number> ): IncMetric {
     metrics[ metricName ]++
   }
 }
+export const nullIncMetric: IncMetric = () => {}

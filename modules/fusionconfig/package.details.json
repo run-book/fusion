@@ -4,10 +4,10 @@
   "description": "Like heira but for whole files",
   "packageJson": {
     "dependencies":    {
-      "@itsmworkbench/cli":          "0.0.29",
-      "@itsmworkbench/commander12":  "0.0.29",
-      "@itsmworkbench/jsyaml":       "0.0.29",
-      "@itsmworkbench/nodeurlstore": "0.0.29",
+      "@itsmworkbench/cli":          "0.0.30",
+      "@itsmworkbench/commander12":  "0.0.30",
+      "@itsmworkbench/jsyaml":       "0.0.30",
+      "@itsmworkbench/nodeurlstore": "0.0.30",
       "@laoban/filesops-node":       "1.4.49",
       "@laoban/variables":           "1.4.49",
       "@laoban/utils":               "1.4.49"

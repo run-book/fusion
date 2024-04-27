@@ -5,7 +5,7 @@
   "packageJson": {
     "dependencies":    {
       "@laoban/utils":      "1.4.49",
-      "@itsmworkbench/koa": "0.0.29"
+      "@itsmworkbench/koa": "0.0.30"
     },
     "devDependencies": {
     }
