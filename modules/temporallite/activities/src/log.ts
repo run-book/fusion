@@ -13,8 +13,10 @@ export const LogLevelValue = {
 }
 
 export interface LogConfig0<T> {
-  loglevel?: LogLevel;
+  loglevel?: LogLevel; //overrides default when enterMessage and/or exitMessage are set. This allows us to do logging even when the log level is (say) NONE
   messages?: NameAnd<string>
+  enterMessage?: string;
+  exitMessage?: string;
   formatOutput?: ( output: T ) => string;
 }
 export interface LogConfig1<P1, T> extends LogConfig0<T> {
