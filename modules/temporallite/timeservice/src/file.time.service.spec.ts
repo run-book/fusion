@@ -1,4 +1,4 @@
-import { checkAndHandleOffset, checkTimeSynchronization, defaultTimeServiceData } from "./file.time.service";
+import { checkAndHandleOffset, checkTimeSynchronization, defaultTimeServiceData, firstCheckAndHandle, repeatingCheckAndHandles } from "./file.time.service";
 
 const filenameForTest = 'target/timeTest.txt';
 describe ( 'Time Synchronization Tests', function () {
@@ -90,5 +90,75 @@ describe ( 'checkAndHandleOffset', () => {
   } );
 } );
 
+describe ( 'firstCheckAndHandle', () => {
+  let mockCheckTimeSynchronization;
+  let config;
+  let logData;
+
+  beforeEach ( () => {
+    logData = [];
+    mockCheckTimeSynchronization = jest.fn ();
+    config = {
+      filenameForTest: '/path/to/testfile.txt',
+      log: ( message, error ) => logData.push ( `Error${error} ${message}` ),
+      maximumAllowedOffset: 100,
+      offsetFromNow: 0,
+      allowMaxOffsetError: false,
+      timeBetweenChecksms: 1000, // Example interval
+    };
+  } );
+
+  it ( 'should initialize without errors when offset is within the allowed limit', async () => {
+    mockCheckTimeSynchronization.mockResolvedValue ( 50 ); // Within the limit
+    await firstCheckAndHandle ( config, mockCheckTimeSynchronization );
+    expect ( logData ).toContainEqual ( 'Errorfalse Starting time service' );
+    expect ( logData ).not.toContainEqual ( expect.stringContaining ( 'Error: Time offset exceeded maximum allowed limit' ) );
+    expect ( config.offsetFromNow ).toBe ( 50 );
+  } );
+
+  it ( 'should log error and potentially throw when the maximum allowed offset is exceeded', async () => {
+    mockCheckTimeSynchronization.mockResolvedValue ( 150 ); // Exceeds the limit
+    await expect ( firstCheckAndHandle ( config, mockCheckTimeSynchronization ) )
+      .rejects.toThrow ( 'Time service is not started. Please abort and fix!' );
+    expect ( logData ).toContainEqual ( expect.stringContaining ( 'Errortrue Error: Time offset exceeded maximum allowed limit' ) );
+  } );
+
+  it ( 'should not throw but still log error when `allowMaxOffsetError` is true and maximum offset is exceeded', async () => {
+    config.allowMaxOffsetError = true; // Allowing error without throwing
+    mockCheckTimeSynchronization.mockResolvedValue ( 150 ); // Exceeds the limit
+    await firstCheckAndHandle ( config, mockCheckTimeSynchronization );
+    expect ( logData ).toContainEqual ( expect.stringContaining ( 'Errortrue Error: Time offset exceeded maximum allowed limit' ) );
+    expect ( config.offsetFromNow ).toBe ( 150 ); // Should still update the offset
+  } );
+} );
+
+
+describe('repeatingCheckAndHandles', () => {
+  let mockCheckAndHandleOffset;
+  let config;
+  let logData;
+
+  beforeEach(() => {
+    logData = [];
+    mockCheckAndHandleOffset = jest.fn(); // Mock the dependency
+    config = {
+      log: (message, error) => logData.push(`Error${error} ${message}`)
+    };
+  });
+
+  it('should call checkAndHandleOffset without throwing an error', async () => {
+    mockCheckAndHandleOffset.mockResolvedValue();
+    await repeatingCheckAndHandles(config, mockCheckAndHandleOffset);
+    expect(mockCheckAndHandleOffset).toHaveBeenCalled();
+  });
+
+  it('should catch errors from checkAndHandleOffset and log them', async () => {
+    const error = new Error('Test error');
+    mockCheckAndHandleOffset.mockRejectedValue(error);
+    await repeatingCheckAndHandles(config, mockCheckAndHandleOffset);
+    expect(logData).toContainEqual(`Errortrue Failed during time synchronization check:\n${error}`);
+    expect(mockCheckAndHandleOffset).toHaveBeenCalled();
+  });
+});
 
 
