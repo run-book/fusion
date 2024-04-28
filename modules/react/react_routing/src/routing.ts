@@ -44,4 +44,5 @@ export function placeRouteInto<S> ( data: RoutingData<S>, path: string, s: S ): 
       return acc
     }
   }
+  return s
 }

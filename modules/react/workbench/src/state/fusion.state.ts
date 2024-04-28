@@ -1,11 +1,11 @@
 import { Lenses, Optional } from "@focuson/lens";
 import { ErrorsAnd, NameAnd, } from "@laoban/utils";
 import { FCLogRecord } from "@itsmworkbench/utils";
-import { ListNamesResult, UrlFolder } from "@itsmworkbench/urlstore"
-import { DiTag } from "@itsmworkbench/dependentdata";
+import { UrlFolder } from "@itsmworkbench/urlstore"
+
 import { ConfigFile } from "@fusionconfig/config";
 import { ReqRespAction } from "./test.selection";
-import { ReqRespTestsResult, RunReqRespTestsDefn, RunTestsDefn, TestsResult } from "@fusionconfig/tests";
+import { ReqRespTestsResult, RunReqRespTestsDefn } from "@fusionconfig/tests";
 
 
 export type SelectionState = {
@@ -64,7 +64,6 @@ export interface FusionConfigFile extends ConfigFile {
 export type FusionWorkbenchState = {
   selectionState: SelectionState
   debug?: DebugState
-  tags: NameAnd<DiTag>,
   depDataLog: FCLogRecord<any, any>[],
   folders?: UrlFolder
   legal_parameters?: NameAnd<string[]>
@@ -83,7 +82,6 @@ export const testNameL = selectionL.focusQuery ( 'testName' )
 export const testL: Optional<FusionWorkbenchState, ErrorsAnd<ReqRespTestsResult>> = idL.focusQuery ( 'tests' )
 export const requestResponseL = selectionL.focusQuery ( 'requestResponse' )
 export const routeL: Optional<FusionWorkbenchState, string> = selectionL.focusQuery ( 'route' )
-export const tagsL = idL.focusQuery ( 'tags' )
 export const foldersO = idL.focusQuery ( 'folders' )
 export const legalParamsL: Optional<FusionWorkbenchState, NameAnd<string[]>> = idL.focusQuery ( 'legal_parameters' )
 export const paramsL: Optional<FusionWorkbenchState, NameAnd<string>> = idL.focusQuery ( 'parameters' )

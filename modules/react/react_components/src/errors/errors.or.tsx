@@ -13,6 +13,6 @@ export function ErrorOr<S, T> ( { value, context, children }: ErrorsOrProps<S, T
   if ( hasErrors ( value ) ) return <>{context}
     <pre>{JSON.stringify ( value, null, 2 )}</pre>
   </>
-  const castState = value as T
+  const castState = value as NonNullable<T>
   return <>{children ( castState )}</>
 }

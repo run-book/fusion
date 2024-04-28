@@ -27,7 +27,6 @@ import RoomBooking from "../roombooking/room.booking";
 import { BookingGrid2 } from "../roombooking/room.booking2";
 
 
-
 const rootElement = document.getElementById ( 'root' );
 if ( !rootElement ) throw new Error ( 'Failed to find the root element' );
 const root = createRoot ( rootElement );
@@ -186,15 +185,11 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
 
 const startState: FusionWorkbenchState = {
   selectionState: { requestResponse: reqRespOptions[ 0 ] },
-  tags: {}, depDataLog: [],
+  depDataLog: [],
   debug: { depData: true },
 }
 const withRoute = placeRouteInto ( routingData, window.location.pathname + window.location.search, startState )
 console.log ( 'withRoute', withRoute )
 // let parameters: NameAnd<string> | undefined = getQueryParams ( window.location.search )
 // if ( Object.keys ( parameters ).length === 0 ) parameters = undefined
-setJson ( {
-  selectionState: { requestResponse: reqRespOptions[ 0 ] },
-  tags: {}, depDataLog: [],
-  debug: { depData: true },
-} )
+setJson ( startState )

@@ -70,7 +70,7 @@ export function extractPathAndQuery ( fullPath: string ): { path: string, query:
   }
 }
 
-export function makeSearchString ( params: NameAnd<string> ) {
+export function makeSearchString ( params: NameAnd<string>|undefined ) {
   const searchParams = new URLSearchParams ();
   Object.entries ( params || {} ).forEach ( ( [ key, value ] ) => searchParams.append ( key, value ) );
   return searchParams.toString ();
