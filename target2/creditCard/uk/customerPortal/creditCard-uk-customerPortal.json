@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "bpmn": {
+    "model": "creditCard"
+  },
+  "plugins": [
+    "addKafkaSchemasToServices",
+    "addTaskDetails",
+    "addTransformersToTasks",
+    "removeKey(services)",
+    "removeKey(parameters)",
+    "removeKey(hierarchy)",
+    "removeKey(where)",
+    "removeKey(plugins)"
+  ],
+  "tasks": {
+    "aml": {
+      "taskDescription": "AML check for customer",
+      "service": "experian_aml",
+      "variables": [
+        "userdata"
+      ],
+      "serviceDescription": "AML service provided by Experian for real-time background checks.",
+      "request": {
+        "topic": "experian.aml.request",
+        "kafka": {
+          "name": "itsm/org/schema/service/experian_aml/request",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "schema": {
+          "name": "itsm/org/schema/task/aml/request",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "transformer": {
+          "name": "itsm/org/transformer/experian_aml/aml/aml__to_experian_aml",
+          "id": "itsmid/org/transformer/0abc45a984deadf1d26681fb76aab57d6f86ea94"
+        }
+      },
+      "response": {
+        "topic": "experian.aml.response",
+        "kafka": {
+          "name": "itsm/org/schema/service/experian_aml/response",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "schema": {
+          "name": "itsm/org/schema/task/aml/response",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "transformer": {
+          "name": "itsm/org/transformer/experian_aml/aml/aml__from_experian_aml",
+          "id": "itsmid/org/transformer/0abc45a984deadf1d26681fb76aab57d6f86ea94"
+        }
+      }
+    },
+    "creditCheck": {
+      "service": "equifax_creditCheck",
+      "taskDescription": "Credit check for customer. In the UK we use Equifax",
+      "variables": [
+        "userdata"
+      ],
+      "serviceDescription": "Credit score checking service provided by Equifax.",
+      "request": {
+        "topic": "equifax.creditScore.request",
+        "kafka": {
+          "name": "itsm/org/schema/service/equifax_creditCheck/request",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "schema": {
+          "name": "itsm/org/schema/task/creditCheck/request",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "transformer": {
+          "name": "itsm/org/transformer/equifax_creditCheck/creditcheck/creditcheck_to_equifax",
+          "id": "itsmid/org/transformer/4f39283bb75d53da42655e47d51af56f6480c788"
+        }
+      },
+      "response": {
+        "topic": "equifax.creditScore.response",
+        "kafka": {
+          "name": "itsm/org/schema/service/equifax_creditCheck/response",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "schema": {
+          "name": "itsm/org/schema/task/creditCheck/response",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "transformer": {
+          "name": "itsm/org/transformer/equifax_creditCheck/creditcheck/creditcheck_from_equifax",
+          "id": "itsmid/org/transformer/4f39283bb75d53da42655e47d51af56f6480c788"
+        }
+      }
+    },
+    "pricing": {
+      "taskDescription": "Pricing service for product and service pricing adjustments",
+      "service": "internal_pricingService",
+      "variables": [
+        "userdata"
+      ],
+      "serviceDescription": "Internal pricing service for product and service pricing adjustments.",
+      "request": {
+        "topic": "internal.pricing.request",
+        "kafka": {
+          "name": "itsm/org/schema/service/internal_pricingService/request",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "schema": {
+          "name": "itsm/org/schema/task/pricing/request",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "transformer": {
+          "name": "itsm/org/transformer/internal_pricingService/pricing/pricing_to_internal/pricing_to_internal",
+          "id": "itsmid/org/transformer/2199c041baeb8fa8f4df428e106b37eb342fd573"
+        }
+      },
+      "response": {
+        "topic": "internal.pricing.response",
+        "kafka": {
+          "name": "itsm/org/schema/service/internal_pricingService/response",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "schema": {
+          "name": "itsm/org/schema/task/pricing/response",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "transformer": {
+          "name": "itsm/org/transformer/internal_pricingService/pricing/pricing_from_internal/pricing_from_internal",
+          "id": "itsmid/org/transformer/2199c041baeb8fa8f4df428e106b37eb342fd573"
+        }
+      }
+    },
+    "signatureVerification": {
+      "taskDescription": "Signature verification for document signing",
+      "service": "internal_signatureVerification",
+      "variables": [
+        "userdata"
+      ],
+      "serviceDescription": "Internal signature verification service for document signing.",
+      "request": {
+        "topic": "internal.signatureVerification.request",
+        "kafka": {
+          "name": "itsm/org/schema/service/internal_signatureVerification/request",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "schema": {
+          "name": "itsm/org/schema/task/signatureVerification/request",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "transformer": {
+          "name": "itsm/org/transformer/internal_signatureVerification/signatureVerification/signature_to_internal",
+          "id": "itsmid/org/transformer/5245110ec629c10d54102dd2753e1459d49c8730"
+        }
+      },
+      "response": {
+        "topic": "internal.signatureVerification.response",
+        "kafka": {
+          "name": "itsm/org/schema/service/internal_signatureVerification/response",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "schema": {
+          "name": "itsm/org/schema/task/signatureVerification/response",
+          "id": "itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9"
+        },
+        "transformer": {
+          "name": "itsm/org/transformer/internal_signatureVerification/signatureVerification/signature_from_internal",
+          "id": "itsmid/org/transformer/5245110ec629c10d54102dd2753e1459d49c8730"
+        }
+      }
+    }
+  }
+}

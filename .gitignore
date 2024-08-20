@@ -10,6 +10,7 @@ build/
 .laoban.test.json
 
 target/
+target2/
 
 tests/git/org/.git
 

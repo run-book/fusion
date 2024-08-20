@@ -11,51 +11,24 @@ where:
    services: "service/<service>/<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
 
 services:
-  experian_aml:
-    serviceDescription: "AML service provided by Experian for real-time background checks."
-    request:
-      topic: "experian.aml.request"
-    response:
-      topic: "experian.aml.response"
 
-  equifax_creditCheck:
-    serviceDescription: "Credit score checking service provided by Equifax."
+  "iorig-credit-bureau-uc-service":
+    serviceDescription: "This interaction with UC, which provides credit history and affordability evaluations."
     request:
-      topic: "equifax.creditScore.request"
+      topic: "iorig-credit-bureau-uc-service.request"
     response:
-      topic: "equifax.creditScore.response"
+      topic: "iorig-credit-bureau-uc-service.response"
 
-  experian_creditCheck:
-    serviceDescription: "Credit score checking service provided by Experian."
+  iorig-aml-service:
+    serviceDescription: "This is an internal service that evaluates the AML data and decides if the customer is a good risk"
     request:
-      topic: "experian.creditScore.request"
+      topic: "iorig-aml-service"
     response:
-      topic: "experian.creditScore.response"
+      topic: "iorig-aml-service"
 
-  internal_signatureVerification:
-    serviceDescription: "Internal signature verification service for document signing."
-    request:
-      topic: "internal.signatureVerification.request"
-    response:
-      topic: "internal.signatureVerification.response"
 
-  internal_pricingService:
-    serviceDescription: "Internal pricing service for product and service pricing adjustments."
-    request:
-      topic: "internal.pricing.request"
-    response:
-      topic: "internal.pricing.response"
+#      uk.ipay.origination.aml.status.req
+#      uk.ipay.origination.aml.status.res
+#      se.loan.origination.aml.status.req
+#      se.loan.origination.aml.status.res
 
-  internal_carloan_PricingService:
-    serviceDescription: "Internal pricing service for carloans"
-    request:
-      topic: "internal.pricing.request"
-    response:
-      topic: "internal.pricing.response"
-
-  internal_limitManagement:
-    serviceDescription: "Limit management service for transaction and account limits."
-    request:
-      topic: "internal.limitManagement.request"
-    response:
-      topic: "internal.limitManagement.response"

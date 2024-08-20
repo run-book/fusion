@@ -1,7 +1,0 @@
-bpmn:
-  model: carLoan
-
-tasks:
-  creditCheck:
-    taskDescription: "Credit check for customer for car loans usually using equifax"
-    service: equifax_creditCheck

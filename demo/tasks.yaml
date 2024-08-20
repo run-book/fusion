@@ -23,27 +23,11 @@ where:
     - "task/<task>/<reqOrResp>"
 
 tasks:
-  aml:
-    taskDescription: "AML check for customer"
-    service: experian_aml
+  aml_evaluation:
+    taskDescription: "This task evaluates the AML data and decides if the customer is a good risk"
+    service: iorig-aml-service
     variables: [ 'userdata' ]
-    # will change to
-#    variables:
-#        input: [ 'userdata' ] - might by 'userdata' or ['userdata1', 'userdata2']. If first don't prefix with userdata in schema
-#        output:  'amlData'
-  creditCheck:
-    taskDescription: "Credit check for customer"
-    service: experian_creditCheck
+
+  affordability_evaluation:
+    taskDescription: "Also known as UC Kalp. How much money can the customer afford to borrow"
     variables: [ 'userdata' ]
-  signatureVerification:
-    taskDescription: "Signature verification for document signing"
-    service: internal_signatureVerification
-    variables: [ 'userdata' ]
-  pricing:
-    taskDescription: "Pricing service for product and service pricing adjustments"
-    service: internal_pricingService
-    variables: [ 'userdata' ]
-#  limitManagement:
-#    taskDescription: "Limit management service for transaction and account limits"
-#    service: internal_limitManagement
-#    variables: ['userdata']

@@ -15,7 +15,7 @@ export const callService = ( matchService: RegExp, fileOps: FileOps, urlStore: U
       return (match && isMethodMatch)===true;
     },
     apply: async ( ctx ) => {
-      const params = ctx.context.request.query || {};
+      // const params = ctx.context.request.query || {};
       const body = JSON.parse ( ctx.context.request.rawBody );
       console.log ( 'body', body )
       const configName = body.configName;

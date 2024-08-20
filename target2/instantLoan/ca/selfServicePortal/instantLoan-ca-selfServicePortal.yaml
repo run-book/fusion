@@ -1,0 +1,209 @@
+# {"product":"instantLoan","geo":"ca","channel":"selfServicePortal"}
+#
+# Files
+# {"trail":[],"file":"global.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"services.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"tasks.yaml","exists":true,"errors":[]}
+# {"trail":["global.yaml"],"file":"instantLoan.yaml","exists":true,"errors":[]}
+#
+# Files not found
+# {"trail":["global.yaml"],"file":"geo/ca/ca_overrides.yaml","exists":false,"errors":[]}
+# {"trail":["global.yaml"],"file":"geo/ca/instantLoan/ca_instantLoan.yaml","exists":false,"errors":[]}
+# {"trail":["global.yaml"],"file":"geo/ca/instantLoan/selfServicePortal/ca_instantLoan_selfServicePortal.yaml","exists":false,"errors":[]}
+#
+version:
+  1                                                                                   # Added by: global.yaml, services.yaml
+bpmn:
+  model:
+    instantLoan                                                                       # Added by: global.yaml, instantLoan.yaml
+plugins:
+  - addKafkaSchemasToServices                                                         # Added by: global.yaml
+  - addTaskDetails                                                                    # Added by: global.yaml
+  - addTransformersToTasks                                                            # Added by: global.yaml
+  - removeKey(services)                                                               # Added by: global.yaml
+  - removeKey(parameters)                                                             # Added by: global.yaml
+  - removeKey(hierarchy)                                                              # Added by: global.yaml
+  - removeKey(where)                                                                  # Added by: global.yaml
+  - removeKey(plugins)                                                                # Added by: global.yaml
+tasks:
+  aml:
+    taskDescription:
+      AML check for customer                                                          # Added by: tasks.yaml
+    service:
+      experian_aml                                                                    # Added by: tasks.yaml
+    variables:
+      - userdata                                                                      # Added by: tasks.yaml
+    serviceDescription:
+      AML service provided by Experian for real-time background checks.               # Added by: services.yaml
+    request:
+      topic:
+        experian.aml.request                                                          # Added by: services.yaml
+      kafka:
+        name:
+          itsm/org/schema/service/experian_aml/request                                # Added by: addRequestsAndResponsesToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addRequestsAndResponsesToServices
+      schema:
+        name:
+          itsm/org/schema/task/aml/request                                            # Added by: addTaskSchemasToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addTaskSchemasToServices
+      transformer:
+        name:
+          itsm/org/transformer/experian_aml/aml/aml__to_experian_aml                  # Added by: addTransformersToTasks(itsm/org/schema/task/aml/request ==> itsm/org/schema/service/experian_aml/request)
+        id:
+          itsmid/org/transformer/0abc45a984deadf1d26681fb76aab57d6f86ea94             # Added by: addTransformersToTasks(itsm/org/schema/task/aml/request ==> itsm/org/schema/service/experian_aml/request)
+    response:
+      topic:
+        experian.aml.response                                                         # Added by: services.yaml
+      kafka:
+        name:
+          itsm/org/schema/service/experian_aml/response                               # Added by: addRequestsAndResponsesToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addRequestsAndResponsesToServices
+      schema:
+        name:
+          itsm/org/schema/task/aml/response                                           # Added by: addTaskSchemasToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addTaskSchemasToServices
+      transformer:
+        name:
+          itsm/org/transformer/experian_aml/aml/aml__from_experian_aml                # Added by: addTransformersToTasks(itsm/org/schema/service/experian_aml/response ==> itsm/org/schema/task/aml/response )
+        id:
+          itsmid/org/transformer/0abc45a984deadf1d26681fb76aab57d6f86ea94             # Added by: addTransformersToTasks(itsm/org/schema/service/experian_aml/response ==> itsm/org/schema/task/aml/response )
+  creditCheck:
+    taskDescription:
+      Credit check for customer                                                       # Added by: tasks.yaml
+    service:
+      experian_creditCheck                                                            # Added by: tasks.yaml
+    variables:
+      - userdata                                                                      # Added by: tasks.yaml
+    serviceDescription:
+      Credit score checking service provided by Experian.                             # Added by: services.yaml
+    request:
+      topic:
+        experian.creditScore.request                                                  # Added by: services.yaml
+      kafka:
+        name:
+          itsm/org/schema/service/experian_creditCheck/request                        # Added by: addRequestsAndResponsesToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addRequestsAndResponsesToServices
+      schema:
+        name:
+          itsm/org/schema/task/creditCheck/request                                    # Added by: addTaskSchemasToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addTaskSchemasToServices
+      transformer:
+        name:
+          itsm/org/transformer/experian_creditCheck/creditCheck/creditcheck_to_experian # Added by: addTransformersToTasks(itsm/org/schema/task/creditCheck/request ==> itsm/org/schema/service/experian_creditCheck/request)
+        id:
+          itsmid/org/transformer/5c97717fd2b8a7e8df2b82d5e385cab2d5443a38             # Added by: addTransformersToTasks(itsm/org/schema/task/creditCheck/request ==> itsm/org/schema/service/experian_creditCheck/request)
+    response:
+      topic:
+        experian.creditScore.response                                                 # Added by: services.yaml
+      kafka:
+        name:
+          itsm/org/schema/service/experian_creditCheck/response                       # Added by: addRequestsAndResponsesToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addRequestsAndResponsesToServices
+      schema:
+        name:
+          itsm/org/schema/task/creditCheck/response                                   # Added by: addTaskSchemasToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addTaskSchemasToServices
+      transformer:
+        name:
+          itsm/org/transformer/experian_creditCheck/creditCheck/creditcheck_from_experian # Added by: addTransformersToTasks(itsm/org/schema/service/experian_creditCheck/response ==> itsm/org/schema/task/creditCheck/response )
+        id:
+          itsmid/org/transformer/5c97717fd2b8a7e8df2b82d5e385cab2d5443a38             # Added by: addTransformersToTasks(itsm/org/schema/service/experian_creditCheck/response ==> itsm/org/schema/task/creditCheck/response )
+  signatureVerification:
+    taskDescription:
+      Signature verification for document signing                                     # Added by: tasks.yaml
+    service:
+      internal_signatureVerification                                                  # Added by: tasks.yaml
+    variables:
+      - userdata                                                                      # Added by: tasks.yaml
+    serviceDescription:
+      Internal signature verification service for document signing.                   # Added by: services.yaml
+    request:
+      topic:
+        internal.signatureVerification.request                                        # Added by: services.yaml
+      kafka:
+        name:
+          itsm/org/schema/service/internal_signatureVerification/request              # Added by: addRequestsAndResponsesToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addRequestsAndResponsesToServices
+      schema:
+        name:
+          itsm/org/schema/task/signatureVerification/request                          # Added by: addTaskSchemasToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addTaskSchemasToServices
+      transformer:
+        name:
+          itsm/org/transformer/internal_signatureVerification/signatureVerification/signature_to_internal # Added by: addTransformersToTasks(itsm/org/schema/task/signatureVerification/request ==> itsm/org/schema/service/internal_signatureVerification/request)
+        id:
+          itsmid/org/transformer/5245110ec629c10d54102dd2753e1459d49c8730             # Added by: addTransformersToTasks(itsm/org/schema/task/signatureVerification/request ==> itsm/org/schema/service/internal_signatureVerification/request)
+    response:
+      topic:
+        internal.signatureVerification.response                                       # Added by: services.yaml
+      kafka:
+        name:
+          itsm/org/schema/service/internal_signatureVerification/response             # Added by: addRequestsAndResponsesToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addRequestsAndResponsesToServices
+      schema:
+        name:
+          itsm/org/schema/task/signatureVerification/response                         # Added by: addTaskSchemasToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addTaskSchemasToServices
+      transformer:
+        name:
+          itsm/org/transformer/internal_signatureVerification/signatureVerification/signature_from_internal # Added by: addTransformersToTasks(itsm/org/schema/service/internal_signatureVerification/response ==> itsm/org/schema/task/signatureVerification/response )
+        id:
+          itsmid/org/transformer/5245110ec629c10d54102dd2753e1459d49c8730             # Added by: addTransformersToTasks(itsm/org/schema/service/internal_signatureVerification/response ==> itsm/org/schema/task/signatureVerification/response )
+  pricing:
+    taskDescription:
+      Pricing service for product and service pricing adjustments                     # Added by: tasks.yaml
+    service:
+      internal_pricingService                                                         # Added by: tasks.yaml
+    variables:
+      - userdata                                                                      # Added by: tasks.yaml
+    serviceDescription:
+      Internal pricing service for product and service pricing adjustments.           # Added by: services.yaml
+    request:
+      topic:
+        internal.pricing.request                                                      # Added by: services.yaml
+      kafka:
+        name:
+          itsm/org/schema/service/internal_pricingService/request                     # Added by: addRequestsAndResponsesToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addRequestsAndResponsesToServices
+      schema:
+        name:
+          itsm/org/schema/task/pricing/request                                        # Added by: addTaskSchemasToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addTaskSchemasToServices
+      transformer:
+        name:
+          itsm/org/transformer/internal_pricingService/pricing/pricing_to_internal/pricing_to_internal # Added by: addTransformersToTasks(itsm/org/schema/task/pricing/request ==> itsm/org/schema/service/internal_pricingService/request)
+        id:
+          itsmid/org/transformer/2199c041baeb8fa8f4df428e106b37eb342fd573             # Added by: addTransformersToTasks(itsm/org/schema/task/pricing/request ==> itsm/org/schema/service/internal_pricingService/request)
+    response:
+      topic:
+        internal.pricing.response                                                     # Added by: services.yaml
+      kafka:
+        name:
+          itsm/org/schema/service/internal_pricingService/response                    # Added by: addRequestsAndResponsesToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addRequestsAndResponsesToServices
+      schema:
+        name:
+          itsm/org/schema/task/pricing/response                                       # Added by: addTaskSchemasToServices
+        id:
+          itsmid/org/schema/f32a5804e292d30bedf68f62d32fb75d87e99fd9                  # Added by: addTaskSchemasToServices
+      transformer:
+        name:
+          itsm/org/transformer/internal_pricingService/pricing/pricing_from_internal/pricing_from_internal # Added by: addTransformersToTasks(itsm/org/schema/service/internal_pricingService/response ==> itsm/org/schema/task/pricing/response )
+        id:
+          itsmid/org/transformer/2199c041baeb8fa8f4df428e106b37eb342fd573             # Added by: addTransformersToTasks(itsm/org/schema/service/internal_pricingService/response ==> itsm/org/schema/task/pricing/response )
+

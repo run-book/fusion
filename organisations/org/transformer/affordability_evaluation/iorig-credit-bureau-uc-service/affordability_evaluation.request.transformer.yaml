@@ -1,0 +1,6 @@
+version: 1
+type: 'jsonata'
+from: itsm/org/schema/task/affordability_evaluation/request
+to: itsm/org/schema/service/iorig-credit-bureau-uc-service/request
+jsonata: |
+  $

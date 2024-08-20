@@ -3,29 +3,15 @@ version: 1
 parameters:
   product:
     legal:
-      - instantLoan
-      - mortgage
-      - creditCard
-      - carLoan
+      - default
   geo:
     legal:
       - uk
-      - sw
-      - ca
+      - se
   channel:
     legal:
-      - customerPortal
-      - merchantPortal
-      - selfServicePortal
+      - default
 
-# result of demo1. Very few permutations. So should have option of being explicit
-#permutations:
-#  - geo: uk
-#    product: instantLoan
-#    channel: *
-#  - geo: sw
-#    product: ca
-#    channel: customerPortal
 
 
 plugins:
@@ -45,10 +31,11 @@ bpmn:
 hierarchy:
   "All the services we can use": "services.yaml"
   "All the tasks that are in Camunda": "tasks.yaml"
-  "Product Specific Configuration": "${product}.yaml"
   "Geo Specific Configuration": "geo/${geo}/${geo}_overrides.yaml"
-  "This Product in This Country": "geo/${geo}/${product}/${geo}_${product}.yaml"
-  "Channel Specific Configuration": "geo/${geo}/${product}/${channel}/${geo}_${product}_${channel}.yaml"
+
+#  "Product Specific Configuration": "${product}.yaml"
+#  "This Product in This Country": "geo/${geo}/${product}/${geo}_${product}.yaml"
+#  "Channel Specific Configuration": "geo/${geo}/${product}/${channel}/${geo}_${product}_${channel}.yaml"
 
 #Naming
 # Tasks are external tasks in Camunda

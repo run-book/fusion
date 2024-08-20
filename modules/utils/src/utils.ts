@@ -76,12 +76,3 @@ export function objectToQueryString ( params: NameAnd<any> ): string {
   } ).join ( '&' );
   return queryString;
 }
-
-export function simpleTemplate(template: string, data: NameAnd<any>): string {
-  return template.replace(/\{(\w+)\}/g, (match, key) => {
-    if (key in data) {
-      return String(data[key]);
-    }
-    return match; // Return the original match if no corresponding key is found
-  });
-}

@@ -1,0 +1,21 @@
+version: 1
+
+tasks:
+  affordability_evaluation:
+    taskDescription: "Also known as UC Kalp. How much money can the customer afford to borrow"
+    service: iorig-credit-bureau-uc-service
+    variables: [ 'userdata' ]
+
+services:
+  iorig-aml-service:
+    request:
+      topic: se.loan.origination.aml.status.req
+    response:
+      topic: se.loan.origination.aml.status.res
+
+
+
+#    request:
+#      topic: "iorig-credit-bureau-uc-service.request"
+#    response:
+#      topic: "iorig-credit-bureau-uc-service.response"
