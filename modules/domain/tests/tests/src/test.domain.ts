@@ -38,8 +38,8 @@ export type TestsResult = {
 export type NameAndSchema = { name: NamedUrl, schema: any }
 export type TransformerAndDesc = { name: NamedUrl, transformerDesc: string }
 
-export type NameAndValueAndSchemaResult = { name: NamedUrl, value: any, result: SchemaTestResult }
-export type ValueAndTransformerResult = { value: any, result: TransformerTestResult }
+export type NameAndValueAndSchemaResult = { name: NamedUrl, value: any, result: SchemaTestResult|undefined }
+export type ValueAndTransformerResult = { value: any, result: TransformerTestResult|undefined }
 
 export type RanTestResultName = keyof RanTestResult
 export type RanTestSchemaName = 'input' | 'expectedOutput'

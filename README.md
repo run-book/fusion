@@ -1,5 +1,9 @@
 This is a tool for managing hierarchical configuration files
 
+# Notes
+* In order to check the config `fusion config merge -f demo/global.yaml -p "geo=uk,product=default,channel=default"  -u organisations `
+
+
 # Hierarchical configuration
 Heavily inspired by Hiera, but with a few key differences:
 

@@ -1,0 +1,6 @@
+version: 1
+type: 'jsonata'
+from:  itsm/org/schema/task/AML_Evaluation/request
+to: itsm/org/schema/service/iorig-aml-service/request
+jsonata: |
+  $

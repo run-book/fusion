@@ -27,15 +27,11 @@ plugins:
 bpmn:
   model: camunda # We'd normally leave it blank, but this is for discussion and for the POC it's useful anyway
 
-
 hierarchy:
-  "All the services we can use": "services.yaml"
   "All the tasks that are in Camunda": "tasks.yaml"
+  "All the services we can use": "services.yaml"
   "Geo Specific Configuration": "geo/${geo}/${geo}_overrides.yaml"
 
-#  "Product Specific Configuration": "${product}.yaml"
-#  "This Product in This Country": "geo/${geo}/${product}/${geo}_${product}.yaml"
-#  "Channel Specific Configuration": "geo/${geo}/${product}/${channel}/${geo}_${product}_${channel}.yaml"
 
 #Naming
 # Tasks are external tasks in Camunda

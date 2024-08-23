@@ -8,11 +8,10 @@ version: 1
 #   the id is the precise current value of the schema (based on the git hash)
 
 where:
-   services: "service/<service>/<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
+  services: "service/<service>/<reqOrResp>" # This is the naming convention. So if look at the first entry in capabilities services.equifax_creditCheck.request or services.equifax_creditCheck.response
 
 services:
-
-  "iorig-credit-bureau-uc-service":
+  iorig-credit-bureau-uc-service:
     serviceDescription: "This interaction with UC, which provides credit history and affordability evaluations."
     request:
       topic: "iorig-credit-bureau-uc-service.request"
@@ -20,12 +19,30 @@ services:
       topic: "iorig-credit-bureau-uc-service.response"
 
   iorig-aml-service:
-    serviceDescription: "This is an internal service that evaluates the AML data and decides if the customer is a good risk"
-    request:
-      topic: "iorig-aml-service"
-    response:
-      topic: "iorig-aml-service"
+    serviceDescription: "This is the actual aml service that checks the customer"
 
+
+  iorig-fraud-service:
+    serviceDescription: "This is the actual fraud service that checks the customer"
+    request:
+      topic: "iorig-fraud-service.request"
+    response:
+      topic: "iorig-fraud-service.response"
+
+#      uk.ipay.origination.aml.status.req
+#      uk.ipay.origination.aml.status.res
+#      se.loan.origination.aml.status.req
+#      se.loan.origination.aml.status.res
+
+
+#
+#  iorig-aml-service:
+#    serviceDescription: "This is an internal service that evaluates the AML data and decides if the customer is a good risk"
+#    request:
+#      topic: "iorig-aml-service"
+#    response:
+#      topic: "iorig-aml-service"
+#
 
 #      uk.ipay.origination.aml.status.req
 #      uk.ipay.origination.aml.status.res

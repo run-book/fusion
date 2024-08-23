@@ -14,8 +14,10 @@ export function TaskOnHomePage ( { taskName, task }: TaskOnHomePageProps ) {
     <Typography>Name: {taskName}</Typography>
     <Typography>{task.taskDescription}</Typography>
     <hr/>
-    <Typography variant="subtitle1">Kafka Topic: {task.request.topic}</Typography>
     <Typography>{task.serviceDescription}</Typography>
+    <hr/>
+    <Typography variant="subtitle1"><b>Kafka Request Topic:</b> {task.request.topic}</Typography>
+    <Typography variant="subtitle1">Kafka Response Topic: {task.response.topic}</Typography>
   </>
 
 }

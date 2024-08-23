@@ -26,7 +26,7 @@ export async function loadSchemasAndTransformer ( engine: TestEngine, schemaName
 }
 
 
-export const loadTestValue = async <T> ( ln: UrlLoadNamedFn, n: NamedUrl | undefined ): Promise<ErrorsAnd<NamedLoadResult<T>>> =>
+export const loadTestValue = async <T> ( ln: UrlLoadNamedFn, n: NamedUrl | undefined ): Promise<undefined|ErrorsAnd<NamedLoadResult<T>>> =>
   n === undefined ? undefined : ln ( n );
 
 export async function loadTestValues ( engine: TestEngine, tx: TransformerFn, inpTestName: NamedUrl | undefined, outTestName: NamedUrl | undefined ): Promise<ErrorsAnd<TestInExpectedActualOut<any>>> {
@@ -45,7 +45,7 @@ export async function valuesToTestResults ( engine: TestEngine, schemas: TestInO
     actualOutput: values.actualOutput === undefined ? undefined : engine.testSchema ( schemas.output, values.actualOutput ),
     expectedOutput: values.expectedOutput === undefined ? undefined : engine.testSchema ( schemas.output, values.expectedOutput )
   }
-  const transformerResults: TransformerTestResult = (values.expectedOutput !== undefined && values.actualOutput !== undefined) ?
+  const transformerResults: TransformerTestResult|undefined = (values.expectedOutput !== undefined && values.actualOutput !== undefined) ?
     await engine.testTransformer ( values.expectedOutput, values.actualOutput ) :
     undefined
   return { schema: schemaResults, transformer: transformerResults }
@@ -59,8 +59,8 @@ async function runOneTest ( engine: TestEngine, schemasAndTx: SchemasAndTransfor
     async values => mapErrors ( await valuesToTestResults ( engine, schemasAndTx.schemas, values ),
       results => {
         let ran: RanTestResult = {
-          input: { name: inpTestName, value: values.input, result: results.schema.input },
-          expectedOutput: { name: outTestName, value: values.expectedOutput, result: results.schema.expectedOutput },
+          input: { name: inpTestName as NamedUrl,  value: values.input, result: results.schema.input },
+          expectedOutput: { name: outTestName as NamedUrl, value: values.expectedOutput, result: results.schema.expectedOutput },
           actualOutput: { value: values.actualOutput, result: results.transformer }
         };
         return ran

@@ -1,0 +1,6 @@
+version: 1
+type: 'jsonata'
+from:  itsm/org/schema/service/iorig-fraud-service/response
+to: itsm/org/schema/task/Fraud_Evaluation/response
+jsonata: |
+ $

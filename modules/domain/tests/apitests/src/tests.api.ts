@@ -6,10 +6,10 @@ import { KoaPartialFunction } from "@itsmworkbench/koa";
 export const matchTests = /\/tests$/;
 export const runTests = ( runTests: RunReqRespTests, debug?: boolean ): KoaPartialFunction => {
   return ({
-    isDefinedAt: ( ctx ) => {
+    isDefinedAt: ( ctx ):boolean => {
       const match = matchTests.exec ( ctx.context.request.path );
       const isMethodMatch = ctx.context.request.method === 'POST';
-      return match && isMethodMatch;
+      return !!(match && isMethodMatch);
     },
     apply: async ( ctx ) => {
       const body: RunReqRespTestsDefn = JSON.parse ( ctx.context.request.rawBody );

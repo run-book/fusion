@@ -1,13 +1,10 @@
 version: 1
 
-tasks:
-  affordability_evaluation:
-    taskDescription: "Different in the uk"
-    service: "iorig-credit-bureau-uc-service" # This is the wrong service
-#    request:
-#      topic: "iorig-credit-bureau-uc-service.request"
-#    response:
-#      topic: "iorig-credit-bureau-uc-service.response"
+tasks: {}
+#  affordability_evaluation:
+#    taskDescription: "Different in the uk"
+#    service: "iorig-credit-bureau-uc-service" # This is the wrong service
+
 
 services:
   iorig-aml-service:

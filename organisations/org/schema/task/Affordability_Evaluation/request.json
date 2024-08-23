@@ -1,10 +1,10 @@
 {
   "type": "object",
   "properties": {
-    "goodbye": {
+    "hello": {
       "type": "string"
     }
   },
-  "required": ["goodbye"],
+  "required": ["hello"],
   "additionalProperties": false
 }

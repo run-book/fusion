@@ -1,10 +1,10 @@
 version: 1
 
-tasks:
-  affordability_evaluation:
-    taskDescription: "Also known as UC Kalp. How much money can the customer afford to borrow"
-    service: iorig-credit-bureau-uc-service
-    variables: [ 'userdata' ]
+tasks: {}
+#  affordability_evaluation:
+#    taskDescription: "Also known as UC Kalp. How much money can the customer afford to borrow"
+#    service: iorig-credit-bureau-uc-service
+#    variables: [ 'userdata' ]
 
 services:
   iorig-aml-service:

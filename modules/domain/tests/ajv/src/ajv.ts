@@ -1,10 +1,11 @@
 import Ajv from "ajv"
-import { TestSchemaFn } from "@fusionconfig/tests";
+import { SchemaTestError, TestSchemaFn } from "@fusionconfig/tests";
+import { toArray } from "@laoban/utils";
 
 const ajv = new Ajv ( { allErrors: true } )
 export const ajvTest: TestSchemaFn = ( schema: any, data: any ) => {
   const validate = ajv.compile ( schema )
   const valid = validate ( data )
-  return valid ? [] : validate.errors.map ( e =>
-    ({ path: e.instancePath, message: e.message }) )
+  return valid ? [] : toArray(validate.errors).map ( e =>
+    ({ path: e?.instancePath, message: e?.message }) as SchemaTestError)
 }

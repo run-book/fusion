@@ -17,17 +17,40 @@
 # Consider tweaking this... the ${} and the <> is a little ugly. I am not sure if we want the two levels...
 where:
   tasks:
-    - "task/<task>/${geo}/${product}/${channel}/<reqOrResp>"
-    - "task/<task>/${product}/${geo}/<reqOrResp>"
-    - "task/<task>/${product}/<reqOrResp>"
+    #    - "task/<task>/${geo}/${product}/${channel}/<reqOrResp>"
+    #    - "task/<task>/${product}/${geo}/<reqOrResp>"
+    #    - "task/<task>/${product}/<reqOrResp>"
     - "task/<task>/<reqOrResp>"
 
 tasks:
-  aml_evaluation:
-    taskDescription: "This task evaluates the AML data and decides if the customer is a good risk"
-    service: iorig-aml-service
+  Affordability_Evaluation:
+    taskDescription: "How much money can the customer afford to borrow"
+    service: "iorig-credit-bureau-uc-service"
     variables: [ 'userdata' ]
 
-  affordability_evaluation:
-    taskDescription: "Also known as UC Kalp. How much money can the customer afford to borrow"
+  AML_Evaluation:
+    taskDescription: "This task evaluates the AML data and decides if the customer is a good risk"
+    service: "iorig-aml-service"
     variables: [ 'userdata' ]
+
+  Fraud_Evaluation:
+    taskDescription: "This task evaluates the fraud data and decides if the customer is a good risk"
+    service: "iorig-fraud-service"
+    variables: [ 'userdata' ]
+
+
+
+
+
+
+
+
+
+#  aml_evaluation:
+#    taskDescription: "This task evaluates the AML data and decides if the customer is a good risk"
+#    service: iorig-aml-service
+#    variables: [ 'userdata' ]
+#
+#  affordability_evaluation:
+#    taskDescription: "Also known as UC Kalp. How much money can the customer afford to borrow"
+#    variables: [ 'userdata' ]
