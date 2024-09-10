@@ -4,7 +4,7 @@
   "description": "Fairly generic react components for use in fusion projects",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils": "1.4.51"
+      "@laoban/utils":"${properties.laobanVersion}"
     },
     "devDependencies": {},
     "bin":             {

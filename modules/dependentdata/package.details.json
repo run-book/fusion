@@ -5,9 +5,9 @@
   "packageJson": {
     "dependencies":    {
       "node":                 "^v14.4.0",
-      "@laoban/utils":        "1.4.51",
+      "@laoban/utils":       "${properties.laobanVersion}",
       "@focuson/lens":        "1.44.3",
-      "@itsmworkbench/utils": "0.0.30"
+      "@itsmworkbench/utils": "${properties.itsmVersion}"
     },
     "devDependencies": {},
     "browser":         {

@@ -17,13 +17,13 @@
     ]
   },
   "dependencies": {
-    "@laoban/utils": "1.4.51",
-    "@laoban/fileops": "1.4.51",
-    "@itsmworkbench/urlstore": "0.0.30",
+    "@laoban/utils": "1.4.45",
+    "@laoban/fileops": "1.4.45",
+    "@itsmworkbench/urlstore": "0.3.12",
     "debug": "^4.3.4"
   },
   "devDependencies": {
-    "@itsmworkbench/jsyaml": "0.0.30",
+    "@itsmworkbench/jsyaml": "0.3.12",
     "typescript": "^5.2.2",
     "@testing-library/jest-dom": "^6.1.4",
     "@types/jest": "^29.0.0",

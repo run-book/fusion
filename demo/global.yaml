@@ -1,17 +1,11 @@
 version: 1
 
 parameters:
-  product:
-    legal:
-      - default
   geo:
     legal:
       - uk
       - se
-  channel:
-    legal:
-      - default
-
+      - de
 
 
 plugins:
@@ -24,13 +18,12 @@ plugins:
   - removeKey(where)
   - removeKey(plugins)
 
-bpmn:
-  model: camunda # We'd normally leave it blank, but this is for discussion and for the POC it's useful anyway
 
 hierarchy:
   "All the tasks that are in Camunda": "tasks.yaml"
   "All the services we can use": "services.yaml"
   "Geo Specific Configuration": "geo/${geo}/${geo}_overrides.yaml"
+  "Camunda details": "camunda.yaml"
 
 
 #Naming

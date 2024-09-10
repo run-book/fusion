@@ -17,16 +17,14 @@
 # Consider tweaking this... the ${} and the <> is a little ugly. I am not sure if we want the two levels...
 where:
   tasks:
-    #    - "task/<task>/${geo}/${product}/${channel}/<reqOrResp>"
-    #    - "task/<task>/${product}/${geo}/<reqOrResp>"
-    #    - "task/<task>/${product}/<reqOrResp>"
     - "task/<task>/<reqOrResp>"
 
 tasks:
   Affordability_Evaluation:
-    taskDescription: "How much money can the customer afford to borrow"
+    taskDescription: "How much more money can the customer afford to borrow"
     service: "iorig-credit-bureau-uc-service"
     variables: [ 'userdata' ]
+
 
   AML_Evaluation:
     taskDescription: "This task evaluates the AML data and decides if the customer is a good risk"

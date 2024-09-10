@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="active" type="NodeJSConfigurationType" application-parameters=" camunda active -f demo/global.yaml -p &quot;geo=uk&quot;  " node-parameters="-r ts-node/register" path-to-js-file="modules/fusionconfig/index.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

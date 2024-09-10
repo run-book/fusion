@@ -165,8 +165,6 @@ function App ( { state }: LensProps<FusionWorkbenchState, FusionWorkbenchState, 
           Nav={<FusionNav state={state}/>}
           Details={<FusionDetails state={state}/>}>
           <Route path='/'><HomePage state={state}/></Route>
-          <Route path='/booking'><RoomBooking/></Route>
-          <Route path='/booking2'><BookingGrid2/></Route>
           {/*<Route path='/booking3'><BookingGrid3/></Route>*/}
           <Route path='/folders'><DebugFolders state={state.focusOn ( 'folders' )}/></Route>
           <RouteVars path='/task/{task}/{action}'>{

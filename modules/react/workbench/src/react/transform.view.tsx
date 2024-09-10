@@ -13,24 +13,25 @@ export type TransformViewLayoutProps = {
   errors: React.ReactElement
 }
 export function TransformViewLayout ( { samples, input, transformer,expectedOutput, actualOutput, errors }: TransformViewLayoutProps ) {
+  const maxHeight='200px'
   return <Grid container spacing={2}>
-    <Grid item xs={12} sm={12} md={4}>
-      <CardWithTitleAndBody title={`Input`} comp={input}/>
+    <Grid item xs={12} sm={6} md={6}>
+      <CardWithTitleAndBody title={`Transformer`} maxHeight={maxHeight} comp={transformer}/>
+    </Grid>
+    <Grid item xs={12} sm={6} md={6}>
+      <CardWithTitleAndBody title={`Actual Output`}  maxHeight={maxHeight} comp={actualOutput}/>
     </Grid>
     <Grid item xs={12} sm={12} md={4}>
-      <CardWithTitleAndBody title={`Samples`} comp={samples}/>
+      <CardWithTitleAndBody title={`Input`} maxHeight={maxHeight}  comp={input}/>
+    </Grid>
+    <Grid item xs={12} sm={12} md={4}>
+      <CardWithTitleAndBody title={`Samples`}  maxHeight={maxHeight} comp={samples}/>
     </Grid>
     <Grid item xs={12} sm={6} md={4}>
-      <CardWithTitleAndBody title={`Expected Output`} comp={expectedOutput}/>
-    </Grid>
-    <Grid item xs={12} sm={6} md={6}>
-      <CardWithTitleAndBody title={`Transformer`} comp={transformer}/>
-    </Grid>
-    <Grid item xs={12} sm={6} md={6}>
-      <CardWithTitleAndBody title={`Actual Output`} comp={actualOutput}/>
+      <CardWithTitleAndBody title={`Expected Output`}  maxHeight={maxHeight} comp={expectedOutput}/>
     </Grid>
     <Grid item xs={12} sm={12} md={12}>
-      <CardWithTitleAndBody title={`Errors`} comp={errors}/>
+      <CardWithTitleAndBody title={`Errors`} maxHeight={maxHeight}  comp={errors}/>
     </Grid>
   </Grid>
 }

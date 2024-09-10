@@ -4,12 +4,12 @@
   "description": "How we process tasks in the config",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":           "1.4.51",
-      "@laoban/fileops":         "1.4.51",
-      "@itsmworkbench/urlstore": "0.0.30"
+      "@laoban/utils":          "${properties.laobanVersion}",
+      "@laoban/fileops":        "${properties.laobanVersion}",
+      "@itsmworkbench/urlstore": "${properties.itsmVersion}"
     },
     "devDependencies": {
-      "@itsmworkbench/jsyaml": "0.0.30"
+      "@itsmworkbench/jsyaml": "${properties.itsmVersion}"
     }
   },
   "links":       [

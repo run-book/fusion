@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "node": "^v14.4.0",
-    "@laoban/utils": "1.4.51",
+    "@laoban/utils": "1.4.45",
     "@focuson/lens": "1.44.3",
-    "@itsmworkbench/utils": "0.0.30",
+    "@itsmworkbench/utils": "0.3.12",
     "debug": "^4.3.4"
   },
   "devDependencies": {

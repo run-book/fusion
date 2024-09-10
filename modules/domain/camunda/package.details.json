@@ -1,0 +1,24 @@
+{
+  "template":    "typescript",
+  "name":        "@fusionconfig/camunda",
+  "description": "Interaction with the camunda rest api",
+  "packageJson": {
+    "dependencies":    {
+      "@laoban/utils":   "${properties.laobanVersion}",
+      "@laoban/fileops": "${properties.laobanVersion}",
+      "@itsmworkbench/indexconfig": "${properties.itsmVersion}",
+      "@itsmworkbench/indexing": "${properties.itsmVersion}",
+      "@itsmworkbench/utils": "${properties.itsmVersion}"
+    },
+    "devDependencies": {
+    }
+  },
+  "links":       [
+    "@fusionconfig/auth"
+  ],
+  "guards":      {
+    "compile": true,
+    "publish": true,
+    "test":    true
+  }
+}

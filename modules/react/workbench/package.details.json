@@ -4,9 +4,9 @@
   "description": "Fusion Workbench. Gui for working with transformations and schemas",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":                  "1.4.51",
-      "@itsmworkbench/browserurlstore": "0.0.30",
-      "@itsmworkbench/events":          "0.0.30"
+      "@laoban/utils":                 "${properties.laobanVersion}",
+      "@itsmworkbench/browserurlstore": "${properties.itsmVersion}",
+      "@itsmworkbench/events":          "${properties.itsmVersion}"
     },
     "devDependencies": {},
     "bin":             {

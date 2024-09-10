@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="tasks with id" type="NodeJSConfigurationType" application-parameters="camunda tasks creditCard:3:cf9f022d-f21a-11ee-bb7c-3800253060fc -f demo/global.yaml -p &quot;geo=uk&quot;" node-parameters="-r ts-node/register" path-to-js-file="modules/fusionconfig/index.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

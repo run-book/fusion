@@ -5,6 +5,7 @@ import { CardProps } from "@mui/material/Card/Card";
 export interface ResponseCardData {
   title: string;
   comp: React.ReactNode;  // This allows any React component to be passed
+  maxHeight?: string // we will do a vertical scroll if maxHeight is set
 }
 
 interface CardBodyProps {
@@ -13,7 +14,7 @@ interface CardBodyProps {
 }
 
 export const CardBody: React.FC<CardBodyProps> = ( { title, comp } ) => (
-  <>{title?.length>0 &&<Typography variant="h5" component="div" gutterBottom>{title}</Typography>}{comp}</>
+  <>{title?.length > 0 && <Typography variant="h5" component="div" gutterBottom>{title}</Typography>}{comp}</>
 );
 
 
@@ -26,12 +27,20 @@ export type CardWithTitleAndBodyProps = {
   card: ResponseCardData
 
 }
-export function CardWithTitleAndBody ( {title,comp,...cardProps}: ResponseCardData & CardProps ) {
-  return <Card raised sx={{ height: '100%' }} {...cardProps}>
-    <CardContent sx={{ height: '100%' }}>
-      <CardBody title={title} comp={comp}/>
-    </CardContent>
-  </Card>
+export function CardWithTitleAndBody({ title, comp, maxHeight, ...cardProps }: ResponseCardData & CardProps) {
+  return (
+    <Card raised sx={{ height: '100%' }} {...cardProps}>
+      <CardContent
+        sx={{
+          height: '100%',
+          maxHeight: maxHeight || 'auto',
+          overflowY: maxHeight === undefined ?  'visible':'auto',
+        }}
+      >
+        <CardBody title={title} comp={comp} />
+      </CardContent>
+    </Card>
+  );
 }
 export const ResponseTwoColumnCards: React.FC<ResponseTwoColumnCardsProps> = ( { cards, singleColumn } ) => {
   const columnSize = singleColumn ? 12 : 6; // Default to 2 columns unless forced to 1

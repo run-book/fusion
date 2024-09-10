@@ -7,9 +7,9 @@
       "jsonata":                   "^v2.0.4",
       "@mui/x-tree-view":          "^7.1.1",
       "@react-spring/web":         "^9.7.3",
-      "@laoban/utils":             "1.4.51",
-      "@itsmworkbench/jsyaml":     "0.0.30",
-      "@itsmworkbench/eventstore": "0.0.30",
+      "@laoban/utils":            "${properties.laobanVersion}",
+      "@itsmworkbench/jsyaml":     "${properties.itsmVersion}",
+      "@itsmworkbench/eventstore": "${properties.itsmVersion}",
       "@monaco-editor/react":      "^4.6.0"
     },
     "devDependencies": {},

@@ -7,15 +7,17 @@ import { defaultCommentOffset, findPartInMerged, loadAndMergeAndYamlParts } from
 import { parseParams, permutate } from "@fusionconfig/utils";
 
 
-function fromOpts ( opts: NameAnd<string | boolean> ) {
+export function fromOpts ( opts: NameAnd<string |string[]| boolean> ) {
   const params = parseParams ( opts.params )
+  const full = opts.full === true
   const file = opts.file as string
   const parent = path.dirname ( file )
   const commentOffset = parseInt ( opts.commentOffset as string )
   const raw = opts.raw === true
   const urlStore = opts.urlStore as string
   const cache = opts.cache === true
-  return { params, file: path.basename ( file ), parent, commentOffset, raw, urlStore, cache };
+  const debug = opts.debug === true
+  return { params, file: path.basename ( file ), parent, commentOffset, raw, urlStore, cache, full ,debug};
 }
 export function viewConfigCommand<Commander, Config, CleanConfig> ( tc: ContextConfigAndCommander<Commander, any, Config, CleanConfig> ): CommandDetails<Commander> {
   return {
@@ -256,7 +258,7 @@ export function addPropertyCommand<Commander, Config, CleanConfig> ( tc: Context
       if ( opts.full === true ) {
         console.log ( JSON.stringify ( property === '.' ? sorted : findPartInMerged ( sorted, property ), null, 2 ) )
       } else {
-        const simplified = tc.context.yaml.parser ( yaml || ''  )
+        const simplified = tc.context.yaml.parser ( yaml || '' )
         let result = property == '.' ? simplified : findPart ( simplified, property );
         if ( opts.keys ) {
           if ( typeof result === 'object' )

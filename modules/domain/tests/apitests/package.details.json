@@ -4,8 +4,8 @@
   "description": "the koa code fortests",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils":      "1.4.51",
-      "@itsmworkbench/koa": "0.0.30"
+      "@laoban/utils":     "${properties.laobanVersion}",
+      "@itsmworkbench/koa": "${properties.itsmVersion}"
     },
     "devDependencies": {
     }

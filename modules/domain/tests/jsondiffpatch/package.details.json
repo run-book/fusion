@@ -4,7 +4,7 @@
   "description": "using json diff patch to compare json objects",
   "packageJson": {
     "dependencies":    {
-      "@laoban/utils": "1.4.51",
+      "@laoban/utils":"${properties.laobanVersion}",
       "jsondiffpatch": "^0.4.1"
     },
     "devDependencies": {

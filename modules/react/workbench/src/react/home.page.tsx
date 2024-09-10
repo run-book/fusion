@@ -34,12 +34,10 @@ export type HomePageLayoutProps = {
 export function HomePageLayout ( { tasks, description, foundLines, notFoundLines }: HomePageLayoutProps ) {
   return <Stack spacing={2}>
     {tasks}
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={12} md={12}>
-        {description}
-      </Grid>
-    </Grid>
-    <Grid container spacing={2}>
+    <div style={{ paddingLeft: '16px'}}>
+      {description}
+    </div>
+    <Grid container spacing={2} style={{paddingRight: '16px'}}>
       <Grid item xs={12} sm={6} md={6}>
         {foundLines}
       </Grid>
@@ -61,12 +59,14 @@ export function HomePage<S> ( { state }: LensProps<S, FusionWorkbenchState, any>
                                      items={items}
                                      children={( name, task: Task ) => <TaskOnHomeCardPage taskName={name} task={task}/>}/>}
     description={
-      <CardWithTitleAndBody title='What you can see' sx={{ height: undefined }} comp={<MultiParagraphText i18nKey={[ "fusion.home.description" ]}/>}/>
-    } foundLines={
-    <CardWithTitleAndBody title='Files used to define the config' comp={
-      <>{foundLines.map ( ( l, i ) => <Typography style={{ wordWrap: 'break-word' }} key={i}>{l}</Typography> )}</>}/>
-  } notFoundLines={
-    <CardWithTitleAndBody title={`Files that could be used to define the config, but don't exist`} comp={
-      <>{notFoundLines.map ( ( l, i ) => <Typography style={{ wordWrap: 'break-word' }} key={i}>{l}</Typography> )}</>}/>
-  }/>
+      <CardWithTitleAndBody title='What you can see' comp={<MultiParagraphText i18nKey={[ "fusion.home.description" ]}/>}/>
+    }
+    foundLines={
+      <CardWithTitleAndBody title='Files used to define the config' comp={
+        <>{foundLines.map ( ( l, i ) => <Typography style={{ wordWrap: 'break-word' }} key={i}>{l}</Typography> )}</>}/>
+    }
+    notFoundLines={
+      <CardWithTitleAndBody title={`Files that could be used to define the config, but don't exist`} comp={
+        <>{notFoundLines.map ( ( l, i ) => <Typography style={{ wordWrap: 'break-word' }} key={i}>{l}</Typography> )}</>}/>
+    }/>
 }

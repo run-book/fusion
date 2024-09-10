@@ -1,0 +1,10 @@
+bpmn:
+  model: camunda # We'd normally leave it blank, but this is for discussion and for the POC it's useful anyway
+
+camunda:
+   baseurl: "http://localhost:8082/engine-rest"
+   auth:
+     method: Basic
+     credentials:
+       username: demo
+       password: CAMUNDA_PASSWORD # environment variable

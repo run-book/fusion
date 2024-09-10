@@ -4,13 +4,14 @@
   "description": "Like heira but for whole files",
   "packageJson": {
     "dependencies":    {
-      "@itsmworkbench/cli":          "0.0.30",
-      "@itsmworkbench/commander12":  "0.0.30",
-      "@itsmworkbench/jsyaml":       "0.0.30",
-      "@itsmworkbench/nodeurlstore": "0.0.30",
-      "@laoban/filesops-node":       "1.4.51",
-      "@laoban/variables":           "1.4.51",
-      "@laoban/utils":               "1.4.51"
+      "@itsmworkbench/cli":          "${properties.itsmVersion}",
+      "@itsmworkbench/commander12":  "${properties.itsmVersion}",
+      "@itsmworkbench/jsyaml":       "${properties.itsmVersion}",
+      "@itsmworkbench/nodeurlstore": "${properties.itsmVersion}",
+      "@itsmworkbench/indexing":     "${properties.itsmVersion}",
+      "@laoban/filesops-node":       "${properties.laobanVersion}",
+      "@laoban/variables":           "${properties.laobanVersion}",
+      "@laoban/utils":               "${properties.laobanVersion}"
     },
     "devDependencies": {},
     "bin":             {
@@ -25,6 +26,7 @@
     "@fusionconfig/ajv",
     "@fusionconfig/api",
     "@fusionconfig/apitests",
+    "@fusionconfig/auth",
     "@fusionconfig/config",
     "@fusionconfig/clitests",
     "@fusionconfig/fileopsconfig",

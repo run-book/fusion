@@ -1,0 +1,23 @@
+{
+  "template":    "typescript",
+  "name":        "@fusionconfig/auth",
+  "description": "Different types of authentication",
+  "packageJson": {
+    "dependencies":    {
+      "@laoban/utils":   "${properties.laobanVersion}",
+      "@laoban/fileops": "${properties.laobanVersion}",
+      "@itsmworkbench/indexconfig": "${properties.itsmVersion}",
+      "@itsmworkbench/indexing": "${properties.itsmVersion}",
+      "@itsmworkbench/utils": "${properties.itsmVersion}"
+    },
+    "devDependencies": {
+    }
+  },
+  "links":       [
+  ],
+  "guards":      {
+    "compile": true,
+    "publish": true,
+    "test":    true
+  }
+}

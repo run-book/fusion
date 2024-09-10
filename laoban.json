@@ -10,7 +10,8 @@
   "properties":     {
     "license":       "MIT",
     "repository":    "git@github.com:intellimaintain/intellimaintain.git",
-    "laobanVersion": "1.4.40"
+    "laobanVersion": "1.4.45",
+    "itsmVersion":   "0.3.12"
   },
   "templates":      {
     "typescript":    "templates/typescript",
@@ -21,11 +22,11 @@
     "NPM_TOKEN": ""
   },
   "scripts":        {
-    "compile":    {
-      "description": "Compiles the projects",
+    "compile":  {
+      "description":  "Compiles the projects",
       "inLinksOrder": true,
-      "guard":       {"value": "${packageDetails.guards.compile}", "default": true},
-      "commands":    [{"name": "compile", "command": "tsc  --outDir dist", "status": true}]
+      "guard":        {"value": "${packageDetails.guards.compile}", "default": true},
+      "commands":     [{"name": "compile", "command": "tsc  --outDir dist", "status": true}]
     },
     "ls-react": {
       "description": "Lists all the react projects",

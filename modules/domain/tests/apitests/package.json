@@ -17,8 +17,8 @@
     ]
   },
   "dependencies": {
-    "@laoban/utils": "1.4.51",
-    "@itsmworkbench/koa": "0.0.30",
+    "@laoban/utils": "1.4.45",
+    "@itsmworkbench/koa": "0.3.12",
     "@fusionconfig/tests": "0.0.9",
     "debug": "^4.3.4"
   },
