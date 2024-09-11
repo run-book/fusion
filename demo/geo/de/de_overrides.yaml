@@ -9,9 +9,9 @@ tasks: {}
 services:
   iorig-aml-service:
     request:
-      topic: se.loan.origination.aml.status.req
+      topic: de.loan.origination.aml.status.req
     response:
-      topic: se.loan.origination.aml.status.res
+      topic: de.loan.origination.aml.status.res
 
 
 

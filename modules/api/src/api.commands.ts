@@ -10,6 +10,7 @@ import { ajvTest } from "@fusionconfig/ajv/src/ajv";
 import { jsonataTransformer } from "@fusionconfig/jsonata";
 import { jsonDiffPatchFn } from "@fusionconfig/jsondiffpatch";
 import { runReqRespTestsUsingEngine } from "@fusionconfig/tests/src/test.engine";
+import path from "path";
 
 
 export type  ApiCommandContext = HasCurrentDirectory & {
@@ -26,6 +27,7 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
     description: 'Runs the api that supports the Wizard Of Oz',
     options: {
       '-d, --directory <directory>': { description: 'The directory that files are served from (config)', default: context.currentDirectory },
+      '--configRoot <configRoot>': { description: 'The directory that compiled config files are served from', default: path.join ( context.currentDirectory, 'target' ) },
       '-u, --urlStore <urlDirectory>': { description: 'The directory that urlstore files are served from (schemas and transformers)', default: context.currentDirectory },
       '-p, --port <port>': { description: 'Port to run the server on', default: "1235" },
       '--c, --comment-offset <commentOffset>': { description: 'The offset for the comments. How far to the right are the comments', default: defaultCommentOffset },
@@ -63,7 +65,9 @@ export function apiCommand<Commander, Context extends ApiCommandContext, Config>
           context.yaml,
           context.commentFactoryFn ( commentOffset ),
           rt,
-          directory.toString (), debugBoolean, ) )
+          directory.toString (),
+          opts.configRoot.toString (),
+          debugBoolean, ) )
     }
   })
 

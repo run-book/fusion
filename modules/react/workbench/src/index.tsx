@@ -86,7 +86,7 @@ const rawConfig = depDataK ( 'rawConfig', rawConfigL,
   async ( _, ps: NameAnd<string> ): Promise<string> => {
     const params = objectToQueryString ( ps )
     const paramString = params ? `?${params}` : ''
-    const response = await fetch ( `${rootUrl}/fusion/global.yaml${paramString}`, {} );
+    const response = await fetch ( `${rootUrl}fusion/global.yaml${paramString}`, {} );
     if ( response.status >= 400 ) throw new Error ( `Failed to load parameters\n${response.statusText}` )
     return await response.text ()
   }, paramsD, {} )

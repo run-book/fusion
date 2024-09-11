@@ -11,6 +11,7 @@ import { getFolders } from "@itsmworkbench/apiurlstore/dist/src/api.for.url.stor
 import { YamlCapability } from "@itsmworkbench/yaml";
 import { runTests } from "@fusionconfig/apitests/src/tests.api";
 import { RunReqRespTests } from "@fusionconfig/tests";
+import { getConfig } from "./api.for.config";
 
 
 export const fusionHandlers = (
@@ -23,13 +24,16 @@ export const fusionHandlers = (
   commentFn: CommentFunction,
   rt: RunReqRespTests,
   parent: string,
+  configParent: string,
   debug: boolean | undefined,
   ...handlers: KoaPartialFunction[] ): ( from: ContextAndStats ) => Promise<void> =>
   chainOfResponsibility ( defaultShowsError, //called if no matches
+    getConfig (  configParent, debug ),
     getAxes ( fileOps, yaml, configFileName ),
     getFolders ( urlStore.folders ),
     listUrls ( urlStore.list ),
     getUrls ( urlStore ),
+
     getFusion ( matchRawFusion, loadFile, [], commentFn, parent, debug ),
     getFusion ( matchFusion, loadFile, postProcessors, commentFn, parent, debug ),
     callService ( matchService, fileOps, urlStore, debug ),
